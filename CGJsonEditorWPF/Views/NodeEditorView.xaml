@@ -1,0 +1,297 @@
+﻿<UserControl x:Class="CG.Test.Editor.Views.NodeEditorView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:CG.Test.Editor.Views" 
+             xmlns:viewmodels="clr-namespace:CG.Test.Editor.ViewModels" 
+             xmlns:system="clr-namespace:System;assembly=netstandard" 
+             xmlns:editor="clr-namespace:CG.Test.Editor"
+             xmlns:modelsnodes="clr-namespace:CG.Test.Editor.Models.Nodes"
+             mc:Ignorable="d" VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
+    <UserControl.DataContext>
+        <viewmodels:NodeEditorViewModel/>
+    </UserControl.DataContext>
+    <UserControl.Resources>
+        <editor:HasMoreItemsConverter x:Key="_hasMoreItemsConverter"/>
+        <editor:IndexSmallerMultiConverter x:Key="_indexLessConverter"/>
+        <editor:IsNullConverter x:Key="IsNullConverter"/>
+    </UserControl.Resources>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <ToolBar>
+            <Button Margin="8, 8, 0, 8" FontSize="20" FontFamily="{StaticResource SymbolFont}" Content="&#xE72B;" Command="{Binding GoBackCommand}">
+                <Button.IsEnabled>
+                    <Binding Path="PageHistoryIndex" Converter="{StaticResource _hasMoreItemsConverter}">
+                        <Binding.ConverterParameter>
+                            <system:Int32>1</system:Int32>
+                        </Binding.ConverterParameter>
+                    </Binding>
+                </Button.IsEnabled>
+            </Button>
+
+            <!--<Button Margin="8, 8, 0, 8" FontSize="20" FontFamily="{StaticResource SymbolFont}" Content="&#xE72A;" Command="{Binding GoForwardCommand}">
+                <Button.IsEnabled>
+                    <MultiBinding Converter="{StaticResource _indexLessConverter}">
+                        <MultiBinding.Bindings>
+                            <Binding Path="PageHistory"/>
+                            <Binding Path="PageHistoryIndex"/>
+                        </MultiBinding.Bindings>
+                        <MultiBinding.ConverterParameter>
+                            <system:Int32>0</system:Int32>
+                        </MultiBinding.ConverterParameter>
+                    </MultiBinding>
+                </Button.IsEnabled>
+            </Button>-->
+
+            <Separator Margin="4, 4, 0, 4"/>
+
+            <Button Margin="8, 8, 8, 8" FontSize="20" FontFamily="{StaticResource SymbolFont}" Content="&#xE74A;" Command="{Binding GoUpCommand}">
+                <Button.IsEnabled>
+                    <Binding Path="NavigationItems.Count" Converter="{StaticResource _hasMoreItemsConverter}">
+                        <Binding.ConverterParameter>
+                            <system:Int32>1</system:Int32>
+                        </Binding.ConverterParameter>
+                    </Binding>
+                </Button.IsEnabled>
+            </Button>
+
+            <Button FontFamily="{StaticResource SymbolFont}" 
+                    FontSize="20"
+                    Content="&#xE90F;" 
+                    Command="{Binding OpenMultipleOperationDialogCommand}">
+                <Button.IsEnabled>
+                    <Binding Path="SelectedNode.Node.Type" Converter="{StaticResource IsNullConverter}">
+                        <Binding.ConverterParameter>
+                            <system:Boolean>False</system:Boolean>
+                        </Binding.ConverterParameter>
+                    </Binding>
+                </Button.IsEnabled>
+            </Button>
+
+            <!--<ListBox ItemsSource="{Binding AddressItems}" BorderBrush="Transparent" Background="Transparent">
+                <ListBox.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <StackPanel Orientation="Horizontal"/>
+                    </ItemsPanelTemplate>
+                </ListBox.ItemsPanel>
+                <ListBox.Resources>
+                    <Style TargetType="{x:Type ListBoxItem}">
+                        <Setter Property="Template">
+                            <Setter.Value>
+                                <ControlTemplate TargetType="{x:Type ListBoxItem}">
+                                    <ContentPresenter Margin="5, 5, 0, 5"/>
+                                </ControlTemplate>
+                            </Setter.Value>
+                        </Setter>
+                    </Style>
+
+                    --><!--<DataTemplate DataType="{x:Type modelsnodes:EditorNode}">
+                        <Button Content="{Binding}" FontFamily="{StaticResource SymbolFont}" CommandParameter="{Binding}" Command="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type UserControl}}, Path=DataContext.GoToFolderCommand}"/>
+                    </DataTemplate>--><!--
+                </ListBox.Resources>
+                <ListBox.ItemTemplate>
+                    <DataTemplate DataType="{x:Type viewmodels:EditorNamedNode}">
+                        <Button Content="{Binding Name}" CommandParameter="{Binding}" Command="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type UserControl}}, Path=DataContext.GoToNodeCommand}"/>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>-->
+        </ToolBar>
+
+        <ContentControl x:Name="_pageDisplayer" Grid.Row="1" Content="{Binding SelectedNode}">
+            <ContentControl.Resources>
+                <DataTemplate DataType="{x:Type viewmodels:ArrayNodeViewModel}">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="auto"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+
+                        <ToolBar Grid.Row="0">
+                            <Button FontFamily="{StaticResource SymbolFont}" FontSize="20" Content="&#xE710;" IsEnabled="True" 
+                                    Command="{Binding AddElementCommand}" 
+                                    CommandParameter="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}}"/>
+
+                            <Button FontFamily="{StaticResource SymbolFont}" FontSize="20" Content="&#xE8C6;" CommandParameter="{Binding ElementName=_listView, Path=SelectedItems}" Command="{Binding CutElementsCommand}">
+                                <Button.IsEnabled>
+                                    <Binding ElementName="_listView" Path="SelectedItems.Count" Converter="{StaticResource HasAnyItemsConverter}">
+                                        <Binding.ConverterParameter>
+                                            <system:Boolean>False</system:Boolean>
+                                        </Binding.ConverterParameter>
+                                    </Binding>
+                                </Button.IsEnabled>
+                            </Button>
+
+                            <Button x:Name="_copyButton" 
+                                    FontFamily="{StaticResource SymbolFont}" 
+                                    FontSize="20" 
+                                    Content="&#xE8C8;" 
+                                    CommandParameter="{Binding ElementName=_listView, Path=SelectedItems}" Command="{Binding CopyElementsCommand}">
+                                <Button.IsEnabled>
+                                    <Binding ElementName="_listView" Path="SelectedItems.Count" Converter="{StaticResource HasAnyItemsConverter}">
+                                        <Binding.ConverterParameter>
+                                            <system:Boolean>False</system:Boolean>
+                                        </Binding.ConverterParameter>
+                                    </Binding>
+                                </Button.IsEnabled>
+                            </Button>
+
+                            <Button FontFamily="{StaticResource SymbolFont}" 
+                                    FontSize="20" 
+                                    Content="&#xE77F;" 
+                                    Command="{Binding PasteElementsCommand}">
+                                <Button.IsEnabled>
+                                    <Binding Path="Editor.ClipboardNodes.Count" Converter="{StaticResource HasAnyItemsConverter}">
+                                        <Binding.ConverterParameter>
+                                            <system:Boolean>False</system:Boolean>
+                                        </Binding.ConverterParameter>
+                                    </Binding>
+                                </Button.IsEnabled>
+                            </Button>
+                            <Button FontFamily="{StaticResource SymbolFont}" 
+                                    FontSize="20" 
+                                    Command="{Binding PasteElementsBelowCommand}"
+                                    CommandParameter="{Binding ElementName=_listView, Path=SelectedIndex}">
+                                <Button.Content>
+                                    <StackPanel>
+                                        <TextBlock Text="&#xE77F;" Margin="5, 5, 5, 2.5"/>
+                                        <TextBlock Text="&#xE74B;" Margin="5, 2.5, 5, 5" FontSize="12" HorizontalAlignment="Center"/>
+                                    </StackPanel>
+                                </Button.Content>
+                                <Button.IsEnabled>
+                                    <Binding Path="Editor.ClipboardNodes.Count" Converter="{StaticResource HasAnyItemsConverter}">
+                                        <Binding.ConverterParameter>
+                                            <system:Boolean>False</system:Boolean>
+                                        </Binding.ConverterParameter>
+                                    </Binding>
+                                </Button.IsEnabled>
+                            </Button>
+                            <Button FontFamily="{StaticResource SymbolFont}" 
+                                    FontSize="20" 
+                                    Command="{Binding PasteElementsAboveCommand}"
+                                    CommandParameter="{Binding ElementName=_listView, Path=SelectedIndex}">
+                                <Button.Content>
+                                    <StackPanel>
+                                        <TextBlock Text="&#xE74A;" Margin="5, 5, 5, 2.5" FontSize="12" HorizontalAlignment="Center"/>
+                                        <TextBlock Text="&#xE77F;" Margin="5, 2.5, 5, 5"/>
+                                    </StackPanel>
+                                </Button.Content>
+                                <Button.IsEnabled>
+                                    <Binding Path="Editor.ClipboardNodes.Count" Converter="{StaticResource HasAnyItemsConverter}">
+                                        <Binding.ConverterParameter>
+                                            <system:Boolean>False</system:Boolean>
+                                        </Binding.ConverterParameter>
+                                    </Binding>
+                                </Button.IsEnabled>
+                            </Button>
+
+                            <Button x:Name="_deleteButton" 
+                                    FontFamily="{StaticResource SymbolFont}" 
+                                    FontSize="20"
+                                    Content="&#xE74D;" 
+                                    CommandParameter="{Binding ElementName=_listView, Path=SelectedItems}"
+                                    Command="{Binding DeleteElementsCommand}">
+                                <Button.IsEnabled>
+                                    <Binding ElementName="_listView" Path="SelectedItems.Count" Converter="{StaticResource HasAnyItemsConverter}">
+                                        <Binding.ConverterParameter>
+                                            <system:Boolean>False</system:Boolean>
+                                        </Binding.ConverterParameter>
+                                    </Binding>
+                                </Button.IsEnabled>
+
+                            </Button>
+
+                            <Button FontFamily="{StaticResource SymbolFont}" 
+                                    FontSize="20"
+                                    Content="&#xE74A;"
+                                    CommandParameter="{Binding ElementName=_listView, Path=SelectedIndex}"
+                                    Command="{Binding MoveElementUpCommand}">
+                                <Button.IsEnabled>
+                                    <Binding ElementName="_listView" Path="SelectedIndex" Converter="{StaticResource IndexGreaterOrEqualConverter}">
+                                        <Binding.ConverterParameter>
+                                            <system:Int32>1</system:Int32>
+                                        </Binding.ConverterParameter>
+                                    </Binding>
+                                </Button.IsEnabled>
+                            </Button>
+
+                            <Button FontFamily="{StaticResource SymbolFont}" 
+                                    FontSize="20"
+                                    Content="&#xE74B;"
+                                    CommandParameter="{Binding ElementName=_listView, Path=SelectedIndex}"
+                                    Command="{Binding MoveElementDownCommand}">
+                                <Button.IsEnabled>
+                                    <MultiBinding Converter="{StaticResource IndexSmallerConverter}">
+                                        <MultiBinding.Bindings>
+                                            <Binding ElementName="_listView" Path="Items"/>
+                                            <Binding ElementName="_listView" Path="SelectedIndex"/>
+                                        </MultiBinding.Bindings>
+                                    </MultiBinding>
+                                </Button.IsEnabled>
+                            </Button>
+                            <Button FontFamily="{StaticResource SymbolFont}" 
+                                    FontSize="20"
+                                    Content="&#xE721;" 
+                                    Command="{Binding SearchElementsCommand}"/>
+                        </ToolBar>
+
+                        <ScrollViewer Grid.Row="1">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="auto"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+
+                                <ListView x:Name="_indexListView" Grid.Row="0" Grid.Column="0" ItemsSource="{Binding Indices}" IsEnabled="False">
+                                    <ListView.ItemTemplate>
+                                        <DataTemplate DataType="{x:Type system:Int32}">
+                                            <TextBlock FontSize="15" Text="{Binding Converter={StaticResource IndexToTextConverter}}"/>
+                                        </DataTemplate>
+                                    </ListView.ItemTemplate>
+                                </ListView>
+
+                                <ListView x:Name="_listView" Grid.Column="1" ItemsSource="{Binding Elements}">
+                                    <ListView.Resources>
+                                        <Style TargetType="{x:Type ListViewItem}" BasedOn="{StaticResource {x:Type ListViewItem}}">
+                                            <Setter Property="Padding" Value="5"/>
+                                            <EventSetter Event="MouseDoubleClick" Handler="ListViewItem_MouseDoubleClick"/>
+                                        </Style>
+
+                                        <DataTemplate DataType="{x:Type modelsnodes:JsonArrayNode}">
+                                            <StackPanel Orientation="Horizontal">
+                                                <TextBlock FontSize="15" Text="{Binding Type.ElementType.Type.Name}"/>
+                                                <TextBlock FontSize="15" Text="["/>
+                                                <TextBlock FontSize="15" Text="{Binding Elements.Count}"/>
+                                                <TextBlock FontSize="15" Text="]"/>
+                                            </StackPanel>
+                                        </DataTemplate>
+                                        <DataTemplate DataType="{x:Type modelsnodes:JsonObjectNode}">
+                                            <StackPanel Orientation="Horizontal">
+                                                <TextBlock FontSize="15" Text="{Binding Type.Name}"/>
+                                                <TextBlock FontSize="15" Text="{}{"/>
+                                                <TextBlock FontSize="15" Text="..."/>
+                                                <TextBlock FontSize="15" Text="{}}"/>
+                                            </StackPanel>
+                                        </DataTemplate>
+                                        <DataTemplate DataType="{x:Type modelsnodes:JsonValueNode}">
+                                            <StackPanel Orientation="Horizontal">
+                                                <TextBlock FontSize="15" Text="{Binding }"/>
+                                                <TextBlock FontSize="15" Text="{}{"/>
+                                                <TextBlock FontSize="15" Text="..."/>
+                                                <TextBlock FontSize="15" Text="{}}"/>
+                                            </StackPanel>
+                                        </DataTemplate>
+                                    </ListView.Resources>
+                                </ListView>
+                            </Grid>
+                        </ScrollViewer>
+                    </Grid>
+                </DataTemplate>
+            </ContentControl.Resources>
+        </ContentControl>
+    </Grid>
+</UserControl>

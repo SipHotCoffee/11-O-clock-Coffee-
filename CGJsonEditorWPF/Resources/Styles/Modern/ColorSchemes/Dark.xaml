@@ -1,0 +1,46 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <Color x:Key="FocusedBackground" A="255" R="28" G="28" B="28"/>
+    <Color x:Key="Background" A="255" R="32"  G="32"  B="32"/>
+    <Color x:Key="Foreground" A="255" R="224" G="224" B="224"/>
+
+    <Color x:Key="DisabledForeground" A="128" R="224" G="224" B="224"/>
+
+    <Color x:Key="Red0" A="255" R="64" G="0" B="0"/>
+    <Color x:Key="Red1" A="255" R="80" G="0" B="0"/>
+    <Color x:Key="Red2" A="255" R="96" G="0" B="0"/>
+    <Color x:Key="Red3" A="255" R="112" G="0" B="0"/>
+    <Color x:Key="Red4" A="255" R="128" G="0" B="0"/>
+    <Color x:Key="Red5" A="255" R="144" G="0" B="0"/>
+    <Color x:Key="Red6" A="255" R="160" G="0" B="0"/>
+    <Color x:Key="Red7" A="255" R="176" G="0" B="0"/>
+
+    <Color x:Key="Control0" A="0"  R="255" G="255" B="255"/>
+    <Color x:Key="Control1" A="8"  R="255" G="255" B="255"/>
+    <Color x:Key="Control2" A="16" R="255" G="255" B="255"/>
+    <Color x:Key="Control3" A="24" R="255" G="255" B="255"/>
+    <Color x:Key="Control4" A="32" R="255" G="255" B="255"/>
+    <Color x:Key="Control5" A="40" R="255" G="255" B="255"/>
+    <Color x:Key="Control6" A="48" R="255" G="255" B="255"/>
+    <Color x:Key="Control7" A="56" R="255" G="255" B="255"/>
+
+    <Color x:Key="Accent0" A="255" R="128" G="16"  B="0"  />
+    <Color x:Key="Accent1" A="255" R="160" G="52"  B="0"  />
+    <Color x:Key="Accent2" A="255" R="192" G="88"  B="0"  />
+    <Color x:Key="Accent3" A="255" R="224" G="124" B="0"  />
+    <Color x:Key="Accent4" A="255" R="255" G="160" B="0"  />
+    <Color x:Key="Accent5" A="255" R="255" G="184" B="64" />
+    <Color x:Key="Accent6" A="255" R="255" G="208" B="128"/>
+    <Color x:Key="Accent7" A="255" R="255" G="232" B="192"/>
+
+    <!--<Color x:Key="Black0" A="0"  R="0" G="0" B="0"/>
+    <Color x:Key="Black1" A="8"  R="0" G="0" B="0"/>
+    <Color x:Key="Black2" A="16" R="0" G="0" B="0"/>
+    <Color x:Key="Black3" A="24" R="0" G="0" B="0"/>
+    <Color x:Key="Black4" A="32" R="0" G="0" B="0"/>
+    <Color x:Key="Black5" A="40" R="0" G="0" B="0"/>
+    <Color x:Key="Black6" A="48" R="0" G="0" B="0"/>
+    <Color x:Key="Black7" A="56" R="0" G="0" B="0"/>-->
+
+</ResourceDictionary>

@@ -1,0 +1,82 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <ResourceDictionary.MergedDictionaries>
+        <ResourceDictionary Source="Window.xaml"/>
+    </ResourceDictionary.MergedDictionaries>
+
+    <SolidColorBrush x:Key="CheckBox.Normal.Background" Color="{StaticResource Control2}"/>
+    <SolidColorBrush x:Key="CheckBox.Normal.Border"     Color="{StaticResource Control4}"/>
+
+    <SolidColorBrush x:Key="CheckBox.MouseOver.Background" Color="{StaticResource Control4}"/>
+    <SolidColorBrush x:Key="CheckBox.MouseOver.Border"     Color="{StaticResource Control4}"/>
+
+    <SolidColorBrush x:Key="CheckBox.Pressed.Background" Color="{StaticResource Control1}"/>
+    <SolidColorBrush x:Key="CheckBox.Pressed.Border"     Color="{StaticResource Control4}"/>
+
+    <SolidColorBrush x:Key="CheckBox.Checked.Background" Color="{StaticResource Accent4}"/>
+    <SolidColorBrush x:Key="CheckBox.Checked.Border"     Color="{StaticResource Control4}"/>
+
+    <SolidColorBrush x:Key="CheckBox.Disabled.Background" Color="{StaticResource Control2}"/>
+    <SolidColorBrush x:Key="CheckBox.Disabled.Border"     Color="Transparent"/>
+
+    <Style TargetType="{x:Type CheckBox}">
+        <Setter Property="Background"  Value="{StaticResource CheckBox.Normal.Background}"/>
+        <Setter Property="BorderBrush" Value="{StaticResource CheckBox.Normal.Border}"/>
+
+        <Setter Property="HorizontalAlignment" Value="Left"/>
+
+        <Setter Property="Foreground" Value="{StaticResource Window.Active.Foreground}"/>
+
+        <Setter Property="FontSize" Value="14"/>
+
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type CheckBox}">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="auto"/>
+                            <ColumnDefinition Width="auto"/>
+                        </Grid.ColumnDefinitions>
+                        <Grid Grid.Column="0" HorizontalAlignment="Left" Width="20" Height="20">
+                            <Border Background="{TemplateBinding Background}" 
+                                    BorderBrush="{TemplateBinding BorderBrush}"
+                                    BorderThickness="1"
+                                    CornerRadius="4">
+                                <TextBlock x:Name="CheckMark"
+                                           SnapsToDevicePixels="True"
+                                           Foreground="{StaticResource Window.Active.Background}"
+                                           VerticalAlignment="Center" 
+                                           HorizontalAlignment="Center" 
+                                           FontSize="16px"
+                                           FontFamily="{StaticResource SymbolFont}"
+                                           FontWeight="ExtraBold"
+                                           Text="&#xE73E;"
+                                           TextAlignment="Center" Visibility="Collapsed"/>
+                            </Border>
+                        </Grid>
+                        <ContentPresenter Margin="5" Grid.Column="1" Content="{TemplateBinding Content}"/>
+                    </Grid>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter Property="Background"  Value="{StaticResource CheckBox.MouseOver.Background}"/>
+                            <Setter Property="BorderBrush" Value="{StaticResource CheckBox.MouseOver.Border}"/>
+                        </Trigger>
+                        <Trigger Property="IsPressed" Value="True">
+                            <Setter Property="Background"  Value="{StaticResource CheckBox.Pressed.Background}"/>
+                            <Setter Property="BorderBrush" Value="{StaticResource CheckBox.Pressed.Border}"/>
+                        </Trigger>
+                        <Trigger Property="IsChecked" Value="True">
+                            <Setter Property="Background"  Value="{StaticResource CheckBox.Checked.Background}"/>
+                            <Setter Property="BorderBrush" Value="{StaticResource CheckBox.Checked.Border}"/>
+                            <Setter TargetName="CheckMark" Property="Visibility" Value="Visible"/>
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter Property="Background"  Value="{StaticResource CheckBox.Disabled.Background}"/>
+                            <Setter Property="BorderBrush" Value="{StaticResource CheckBox.Disabled.Border}"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+</ResourceDictionary>

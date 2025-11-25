@@ -1,0 +1,23 @@
+﻿<editor:CustomWindow x:Class="CG.Test.Editor.Views.TypePickerDialogView"
+                     xmlns:editor="clr-namespace:CG.Test.Editor"
+                     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+                     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+                     xmlns:local="clr-namespace:CG.Test.Editor.Views" 
+                     xmlns:viewmodels="clr-namespace:CG.Test.Editor.ViewModels"
+                     mc:Ignorable="d"
+                     Title="Select Type" Height="300" Width="400">
+    <Window.DataContext>
+        <viewmodels:TypePickerDialogViewModel/>
+    </Window.DataContext>
+    <Grid>
+        <ListView ItemsSource="{Binding Types}">
+            <ListView.ItemTemplate>
+                <DataTemplate>
+                    <TextBlock Text="{Binding Type.Name}"/>
+                </DataTemplate>
+            </ListView.ItemTemplate>
+        </ListView>
+    </Grid>
+</editor:CustomWindow>
