@@ -3,16 +3,16 @@ using System.Windows.Data;
 
 namespace CG.Test.Editor.FrontEnd.Converters
 {
-    public class FlipBooleanConverter : IValueConverter
+    public class IsNotNullConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            return !(bool)value;
+            return value is not null;
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            return !(bool)value;
+            throw new NotImplementedException();
         }
     }
 }

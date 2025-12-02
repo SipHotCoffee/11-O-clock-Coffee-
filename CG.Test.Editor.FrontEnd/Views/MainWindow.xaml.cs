@@ -1,13 +1,6 @@
-﻿using System.Text;
-using System.Windows;
+﻿using CG.Test.Editor.FrontEnd.ViewModels;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 
 namespace CG.Test.Editor.FrontEnd.Views
 {
@@ -20,5 +13,25 @@ namespace CG.Test.Editor.FrontEnd.Views
         {
             InitializeComponent();
         }
-    }
+
+        public MainViewModel ViewModel => (MainViewModel)DataContext;
+
+        private void ObjectViewItem_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+        {
+            var item = (ListViewItem)sender;
+            if (ViewModel.SelectedFile is not null && item.Content is KeyValuePair<string, NodeViewModelBase> node)
+            {
+                node.Value.Visit(new NodeEditorVisitor(ViewModel.SelectedFile));
+			}
+        }
+
+        private void ArrayViewItem_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+        {
+			var item = (ListViewItem)sender;
+			if (ViewModel.SelectedFile is not null && item.Content is NodeViewModelBase node)
+			{
+				node.Visit(new NodeEditorVisitor(ViewModel.SelectedFile));
+			}
+		}
+	}
 }

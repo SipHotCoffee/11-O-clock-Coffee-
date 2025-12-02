@@ -43,6 +43,7 @@ namespace CG.Test.Editor.FrontEnd.Views.Dialogs
 
 		private void OkButton_Click(object sender, RoutedEventArgs e)
 		{
+			Value = Math.Clamp(Value, Minimum, Maximum);
 			DialogResult = true;
 			Close();
 		}

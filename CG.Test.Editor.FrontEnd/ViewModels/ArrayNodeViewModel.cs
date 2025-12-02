@@ -1,9 +1,11 @@
 ﻿using CG.Test.Editor.FrontEnd.Models;
+using CommunityToolkit.Mvvm.Input;
 using System.Collections.ObjectModel;
+using System.Xml.Linq;
 
 namespace CG.Test.Editor.FrontEnd.ViewModels
 {
-    public class ArrayNodeViewModel : NodeViewModelBase
+    public partial class ArrayNodeViewModel : NodeViewModelBase
     {
         public ObservableCollection<NodeViewModelBase> Elements { get; }
        
@@ -11,7 +13,7 @@ namespace CG.Test.Editor.FrontEnd.ViewModels
 
         public override SchemaArrayType Type { get; }
 
-        public ArrayNodeViewModel(SchemaArrayType type)
+        public ArrayNodeViewModel(NodeViewModelBase? parent, SchemaArrayType type) : base(parent)
         {
             Type = type;
 
@@ -35,16 +37,33 @@ namespace CG.Test.Editor.FrontEnd.ViewModels
             }
         }
 
-        public override ArrayNodeViewModel Clone()
+        public override ArrayNodeViewModel Clone(NodeViewModelBase? parent)
         {
-            var result = new ArrayNodeViewModel(Type);
+            var result = new ArrayNodeViewModel(parent, Type);
             foreach (var element in Elements)
             {
-                result.Elements.Add(element.Clone());
+                result.Elements.Add(element.Clone(result));
             }
             return result;
         }
 
-        
+        protected override string GetName(NodeViewModelBase item)
+        {
+            for (var i = 0; i < Elements.Count; i++)
+			{
+                var element = Elements[i];
+                if (element == item)
+				{
+                    return $"Item: [{i}]";
+				}
+			}
+            return base.GetName(item);
+		}
+
+        [RelayCommand]
+        void Insert()
+        {
+            Elements.Add(Type.ElementType.Visit(new NodeViewModelGeneratorVisitor(this)));
+        }
     }
 }

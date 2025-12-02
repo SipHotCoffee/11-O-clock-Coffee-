@@ -17,7 +17,8 @@
         <ResourceDictionary Source="UIElements/Menu.xaml"/>
         <ResourceDictionary Source="UIElements/ContextMenu.xaml"/>
         <ResourceDictionary Source="UIElements/ScrollBar.xaml"/>
-        <ResourceDictionary Source="UIElements/ProgressBar.xaml"/>
+		<ResourceDictionary Source="UIElements/SpinButton.xaml"/>
+		<ResourceDictionary Source="UIElements/ProgressBar.xaml"/>
         <ResourceDictionary Source="UIElements/Slider.xaml"/>
         <ResourceDictionary Source="UIElements/DatePicker.xaml"/>
     </ResourceDictionary.MergedDictionaries>

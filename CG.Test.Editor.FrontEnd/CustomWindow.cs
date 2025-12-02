@@ -294,7 +294,7 @@ namespace CG.Test.Editor.FrontEnd
             {
                 DragMove();
 
-                var point = Extensions.GetMousePosition();
+                var point = UIExtensions.GetMousePosition();
 
                 if (point.X >= SystemParameters.WorkArea.Width - AERO_OFFSET && point.X <= SystemParameters.WorkArea.Width)
                 {

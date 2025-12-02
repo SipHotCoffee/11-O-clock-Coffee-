@@ -1,38 +1,36 @@
 ﻿using CG.Test.Editor.FrontEnd.Models;
-using System.Linq;
+using System.Collections.ObjectModel;
 
 namespace CG.Test.Editor.FrontEnd.ViewModels
 {
-
-    public class ObjectNodeViewModel : NodeViewModelBase
+    public class ObjectNodeViewModel(NodeViewModelBase? parent, SchemaObjectType type) : NodeViewModelBase(parent)
     {
-        public KeyValuePair<string, NodeViewModelBase>[] Nodes { get; }
+        public ObservableCollection<KeyValuePair<string, NodeViewModelBase>> Nodes { get; } = [];
 
-		public ObjectNodeViewModel(SchemaObjectType type)
+        public override SchemaObjectType Type { get; } = type;
+
+        public override ObjectNodeViewModel Clone(NodeViewModelBase? parent)
         {
-			Type = type;
+            var result = new ObjectNodeViewModel(parent, Type);
 
-			var nodeVisitor = new NodeViewModelGenerator();
-			Nodes = [.. type.Properties.Values.Select((property) => new KeyValuePair<string, NodeViewModelBase>(property.Name, property.Type.Visit(nodeVisitor)))];
+			foreach (var property in Type.Properties)
+            {
+				result.Nodes.Add(new KeyValuePair<string, NodeViewModelBase>(property.Name, Nodes[property.Index].Value.Clone(result)));
+            }
+
+            return result;
 		}
 
-
-		public ObjectNodeViewModel(SchemaObjectType type, NodeViewModelBase[] nodes)
+        protected override string GetName(NodeViewModelBase item)
         {
-            Type = type;
-            Nodes = [.. type.Properties.Values.Select((property) => new KeyValuePair<string, NodeViewModelBase>(property.Name, nodes[property.Index]))];
-        }
-
-		public override SchemaObjectType Type { get; }
-
-		public override ObjectNodeViewModel Clone()
-        {
-            var nodes = new NodeViewModelBase[Type.Properties.Count];
-            foreach (var property in Type.Properties.Values)
+            foreach (var pair in Nodes)
             {
-                nodes[property.Index] = Nodes[property.Index].Value.Clone();
+                if (pair.Value == item)
+                {
+                    return pair.Key;
+                }
             }
-            return new ObjectNodeViewModel(Type, nodes);
+			return base.GetName(item);
 		}
     }
 }

@@ -64,6 +64,7 @@ namespace CG.Test.Editor.FrontEnd.Views.Controls
 					minimum = Math.Truncate(minimum);
 				}
 				SetValue(MinimumProperty, minimum);
+				Value = Math.Clamp(value, Minimum, Maximum);
 			}
 		}
 
@@ -78,6 +79,7 @@ namespace CG.Test.Editor.FrontEnd.Views.Controls
 					maximum = Math.Truncate(maximum);
 				}
 				SetValue(MaximumProperty, maximum);
+				Value = Math.Clamp(value, Minimum, Maximum);
 			}
 		}
 

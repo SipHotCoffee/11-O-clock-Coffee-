@@ -5,19 +5,31 @@ using System.Windows;
 
 namespace CG.Test.Editor.FrontEnd.ViewModels
 {
+    public struct Vector3(float x, float y, float z);
+    public struct Transformation(Vector3 position, Vector3 rotation, Vector3 scale);
+
+    public class RootNode(Transformation transformation, bool booleanValue, string stringValue, string[] names)
+    {
+        
+    }
+
     public partial class MainViewModel : ObservableObject
     {
+        [ObservableProperty]
+        private FileInstanceViewModel? _selectedFile;
+
         public ObservableCollection<FileInstanceViewModel> OpenFiles { get; } = [];
 
+        [RelayCommand]
         void NewFile(Window window)
         {
-            
-            var instance = new FileInstanceViewModel(window, );
-
+            var instance = new FileInstanceViewModel(window, typeof(RootNode).GetSchemaFromType().Visit(new NodeViewModelGeneratorVisitor(null)));
             OpenFiles.Add(instance);
+            SelectedFile = instance;
 		}
 
-        void OpenFile(Window window)
+		[RelayCommand]
+		void OpenFile(Window window)
         {
 
         }

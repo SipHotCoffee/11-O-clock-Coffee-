@@ -5,6 +5,7 @@
 					xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
 					xmlns:local="clr-namespace:CG.Test.Editor.FrontEnd"
 					xmlns:viewmodels="clr-namespace:CG.Test.Editor.FrontEnd.ViewModels"
+					xmlns:converters="clr-namespace:CG.Test.Editor.FrontEnd.Converters"
 					mc:Ignorable="d"
 					Title="Json Editor" Height="450" Width="800" IsMicaBackgroundEnabled="True" WindowStartupLocation="CenterScreen" WindowState="Maximized">
 	<Window.DataContext>
@@ -12,17 +13,25 @@
 	</Window.DataContext>
 	<Window.Resources>
 		<ResourceDictionary>
+			<converters:IsNotNullConverter x:Key="IsNotNullConverter"/>
+
 			<ResourceDictionary x:Key="NodeCompactDataTemplates">
 				<DataTemplate DataType="{x:Type viewmodels:ArrayNodeViewModel}">
 					<TextBlock Text="[...]"/>
 				</DataTemplate>
 				<DataTemplate DataType="{x:Type viewmodels:ObjectNodeViewModel}">
-					<TextBlock Text="{}{...}"/>
+					<StackPanel Orientation="Horizontal">
+						<TextBlock Text="{Binding Type.Name}"/>
+						<TextBlock Text="{} {...}"/>
+					</StackPanel>
 				</DataTemplate>
 				<DataTemplate DataType="{x:Type viewmodels:IntegerNodeViewModel}">
 					<TextBlock Text="{Binding Value}"/>
 				</DataTemplate>
 				<DataTemplate DataType="{x:Type viewmodels:NumberNodeViewModel}">
+					<TextBlock Text="{Binding Value}"/>
+				</DataTemplate>
+				<DataTemplate DataType="{x:Type viewmodels:BooleanNodeViewModel}">
 					<TextBlock Text="{Binding Value}"/>
 				</DataTemplate>
 				<DataTemplate DataType="{x:Type viewmodels:StringNodeViewModel}">
@@ -42,7 +51,7 @@
 		</Grid.RowDefinitions>
 		<Menu Grid.Row="0">
 			<MenuItem Header="File">
-				<MenuItem Header="New"     InputGestureText="Ctrl+N"/>
+				<MenuItem Header="New"     InputGestureText="Ctrl+N" Command="{Binding NewFileCommand}"/>
 				<MenuItem Header="Open..." InputGestureText="Ctrl+O"/>
 				<MenuItem Header="Save"    InputGestureText="Ctrl+S"/>
 				<MenuItem Header="Save As..."/>
@@ -54,79 +63,141 @@
 		<TabControl Grid.Row="1" ItemsSource="{Binding OpenFiles}">
 			<TabControl.ItemTemplate>
 				<DataTemplate>
-					<Grid>
+					<Grid VerticalAlignment="Center" HorizontalAlignment="Stretch">
 						<Grid.ColumnDefinitions>
 							<ColumnDefinition Width="*"/>
 							<ColumnDefinition Width="auto"/>
 							<ColumnDefinition Width="auto"/>
 						</Grid.ColumnDefinitions>
-						<TextBlock Grid.Column="0" Text="{Binding Name}"/>
-						<TextBlock Grid.Column="1" Text="*" Visibility="Collapsed"/>
-						<Button    Grid.Column="2" FontFamily="{StaticResource SymbolFont}" Content="&#xE8BB;"/>
+						<TextBlock Grid.Column="0" Text="{Binding Name}" VerticalAlignment="Center"/>
+						<TextBlock Grid.Column="1" Text="*" Visibility="Collapsed" VerticalAlignment="Center"/>
+						<Button    Grid.Column="2" Margin="5, 0, 5, 0" FontSize="12" FontFamily="{StaticResource SymbolFont}" Content="&#xE8BB;" VerticalAlignment="Center"/>
 					</Grid>
 				</DataTemplate>
 			</TabControl.ItemTemplate>
 			<TabControl.ContentTemplate>
 				<DataTemplate>
-					<ContentControl Content="{Binding Current}">
-						<ContentControl.Resources>
-							<DataTemplate DataType="{x:Type viewmodels:ArrayNodeViewModel}">
-								<Grid>
-									<Grid.RowDefinitions>
-										<RowDefinition Height="auto"/>
-										<RowDefinition Height="*"/>
-									</Grid.RowDefinitions>
-									<ScrollViewer Grid.Row="1">
-										<Grid>
-											<Grid.ColumnDefinitions>
-												<ColumnDefinition Width="auto"/>
-												<ColumnDefinition Width="*"/>
-											</Grid.ColumnDefinitions>
+					<Grid>
+						<Grid.RowDefinitions>
+							<RowDefinition Height="auto"/>
+							<RowDefinition Height="*"/>
+						</Grid.RowDefinitions>
+						<ToolBar Grid.Row="0">
+							<Button Margin="5, 5, 2.5, 5"   Content="&#xe72b;" FontFamily="{StaticResource SymbolFont}"/>
+							<Button Margin="2.5, 5, 2.5, 5" Content="&#xe72a;" FontFamily="{StaticResource SymbolFont}"/>
+							<Separator/>
+							<Button Margin="2.5, 5, 5, 5" Content="&#xe74a;" FontFamily="{StaticResource SymbolFont}" Command="{Binding MoveUpCommand}" 
+									IsEnabled="{Binding Current.Parent, Converter={StaticResource IsNotNullConverter}}"/>
+							<Separator/>
 
-											<ListView Grid.Column="0" ItemsSource="{Binding Indices}" Background="Transparent">
-												<ListView.ItemTemplate>
-													<DataTemplate>
-														<Grid>
-															<Grid.ColumnDefinitions>
-																<ColumnDefinition Width="auto"/>
-																<ColumnDefinition Width="auto"/>
-																<ColumnDefinition Width="auto"/>
-															</Grid.ColumnDefinitions>
-															<TextBlock Grid.Column="0" VerticalAlignment="Center" Text="["/>
-															<TextBlock Grid.Column="1" VerticalAlignment="Center" Text="{Binding}"/>
-															<TextBlock Grid.Column="2" VerticalAlignment="Center" Text="]: "/>
-														</Grid>
-													</DataTemplate>
-												</ListView.ItemTemplate>
-											</ListView>
-											<ListView Grid.Column="1" ItemsSource="{Binding Elements}"/>
-										</Grid>
-									</ScrollViewer>
-								</Grid>
-							</DataTemplate>
-							<DataTemplate DataType="{x:Type viewmodels:ObjectNodeViewModel}">
-								<ListView ItemsSource="{Binding Nodes}">
-									<ListView.View>
-										<GridView>
-											<GridView.Columns>
-												<GridViewColumn Header="Property Name">
-													<GridViewColumn.CellTemplate>
+							<ItemsControl ItemsSource="{Binding AddressItems}">
+								<ItemsControl.ItemsPanel>
+									<ItemsPanelTemplate>
+										<StackPanel Orientation="Horizontal"/>
+									</ItemsPanelTemplate>
+								</ItemsControl.ItemsPanel>
+								<ItemsControl.ItemTemplate>
+									<DataTemplate>
+										<Button Content="{Binding Node.Name}" Margin="2.5, 5, 2.5, 5" 
+												Command="{Binding  Path=NavigateCommand}" 
+												CommandParameter="{Binding Node}"/>
+									</DataTemplate>
+								</ItemsControl.ItemTemplate>
+							</ItemsControl>
+						</ToolBar>
+						<ContentControl Grid.Row="1" Content="{Binding Current}">
+							<ContentControl.Resources>
+								<DataTemplate DataType="{x:Type viewmodels:ArrayNodeViewModel}">
+									<Grid>
+										<Grid.RowDefinitions>
+											<RowDefinition Height="auto"/>
+											<RowDefinition Height="*"/>
+										</Grid.RowDefinitions>
+										<ToolBar>
+											<Button FontFamily="{StaticResource SymbolFont}" FontSize="18" Content="&#xe948;" Command="{Binding InsertCommand}"/>
+											
+											<Button x:Name="CUT"    FontFamily="{StaticResource SymbolFont}" FontSize="18" Content="&#xe8c6;"/>
+											<Button x:Name="COPY"   FontFamily="{StaticResource SymbolFont}" FontSize="18" Content="&#xe8c8;"/>
+											<Button x:Name="PASTE"  FontFamily="{StaticResource SymbolFont}" FontSize="18" Content="&#xe77f;"/>
+											<Button x:Name="DELETE" FontFamily="{StaticResource SymbolFont}" FontSize="18" Content="&#xe74d;"/>
+										</ToolBar>
+										<ScrollViewer Grid.Row="1">
+											<Grid>
+												<Grid.ColumnDefinitions>
+													<ColumnDefinition Width="auto"/>
+													<ColumnDefinition Width="*"/>
+												</Grid.ColumnDefinitions>
+
+												<ListView Grid.Column="0" Margin="5" IsEnabled="False" 
+														  ItemsSource="{Binding Indices}" Background="Transparent" BorderBrush="Transparent">
+													<ListView.ItemTemplate>
 														<DataTemplate>
-															<StackPanel VerticalAlignment="Center">
-																<TextBlock FontWeight="Bold" FontSize="15" Text="{Binding Key}"/>
-																<TextBlock FontWeight="Bold" FontSize="15" Text=": "/>
-															</StackPanel>
+															<Grid>
+																<Grid.ColumnDefinitions>
+																	<ColumnDefinition Width="auto"/>
+																	<ColumnDefinition Width="auto"/>
+																	<ColumnDefinition Width="auto"/>
+																</Grid.ColumnDefinitions>
+																<TextBlock Grid.Column="0" VerticalAlignment="Center" Text="["/>
+																<TextBlock Grid.Column="1" VerticalAlignment="Center" Text="{Binding}"/>
+																<TextBlock Grid.Column="2" VerticalAlignment="Center" Text="]: "/>
+															</Grid>
 														</DataTemplate>
-													</GridViewColumn.CellTemplate>
-												</GridViewColumn>
-												<GridViewColumn Header="Value"/>
-											</GridView.Columns>
-										</GridView>
-									</ListView.View>	
-								</ListView>
-							</DataTemplate>
-						</ContentControl.Resources>
-					</ContentControl>
+													</ListView.ItemTemplate>
+												</ListView>
+												<ListView Grid.Column="1" Margin="5" ItemsSource="{Binding Elements}" Resources="{StaticResource NodeCompactDataTemplates}">
+													<ListView.ItemContainerStyle>
+														<Style TargetType="{x:Type ListViewItem}" BasedOn="{StaticResource {x:Type ListViewItem}}">
+															<Setter Property="VerticalContentAlignment" Value="Center"/>
+															<Setter Property="VerticalAlignment" Value="Center"/>
+															<EventSetter Event="MouseDoubleClick" Handler="ArrayViewItem_MouseDoubleClick"/>
+														</Style>
+													</ListView.ItemContainerStyle>
+												</ListView>
+											</Grid>
+										</ScrollViewer>
+									</Grid>
+								</DataTemplate>
+								<DataTemplate DataType="{x:Type viewmodels:ObjectNodeViewModel}">
+									<ListView ItemsSource="{Binding Nodes}">
+										<ListView.ItemContainerStyle>
+											<Style TargetType="{x:Type ListViewItem}" BasedOn="{StaticResource {x:Static GridView.GridViewItemContainerStyleKey}}">
+												<Setter Property="VerticalContentAlignment" Value="Center"/>
+												<Setter Property="VerticalAlignment" Value="Center"/>
+												<EventSetter Event="MouseDoubleClick" Handler="ObjectViewItem_MouseDoubleClick"/>
+											</Style>
+										</ListView.ItemContainerStyle>
+										<ListView.View>
+											<GridView>
+												<GridView.Columns>
+													<GridViewColumn Header="Property Name">
+														<GridViewColumn.CellTemplate>
+															<DataTemplate>
+																<StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+																	<TextBlock VerticalAlignment="Center" FontFamily="Cascadia Mono" 
+																			   FontWeight="Bold" FontSize="18" Text="{Binding Key}"/>
+																	<TextBlock VerticalAlignment="Center" FontFamily="Cascadia Mono" 
+																			   FontWeight="Bold" FontSize="18" Text=": "/>
+																</StackPanel>
+															</DataTemplate>
+														</GridViewColumn.CellTemplate>
+													</GridViewColumn>
+													<GridViewColumn Header="Value">
+														<GridViewColumn.CellTemplate>
+															<DataTemplate>
+																<ContentControl VerticalAlignment="Center" Content="{Binding Value}" 
+																				Resources="{StaticResource NodeCompactDataTemplates}"/>
+															</DataTemplate>
+														</GridViewColumn.CellTemplate>
+													</GridViewColumn>
+												</GridView.Columns>
+											</GridView>
+										</ListView.View>	
+									</ListView>
+								</DataTemplate>
+							</ContentControl.Resources>
+						</ContentControl>
+					</Grid>
 				</DataTemplate>
 			</TabControl.ContentTemplate>
 		</TabControl>

@@ -2,7 +2,7 @@
 using System.Windows;
 using System.Windows.Data;
 
-namespace CG.Test.Editor.Converters
+namespace CG.Test.Editor.FrontEnd.Converters
 {
     public class FlippedBooleanToVisibilityConverter : IValueConverter
     {

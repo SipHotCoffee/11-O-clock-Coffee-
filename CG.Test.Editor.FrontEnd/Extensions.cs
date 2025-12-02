@@ -62,17 +62,12 @@ namespace CG.Test.Editor.FrontEnd
 					var constructor = type.GetConstructors(BindingFlags.Public | BindingFlags.Instance).First();
 					var properties = new Dictionary<string, SchemaProperty>();
                     var parameters = constructor.GetParameters();
-                    for (var i = 0; i < parameters.Length; i++)
-					{
-                        var parameter = parameters[i];
-                        properties.Add(parameter.Name ?? string.Empty, new SchemaProperty()
-						{
-							Index = i,
-							Name = parameter.Name ?? string.Empty,
-							Type = parameter.ParameterType.GetSchemaFromType()
-						});
-					}
-					return new SchemaObjectType(type.Name, properties);
+					return new SchemaObjectType(type.Name, parameters.Select((parameter, index) => new SchemaProperty()
+					{ 
+						Index = index,
+						Name = parameter.Name ?? string.Empty,
+						Type = parameter.ParameterType.GetSchemaFromType()
+					}));
 				}
 			}
 		}

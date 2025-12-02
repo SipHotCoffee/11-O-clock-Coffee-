@@ -1,21 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
+﻿using System.Windows;
 
 namespace CG.Test.Editor.FrontEnd.Views.Dialogs
 {
-    public partial class StringValueDialog : Window
+    public partial class StringValueDialog : CustomWindow
     {
-		public static readonly DependencyProperty    MaximumLengthProperty = DependencyProperty.Register(nameof(MaximumLength), typeof(int), typeof(StringValueDialog));
-		public static readonly DependencyProperty             TextProperty = DependencyProperty.Register(nameof(Text), typeof(string), typeof(StringValueDialog));
+		public static readonly DependencyProperty MaximumLengthProperty = DependencyProperty.Register(nameof(MaximumLength), typeof(int), typeof(StringValueDialog));
+		public static readonly DependencyProperty          TextProperty = DependencyProperty.Register(nameof(Text), typeof(string), typeof(StringValueDialog));
 
 		public StringValueDialog()
         {
