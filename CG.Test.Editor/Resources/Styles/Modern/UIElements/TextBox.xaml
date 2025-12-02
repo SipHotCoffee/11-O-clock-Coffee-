@@ -1,0 +1,186 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <ResourceDictionary.MergedDictionaries>
+        <ResourceDictionary Source="Window.xaml"/>
+    </ResourceDictionary.MergedDictionaries>
+    
+    <SolidColorBrush x:Key="TextBox.Normal.Background" Color="{StaticResource Control2}"/>
+
+    <LinearGradientBrush x:Key="TextBox.Normal.Border" StartPoint="0, 0" EndPoint="0, 1">
+        <LinearGradientBrush.GradientStops>
+            <GradientStop Color="{StaticResource Control3}" Offset="0.95"/>
+            <GradientStop Color="{StaticResource Control6}" Offset="1"/>
+        </LinearGradientBrush.GradientStops>
+    </LinearGradientBrush>
+
+    <SolidColorBrush x:Key="TextBox.MouseOver.Background" Color="{StaticResource Control3}"/>
+
+    <LinearGradientBrush x:Key="TextBox.MouseOver.Border" StartPoint="0, 0" EndPoint="0, 1">
+        <LinearGradientBrush.GradientStops>
+            <GradientStop Color="{StaticResource Control4}" Offset="0.95"/>
+            <GradientStop Color="{StaticResource Control7}" Offset="1"/>
+        </LinearGradientBrush.GradientStops>
+    </LinearGradientBrush>
+
+    <SolidColorBrush x:Key="TextBox.Focused.Background" Color="{StaticResource FocusedBackground}"/>
+
+    <SolidColorBrush x:Key="TextBox.Focused.Border" Color="{StaticResource Control2}"/>
+
+    <!--<LinearGradientBrush x:Key="TextBox.Focused.Border" StartPoint="0, 0" EndPoint="0, 1">
+        <LinearGradientBrush.GradientStops>
+            <GradientStop Color="{StaticResource Control2}" Offset="0.95"/>
+            <GradientStop Color="{StaticResource Accent4}"  Offset="0.95"/>
+            <GradientStop Color="{StaticResource Accent4}"  Offset="1"/>
+        </LinearGradientBrush.GradientStops>
+    </LinearGradientBrush>-->
+
+    <SolidColorBrush x:Key="TextBox.Focused.Bar" Color="{StaticResource Accent4}"/>
+
+    <SolidColorBrush x:Key="TextBox.Disabled.Background" Color="{StaticResource Control1}"/>
+
+    <LinearGradientBrush x:Key="TextBox.Disabled.Border">
+        <LinearGradientBrush.GradientStops>
+            <GradientStop Color="{StaticResource Control2}" Offset="0.95"/>
+            <GradientStop Color="{StaticResource Control2}" Offset="1"/>
+        </LinearGradientBrush.GradientStops>
+    </LinearGradientBrush>
+
+    <SolidColorBrush x:Key="TextBox.Selection" Color="{StaticResource Accent2}"/>
+
+    <SolidColorBrush x:Key="TextBox.Disabled.Selection" Color="{StaticResource Control3}"/>
+
+    <Style TargetType="{x:Type TextBox}">
+        <!--<Setter Property="Validation.ErrorTemplate"         Value="{StaticResource TextBoxErrorTemplate}"/>-->
+        <Setter Property="Background"                       Value="{StaticResource TextBox.Normal.Background}"/>
+        <Setter Property="BorderBrush"                      Value="{StaticResource TextBox.Normal.Border}"/>
+        <Setter Property="Foreground"                       Value="{StaticResource Window.Active.Foreground}"/>
+        <Setter Property="CaretBrush"                       Value="{StaticResource Window.Active.Foreground}"/>
+        <Setter Property="SelectionBrush"                   Value="{StaticResource TextBox.Selection}"/>
+        <Setter Property="BorderThickness"                  Value="1"/>
+        <Setter Property="KeyboardNavigation.TabNavigation" Value="None"/>
+        <Setter Property="HorizontalContentAlignment"       Value="Left"/>
+        <Setter Property="FocusVisualStyle"                 Value="{x:Null}"/>
+        <Setter Property="AllowDrop"                        Value="true"/>
+        <Setter Property="ScrollViewer.PanningMode"         Value="VerticalFirst"/>
+        <Setter Property="Stylus.IsFlicksEnabled"           Value="False"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type TextBox}">
+                    <Grid SnapsToDevicePixels="True">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="auto"/>
+                        </Grid.RowDefinitions>
+                        
+                        <Border x:Name="border" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="2" Padding="5, 5, 5, 8" Background="{TemplateBinding Background}" SnapsToDevicePixels="True">
+                            <ScrollViewer x:Name="PART_ContentHost" Focusable="false" HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Hidden"/>
+                        </Border>
+
+                        <Border x:Name="focusBar" 
+                                CornerRadius="0, 0, 2, 2" 
+                                BorderThickness="0" 
+                                Background="{StaticResource TextBox.Focused.Bar}"
+                                Visibility="Collapsed"
+                                Height="2" 
+                                Margin="1" 
+                                VerticalAlignment="Bottom"
+                                SnapsToDevicePixels="True"/>
+                    </Grid>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsEnabled" Value="false">
+                            <Setter Property="Opacity" TargetName="border" Value="0.56"/>
+                        </Trigger>
+                        <Trigger Property="IsMouseOver" Value="true">
+                            <Setter Property="BorderBrush"  TargetName="border" Value="{StaticResource TextBox.MouseOver.Border}"/>
+                            <Setter Property="Background"   TargetName="border" Value="{StaticResource TextBox.MouseOver.Background}"/>
+                        </Trigger>
+                        <Trigger Property="IsKeyboardFocused" Value="true">
+                            <Setter Property="BorderBrush" TargetName="border" Value="{StaticResource TextBox.Focused.Border}"/>
+                            <Setter Property="Background"  TargetName="border" Value="{StaticResource TextBox.Focused.Background}"/>
+                            <!--<Setter Property="BorderThickness" TargetName="border" Value="1, 1, 1, 2"/>-->
+                            <Setter Property="CornerRadius" TargetName="border" Value="3, 3, 0, 0"/>
+                            <Setter Property="Visibility" TargetName="focusBar" Value="Visible"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+        <Style.Triggers>
+            <MultiTrigger>
+                <MultiTrigger.Conditions>
+                    <Condition Property="IsInactiveSelectionHighlightEnabled" Value="true"/>
+                    <Condition Property="IsSelectionActive" Value="false"/>
+                </MultiTrigger.Conditions>
+                <Setter Property="SelectionBrush" Value="{StaticResource TextBox.Disabled.Selection}"/>
+            </MultiTrigger>
+        </Style.Triggers>
+    </Style>
+
+    <Style TargetType="{x:Type PasswordBox}">
+        <!--<Setter Property="Validation.ErrorTemplate"         Value="{StaticResource TextBoxErrorTemplate}"/>-->
+        <Setter Property="Background"                       Value="{StaticResource TextBox.Normal.Background}"/>
+        <Setter Property="BorderBrush"                      Value="{StaticResource TextBox.Normal.Border}"/>
+        <Setter Property="Foreground"                       Value="{StaticResource Window.Active.Foreground}"/>
+        <Setter Property="CaretBrush"                       Value="{StaticResource Window.Active.Foreground}"/>
+        <Setter Property="SelectionBrush"                   Value="{StaticResource TextBox.Selection}"/>
+        <Setter Property="BorderThickness"                  Value="1"/>
+        <Setter Property="KeyboardNavigation.TabNavigation" Value="None"/>
+        <Setter Property="HorizontalContentAlignment"       Value="Left"/>
+        <Setter Property="FocusVisualStyle"                 Value="{x:Null}"/>
+        <Setter Property="AllowDrop"                        Value="true"/>
+        <Setter Property="ScrollViewer.PanningMode"         Value="VerticalFirst"/>
+        <Setter Property="Stylus.IsFlicksEnabled"           Value="False"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type PasswordBox}">
+                    <Grid SnapsToDevicePixels="True">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="auto"/>
+                        </Grid.RowDefinitions>
+
+                        <Border x:Name="border" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="2" Padding="5, 5, 5, 8" Background="{TemplateBinding Background}" SnapsToDevicePixels="True">
+                            <ScrollViewer x:Name="PART_ContentHost" Focusable="false" HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Hidden"/>
+                        </Border>
+
+                        <Border x:Name="focusBar" 
+                             CornerRadius="0, 0, 2, 2" 
+                             BorderThickness="0" 
+                             Background="{StaticResource TextBox.Focused.Bar}"
+                             Visibility="Collapsed"
+                             Height="2" 
+                             Margin="1" 
+                             VerticalAlignment="Bottom"
+                             SnapsToDevicePixels="True"/>
+                    </Grid>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsEnabled" Value="false">
+                            <Setter Property="Opacity" TargetName="border" Value="0.56"/>
+                        </Trigger>
+                        <Trigger Property="IsMouseOver" Value="true">
+                            <Setter Property="BorderBrush"  TargetName="border" Value="{StaticResource TextBox.MouseOver.Border}"/>
+                            <Setter Property="Background"   TargetName="border" Value="{StaticResource TextBox.MouseOver.Background}"/>
+                        </Trigger>
+                        <Trigger Property="IsKeyboardFocused" Value="true">
+                            <Setter Property="BorderBrush" TargetName="border" Value="{StaticResource TextBox.Focused.Border}"/>
+                            <Setter Property="Background"  TargetName="border" Value="{StaticResource TextBox.Focused.Background}"/>
+                            <!--<Setter Property="BorderThickness" TargetName="border" Value="1, 1, 1, 2"/>-->
+                            <Setter Property="CornerRadius" TargetName="border" Value="3, 3, 0, 0"/>
+                            <Setter Property="Visibility" TargetName="focusBar" Value="Visible"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+        <Style.Triggers>
+            <MultiTrigger>
+                <MultiTrigger.Conditions>
+                    <Condition Property="IsInactiveSelectionHighlightEnabled" Value="true"/>
+                    <Condition Property="IsSelectionActive" Value="false"/>
+                </MultiTrigger.Conditions>
+                <Setter Property="SelectionBrush" Value="{StaticResource TextBox.Disabled.Selection}"/>
+            </MultiTrigger>
+        </Style.Triggers>
+    </Style>
+
+</ResourceDictionary>

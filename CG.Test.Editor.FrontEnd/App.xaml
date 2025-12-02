@@ -1,0 +1,17 @@
+﻿<Application x:Class="CG.Test.Editor.FrontEnd.App"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:local="clr-namespace:CG.Test.Editor.FrontEnd.Views" xmlns:dialogs="clr-namespace:CG.Test.Editor.FrontEnd.Views.Dialogs"
+			 StartupUri="Views/MainWindow.xaml">
+    <Application.Resources>
+		<ResourceDictionary>
+			<ResourceDictionary.MergedDictionaries>
+				<ResourceDictionary Source="/Resources/Styles/Modern/ColorSchemes/Dark.xaml"/>
+				<ResourceDictionary Source="/Resources/Styles/Modern/Modern.xaml"/>
+			</ResourceDictionary.MergedDictionaries>
+			<Style TargetType="{x:Type local:MainWindow}"          BasedOn="{StaticResource BaseWindowStyle}"/>
+			<Style TargetType="{x:Type dialogs:NumberValueDialog}" BasedOn="{StaticResource BaseWindowStyle}"/>
+			<Style TargetType="{x:Type dialogs:StringValueDialog}" BasedOn="{StaticResource BaseWindowStyle}"/>
+		</ResourceDictionary>
+	</Application.Resources>
+</Application>

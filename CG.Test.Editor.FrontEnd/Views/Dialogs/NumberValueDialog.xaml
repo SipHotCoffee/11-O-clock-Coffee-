@@ -1,0 +1,44 @@
+﻿<frontend:CustomWindow x:Class="CG.Test.Editor.FrontEnd.Views.Dialogs.NumberValueDialog"
+					   xmlns:frontend="clr-namespace:CG.Test.Editor.FrontEnd"
+                       xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+                       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+                       xmlns:local="clr-namespace:CG.Test.Editor.FrontEnd.Views.Dialogs" xmlns:controls="clr-namespace:CG.Test.Editor.FrontEnd.Views.Controls"
+					   mc:Ignorable="d"
+                       Height="auto" Width="300" SizeToContent="Height" WindowStartupLocation="CenterScreen" ResizeMode="NoResize" Topmost="False" ShowInTaskbar="False"
+					   Title="Select Numeric Value">
+	<Grid>
+		<Grid.ColumnDefinitions>
+			<ColumnDefinition Width="*"/>
+			<ColumnDefinition Width="auto"/>
+		</Grid.ColumnDefinitions>
+
+		<Grid.RowDefinitions>
+			<RowDefinition Height="auto"/>
+			<RowDefinition Height="auto"/>
+		</Grid.RowDefinitions>
+
+		<Slider Grid.Column="0" Margin="5, 5, 2.5, 5" HorizontalAlignment="Stretch" 
+				Minimum="{Binding RelativeSource={RelativeSource AncestorType={x:Type local:NumberValueDialog}}, Path=Minimum}"
+				Maximum="{Binding RelativeSource={RelativeSource AncestorType={x:Type local:NumberValueDialog}}, Path=Maximum}"
+				Value  ="{Binding RelativeSource={RelativeSource AncestorType={x:Type local:NumberValueDialog}}, Path=Value}"/>
+
+		<controls:SpinButton Grid.Column="1" Margin="2.5, 5, 5, 5" 
+							 MinWidth="50"
+							 IsIntegral="{Binding RelativeSource={RelativeSource AncestorType={x:Type local:NumberValueDialog}}, Path=IsIntegral}"
+							 Minimum   ="{Binding RelativeSource={RelativeSource AncestorType={x:Type local:NumberValueDialog}}, Path=Minimum}"
+							 Maximum   ="{Binding RelativeSource={RelativeSource AncestorType={x:Type local:NumberValueDialog}}, Path=Maximum}"
+							 Value     ="{Binding RelativeSource={RelativeSource AncestorType={x:Type local:NumberValueDialog}}, Path=Value}"/>
+
+		<Grid Grid.Row="1" Grid.ColumnSpan="2">
+			<Grid.ColumnDefinitions>
+				<ColumnDefinition Width="*"/>
+				<ColumnDefinition Width="*"/>
+			</Grid.ColumnDefinitions>
+
+			<Button x:Name="_okButton"     Grid.Column="0" Content="OK"     Padding="8" Margin="6, 6, 3, 6" IsDefault="True" Click="OkButton_Click"/>
+			<Button x:Name="_cancelButton" Grid.Column="1" Content="Cancel" Padding="8" Margin="3, 6, 6, 6" IsCancel="True"/>
+		</Grid>
+	</Grid>
+</frontend:CustomWindow>
