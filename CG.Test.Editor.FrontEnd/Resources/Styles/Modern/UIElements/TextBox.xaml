@@ -72,12 +72,13 @@
                             <RowDefinition Height="auto"/>
                         </Grid.RowDefinitions>
                         
-                        <Border x:Name="border" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="2" Padding="5, 5, 5, 8" Background="{TemplateBinding Background}" SnapsToDevicePixels="True">
+                        <Border x:Name="border" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" 
+								CornerRadius="3" Padding="5, 5, 5, 8" Background="{TemplateBinding Background}" SnapsToDevicePixels="True">
                             <ScrollViewer x:Name="PART_ContentHost" Focusable="false" HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Hidden"/>
                         </Border>
 
                         <Border x:Name="focusBar" 
-                                CornerRadius="0, 0, 2, 2" 
+                                CornerRadius="0, 0, 3, 3" 
                                 BorderThickness="0" 
                                 Background="{StaticResource TextBox.Focused.Bar}"
                                 Visibility="Collapsed"

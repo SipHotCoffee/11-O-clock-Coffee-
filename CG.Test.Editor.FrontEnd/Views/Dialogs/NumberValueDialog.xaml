@@ -32,12 +32,13 @@
 				Maximum="{Binding RelativeSource={RelativeSource AncestorType={x:Type local:NumberValueDialog}}, Path=Maximum}"
 				Value  ="{Binding RelativeSource={RelativeSource AncestorType={x:Type local:NumberValueDialog}}, Path=Value}"/>
 
-		<controls:SpinButton Grid.Column="1" Margin="2.5, 5, 5, 5" 
-							 MinWidth="50"
-							 IsIntegral="{Binding RelativeSource={RelativeSource AncestorType={x:Type local:NumberValueDialog}}, Path=IsIntegral}"
-							 Minimum   ="{Binding RelativeSource={RelativeSource AncestorType={x:Type local:NumberValueDialog}}, Path=Minimum}"
-							 Maximum   ="{Binding RelativeSource={RelativeSource AncestorType={x:Type local:NumberValueDialog}}, Path=Maximum}"
-							 Value     ="{Binding RelativeSource={RelativeSource AncestorType={x:Type local:NumberValueDialog}}, Path=Value, Mode=TwoWay}"/>
+		<controls:SpinButton Grid.Column="1"
+								Margin="2.5, 5, 5, 5" 
+								MinWidth="50"
+								IsIntegral="{Binding RelativeSource={RelativeSource AncestorType={x:Type local:NumberValueDialog}}, Path=IsIntegral}"
+								Minimum   ="{Binding RelativeSource={RelativeSource AncestorType={x:Type local:NumberValueDialog}}, Path=Minimum}"
+								Maximum   ="{Binding RelativeSource={RelativeSource AncestorType={x:Type local:NumberValueDialog}}, Path=Maximum}"
+								Value     ="{Binding RelativeSource={RelativeSource AncestorType={x:Type local:NumberValueDialog}}, Path=Value, Mode=TwoWay}"/>
 
 		<Grid Grid.Row="1" Grid.ColumnSpan="2">
 			<Grid.ColumnDefinitions>

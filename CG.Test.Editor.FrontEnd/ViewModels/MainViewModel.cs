@@ -8,7 +8,7 @@ namespace CG.Test.Editor.FrontEnd.ViewModels
     public struct Vector3(float x, float y, float z);
     public struct Transformation(Vector3 position, Vector3 rotation, Vector3 scale);
 
-    public class RootNode(Transformation transformation, bool booleanValue, string stringValue, string[] names)
+    public class RootNode(Transformation transformation, bool booleanValue, string stringValue, string[] names, bool[] flags)
     {
         
     }

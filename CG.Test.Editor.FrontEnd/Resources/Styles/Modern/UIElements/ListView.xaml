@@ -26,7 +26,8 @@
                     Background="{TemplateBinding Background}">
                 <ContentPresenter/>
             </Border>
-            <Border x:Name="SelectionBorder" HorizontalAlignment="Left" Margin="5, 14, 3, 14" CornerRadius="1.5" Width="3" Visibility="Hidden" Background="{StaticResource Item.SelectionHighlight.Border}"/>
+            <Border x:Name="SelectionBorder" HorizontalAlignment="Left" Margin="5, 14, 3, 14" CornerRadius="1.5" Width="3" Visibility="Hidden" 
+					Background="{StaticResource Item.SelectionHighlight.Border}"/>
         </Grid>
         <ControlTemplate.Triggers>
             <MultiTrigger>
