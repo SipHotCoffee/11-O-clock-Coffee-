@@ -266,7 +266,25 @@
 													IsEnabled="{Binding Editor.ClipboardNodes.Count}"
 													Command="{Binding PasteElementsCommand}"
 													Style="{StaticResource ClipboardHasItemsButton}"/>
-											
+
+											<Button Command="{Binding PasteAboveElementsCommand}" 
+													CommandParameter="{Binding ElementName=_listView, Path=SelectedIndex}"
+													Style="{StaticResource SingleSelectionButton}">
+												<StackPanel Orientation="Vertical" HorizontalAlignment="Center">
+													<TextBlock HorizontalAlignment="Center" FontFamily="{StaticResource SymbolFont}" FontSize="12" Margin="2" Text="&#xe74a;"/>
+													<TextBlock HorizontalAlignment="Center" FontFamily="{StaticResource SymbolFont}" FontSize="18" Margin="2" Text="&#xe77f;"/>
+												</StackPanel>
+											</Button>
+
+											<Button Command="{Binding PasteBelowElementsCommand}" 
+													CommandParameter="{Binding ElementName=_listView, Path=SelectedIndex}"
+													Style="{StaticResource SingleSelectionButton}">
+												<StackPanel Orientation="Vertical" HorizontalAlignment="Center">
+													<TextBlock HorizontalAlignment="Center" FontFamily="{StaticResource SymbolFont}" FontSize="18" Margin="2" Text="&#xe77f;"/>
+													<TextBlock HorizontalAlignment="Center" FontFamily="{StaticResource SymbolFont}" FontSize="12" Margin="2" Text="&#xe74b;"/>
+												</StackPanel>
+											</Button>
+
 											<Button FontFamily="{StaticResource SymbolFont}"
 													FontSize="18" Content="&#xe74d;" 
 													Command="{Binding DeleteElementsCommand}"

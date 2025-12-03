@@ -120,7 +120,7 @@ namespace CG.Test.Editor.FrontEnd.ViewModels
             var index = selectedIndex;
 			foreach (var node in Editor.ClipboardNodes.Where((node) => Type.ElementType.IsConvertibleFrom(node.Type)))
 			{
-				Elements.Insert(selectedIndex++, node.Clone(this));
+				Elements.Insert(index++, node.Clone(this));
 			}
 		}
 
@@ -130,7 +130,7 @@ namespace CG.Test.Editor.FrontEnd.ViewModels
 			var index = selectedIndex + 1;
 			foreach (var node in Editor.ClipboardNodes.Where((node) => Type.ElementType.IsConvertibleFrom(node.Type)))
 			{
-				Elements.Insert(selectedIndex++, node.Clone(this));
+				Elements.Insert(index++, node.Clone(this));
 			}
 		}
 
