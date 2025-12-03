@@ -38,7 +38,7 @@
                             Margin="4, 4, 0, 4"
                             MinWidth="130"
                             MinHeight="35">
-                        <ContentPresenter x:Name="ContentSite" Margin="5" VerticalAlignment="Center" HorizontalAlignment="Center" ContentSource="Header"/>
+                        <ContentPresenter x:Name="ContentSite" Margin="5" VerticalAlignment="Center" HorizontalAlignment="Stretch" ContentSource="Header"/>
                     </Border>
 
                     <ControlTemplate.Triggers>

@@ -146,9 +146,10 @@
 							<ColumnDefinition Width="auto"/>
 							<ColumnDefinition Width="auto"/>
 						</Grid.ColumnDefinitions>
-						<TextBlock Grid.Column="0" Text="{Binding Name}" VerticalAlignment="Center"/>
+						<TextBlock Grid.Column="0" TextAlignment="Center" Text="{Binding Name}" VerticalAlignment="Center"/>
 						<TextBlock Grid.Column="1" Text="*" Visibility="Collapsed" VerticalAlignment="Center"/>
-						<Button    Grid.Column="2" Margin="5, 0, 5, 0" FontSize="12" FontFamily="{StaticResource SymbolFont}" Content="&#xE8BB;" VerticalAlignment="Center"/>
+						<Button    Grid.Column="2" Margin="5, 0, 5, 0" FontSize="10" FontFamily="{StaticResource SymbolFont}" 
+								   Content="&#xE8BB;" VerticalAlignment="Center" Command="{Binding CloseCommand}"/>
 					</Grid>
 				</DataTemplate>
 			</TabControl.ItemTemplate>
@@ -194,10 +195,29 @@
 										</Grid.RowDefinitions>
 										<ToolBar>
 											<ToolBar.Resources>
-												<Style x:Key="MultipleSelectionButton" TargetType="{x:Type Button}" BasedOn="{StaticResource {x:Static ToolBar.ButtonStyleKey}}">
+												<Style x:Key="MultipleSelectionButton" 
+													   TargetType="{x:Type Button}" BasedOn="{StaticResource {x:Static ToolBar.ButtonStyleKey}}">
 													<Style.Triggers>
 														<DataTrigger Binding="{Binding ElementName=_listView, Path=SelectedItems.Count}" Value="0">
 															<Setter Property="IsEnabled" Value="False"/>
+														</DataTrigger>
+													</Style.Triggers>
+												</Style>
+												<Style x:Key="ClipboardHasItemsButton" 
+													   TargetType="{x:Type Button}" BasedOn="{StaticResource {x:Static ToolBar.ButtonStyleKey}}">
+													<Style.Triggers>
+														<DataTrigger Binding="{Binding Path=Editor.ClipboardNodes.Count}" Value="0">
+															<Setter Property="IsEnabled" Value="False"/>
+														</DataTrigger>
+													</Style.Triggers>
+												</Style>
+
+												<Style x:Key="SingleSelectionButton" 
+													   TargetType="{x:Type Button}" BasedOn="{StaticResource {x:Static ToolBar.ButtonStyleKey}}">
+													<Setter Property="IsEnabled" Value="False"/>
+													<Style.Triggers>
+														<DataTrigger Binding="{Binding ElementName=_listView, Path=SelectedItems.Count}" Value="1">
+															<Setter Property="IsEnabled" Value="True"/>
 														</DataTrigger>
 													</Style.Triggers>
 												</Style>
@@ -208,13 +228,30 @@
 													Content="&#xe948;" 
 													Command="{Binding InsertCommand}"/>
 
+											<Button Command="{Binding InsertAboveCommand}" 
+													CommandParameter="{Binding ElementName=_listView, Path=SelectedIndex}"
+													Style="{StaticResource SingleSelectionButton}">
+												<StackPanel Orientation="Vertical" HorizontalAlignment="Center">
+													<TextBlock HorizontalAlignment="Center" FontFamily="{StaticResource SymbolFont}" FontSize="12" Margin="2" Text="&#xe74a;"/>
+													<TextBlock HorizontalAlignment="Center" FontFamily="{StaticResource SymbolFont}" FontSize="18" Margin="2" Text="&#xe948;"/>
+												</StackPanel>
+											</Button>
+
+											<Button Command="{Binding InsertBelowCommand}" 
+													CommandParameter="{Binding ElementName=_listView, Path=SelectedIndex}"
+													Style="{StaticResource SingleSelectionButton}">
+												<StackPanel Orientation="Vertical" HorizontalAlignment="Center">
+													<TextBlock HorizontalAlignment="Center" FontFamily="{StaticResource SymbolFont}" FontSize="18" Margin="2" Text="&#xe948;"/>
+													<TextBlock HorizontalAlignment="Center" FontFamily="{StaticResource SymbolFont}" FontSize="12" Margin="2" Text="&#xe74b;"/>
+												</StackPanel>
+											</Button>
+
 											<Button FontFamily="{StaticResource SymbolFont}" 
 													FontSize="18" 
 													Content="&#xe8c6;"
 													Command="{Binding CutElementsCommand}"
 													CommandParameter="{Binding ElementName=_listView, Path=SelectedItems}"
 													Style="{StaticResource MultipleSelectionButton}">
-												
 											</Button>
 											
 											<Button FontFamily="{StaticResource SymbolFont}" 
@@ -226,13 +263,30 @@
 											
 											<Button FontFamily="{StaticResource SymbolFont}" 
 													FontSize="18" Content="&#xe77f;" 
-													Command="{Binding PasteElementsCommand}"/>
+													IsEnabled="{Binding Editor.ClipboardNodes.Count}"
+													Command="{Binding PasteElementsCommand}"
+													Style="{StaticResource ClipboardHasItemsButton}"/>
 											
 											<Button FontFamily="{StaticResource SymbolFont}"
 													FontSize="18" Content="&#xe74d;" 
 													Command="{Binding DeleteElementsCommand}"
 													CommandParameter="{Binding ElementName=_listView, Path=SelectedItems}"
 													Style="{StaticResource MultipleSelectionButton}"/>
+
+											<Separator/>
+
+
+											<Button FontFamily="{StaticResource SymbolFont}"
+													FontSize="18" Content="&#xe74a;" 
+													Command="{Binding MoveElementsUpCommand}"
+													CommandParameter="{Binding ElementName=_listView}"
+													Style="{StaticResource SingleSelectionButton}"/>
+
+											<Button FontFamily="{StaticResource SymbolFont}"
+													FontSize="18" Content="&#xe74b;" 
+													Command="{Binding MoveElementsDownCommand}"
+													CommandParameter="{Binding ElementName=_listView}"
+													Style="{StaticResource SingleSelectionButton}"/>
 										</ToolBar>
 										<ScrollViewer Grid.Row="1">
 											<Grid>

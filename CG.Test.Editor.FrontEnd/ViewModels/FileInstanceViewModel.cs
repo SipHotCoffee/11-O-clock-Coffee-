@@ -79,6 +79,8 @@ namespace CG.Test.Editor.FrontEnd.ViewModels
     {
         private static int _lastId = 1;
 
+        private readonly MainViewModel _mainViewModel;
+
         private readonly List<NodeViewModelBase> _history;
 
         [ObservableProperty]
@@ -99,9 +101,11 @@ namespace CG.Test.Editor.FrontEnd.ViewModels
 		[ObservableProperty]
 		private NodeViewModelBase? _current;
 
-        public FileInstanceViewModel(Window ownerWindow)
+        public FileInstanceViewModel(MainViewModel mainViewModel, Window ownerWindow)
         {
-            _history = [];
+            _mainViewModel = mainViewModel;
+
+			_history = [];
 
             _historyIndex = 0;
 
@@ -118,7 +122,7 @@ namespace CG.Test.Editor.FrontEnd.ViewModels
 
 		public ObservableCollection<NodeViewModelBase> AddressItems { get; }
 
-        public List<NodeViewModelBase> ClipboardNodes { get; }
+        public ObservableCollection<NodeViewModelBase> ClipboardNodes { get; }
 
 		partial void OnRootChanged(NodeViewModelBase? oldValue, NodeViewModelBase? newValue)
         {
@@ -180,7 +184,13 @@ namespace CG.Test.Editor.FrontEnd.ViewModels
 			Current = _history[++HistoryIndex];
 		}
 
-        public void Navigate(NodeViewModelBase target)
+		[RelayCommand]
+		void Close()
+		{
+            _mainViewModel.OpenFiles.Remove(this);
+		}
+
+		public void Navigate(NodeViewModelBase target)
         {
 			Current = target;
 			AddPage();

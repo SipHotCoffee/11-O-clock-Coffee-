@@ -9,10 +9,6 @@ namespace CG.Test.Editor.FrontEnd.ViewModels
 {
     public partial class ArrayNodeViewModel : NodeViewModelBase
     {
-
-        [ObservableProperty]
-        private bool _hasSelection;
-
         public ArrayNodeViewModel(FileInstanceViewModel editor, NodeViewModelBase? parent, SchemaArrayType type) : base(editor, parent)
         {
             Type = type;
@@ -72,11 +68,26 @@ namespace CG.Test.Editor.FrontEnd.ViewModels
             Elements.Add(Type.ElementType.Visit(new NodeViewModelGeneratorVisitor(Editor, this)));
         }
 
-        [RelayCommand]
+		[RelayCommand]
+		void InsertAbove(int selectedIndex)
+		{
+			Elements.Insert(selectedIndex, Type.ElementType.Visit(new NodeViewModelGeneratorVisitor(Editor, this)));
+		}
+
+		[RelayCommand]
+		void InsertBelow(int selectedIndex)
+		{
+			Elements.Insert(selectedIndex + 1, Type.ElementType.Visit(new NodeViewModelGeneratorVisitor(Editor, this)));
+		}
+
+		[RelayCommand]
         void CutElements(IEnumerable selectedItems)
         {
             Editor.ClipboardNodes.Clear();
-            Editor.ClipboardNodes.AddRange(selectedItems.OfType<NodeViewModelBase>());
+            foreach (var selectedItem in selectedItems.OfType<NodeViewModelBase>())
+            {
+                Editor.ClipboardNodes.Add(selectedItem);
+            }
 
             foreach (var node in Editor.ClipboardNodes)
             {
@@ -88,8 +99,11 @@ namespace CG.Test.Editor.FrontEnd.ViewModels
         void CopyElements(IEnumerable selectedItems)
         {
             Editor.ClipboardNodes.Clear();
-            Editor.ClipboardNodes.AddRange(selectedItems.OfType<NodeViewModelBase>().Select((node) => node.Clone(null)));
-        }
+			foreach (var selectedItem in selectedItems.OfType<NodeViewModelBase>().Select((node) => node.Clone(null)))
+			{
+				Editor.ClipboardNodes.Add(selectedItem);
+			}
+		}
 
         [RelayCommand]
         void PasteElements()
@@ -133,35 +147,29 @@ namespace CG.Test.Editor.FrontEnd.ViewModels
         [RelayCommand]
         void MoveElementsUp(ListBox listBox)
         {
-            var startTargetIndex = listBox.SelectedIndex;
+            var currentIndex = listBox.SelectedIndex;
+			var newIndex = currentIndex - 1;
+            if (newIndex < 0)
+            {
+                newIndex = Elements.Count - 1;
+            }
 
-			var nodesToMove = listBox.SelectedItems.OfType<NodeViewModelBase>().ToList();
-			foreach (var nodeToRemove in nodesToMove)
-			{
-				Elements.Remove(nodeToRemove);
-			}
+            (Elements[currentIndex], Elements[newIndex]) = (Elements[newIndex], Elements[currentIndex]);
+            listBox.SelectedIndex = newIndex;
+        }
 
-			foreach (var nodeToInsert in nodesToMove)
-			{
-				Elements.Insert(startTargetIndex, nodeToInsert);
-			}
-		}
-
-		[RelayCommand]
+        [RelayCommand]
 		void MoveElementsDown(ListBox listBox)
 		{
-			var startTargetIndex = listBox.SelectedIndex + 1;
-
-			var nodesToMove = listBox.SelectedItems.OfType<NodeViewModelBase>().ToList();
-			foreach (var nodeToRemove in nodesToMove)
+			var currentIndex = listBox.SelectedIndex;
+			var newIndex = currentIndex + 1;
+			if (newIndex >= Elements.Count)
 			{
-				Elements.Remove(nodeToRemove);
+				newIndex = 0;
 			}
 
-			foreach (var nodeToInsert in nodesToMove)
-			{
-				Elements.Insert(startTargetIndex, nodeToInsert);
-			}
+			(Elements[currentIndex], Elements[newIndex]) = (Elements[newIndex], Elements[currentIndex]);
+			listBox.SelectedIndex = newIndex;
 		}
 	}
 }
