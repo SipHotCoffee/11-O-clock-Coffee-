@@ -15,7 +15,7 @@
 		<ResourceDictionary>
 			<converters:IsNotNullConverter x:Key="IsNotNullConverter"/>
 
-			<ResourceDictionary x:Key="NodeCompactDataTemplates">
+			<ResourceDictionary x:Key="NodeVeryCompactDataTemplates">
 				<DataTemplate DataType="{x:Type viewmodels:ArrayNodeViewModel}">
 					<TextBlock Text="[...]"/>
 				</DataTemplate>
@@ -23,6 +23,83 @@
 					<StackPanel Orientation="Horizontal">
 						<TextBlock Text="{Binding Type.Name}"/>
 						<TextBlock Text="{} {...}"/>
+					</StackPanel>
+				</DataTemplate>
+				<DataTemplate DataType="{x:Type viewmodels:IntegerNodeViewModel}">
+					<TextBlock Text="{Binding Value}"/>
+				</DataTemplate>
+				<DataTemplate DataType="{x:Type viewmodels:NumberNodeViewModel}">
+					<TextBlock Text="{Binding Value}"/>
+				</DataTemplate>
+				<DataTemplate DataType="{x:Type viewmodels:BooleanNodeViewModel}">
+					<TextBlock Text="{Binding Value}"/>
+				</DataTemplate>
+				<DataTemplate DataType="{x:Type viewmodels:StringNodeViewModel}">
+					<StackPanel Orientation="Horizontal">
+						<TextBlock Text="&quot;"/>
+						<TextBlock Text="{Binding Value}"/>
+						<TextBlock Text="&quot;"/>
+					</StackPanel>
+				</DataTemplate>
+			</ResourceDictionary>
+
+			<ResourceDictionary x:Key="NodeCompactDataTemplates">
+				<DataTemplate DataType="{x:Type viewmodels:ArrayNodeViewModel}">
+					<StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+						<TextBlock Text="{Binding Type.ElementType.Name}"/>
+						<TextBlock Text="["/>
+						<TextBlock Text="{Binding Elements.Count}"/>
+						<TextBlock Text="]"/>
+						<TextBlock Text="{} { "/>
+
+						<ItemsControl Resources="{StaticResource NodeVeryCompactDataTemplates}" ItemsSource="{Binding Elements}">
+							<ItemsControl.ItemsPanel>
+								<ItemsPanelTemplate>
+									<StackPanel Orientation="Horizontal"/>
+								</ItemsPanelTemplate>
+							</ItemsControl.ItemsPanel>
+							<ItemsControl.ItemTemplate>
+								<DataTemplate>
+									<StackPanel Orientation="Horizontal">
+										<TextBlock x:Name="commaTextBlock" Text=", "/>
+										<ContentPresenter Content="{Binding}"/>
+									</StackPanel>
+									<DataTemplate.Triggers>
+										<DataTrigger Binding="{Binding RelativeSource={RelativeSource PreviousData}}" Value="{x:Null}">
+											<Setter Property="Visibility" TargetName="commaTextBlock" Value="Collapsed"/>
+										</DataTrigger>
+									</DataTemplate.Triggers>
+								</DataTemplate>
+							</ItemsControl.ItemTemplate>
+						</ItemsControl>
+						<TextBlock Text="{} }"/>
+					</StackPanel>
+				</DataTemplate>
+				<DataTemplate DataType="{x:Type viewmodels:ObjectNodeViewModel}">
+					<StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+						<TextBlock Text="{Binding Type.Name}"/>
+						<TextBlock Text="{} { "/>
+						<ItemsControl Resources="{StaticResource NodeVeryCompactDataTemplates}" ItemsSource="{Binding Nodes}">
+							<ItemsControl.ItemsPanel>
+								<ItemsPanelTemplate>
+									<StackPanel Orientation="Horizontal"/>
+								</ItemsPanelTemplate>
+							</ItemsControl.ItemsPanel>
+							<ItemsControl.ItemTemplate>
+								<DataTemplate>
+									<StackPanel Orientation="Horizontal">
+										<TextBlock x:Name="commaTextBlock" Text=", "/>
+										<ContentPresenter Content="{Binding Value}"/>
+									</StackPanel>
+									<DataTemplate.Triggers>
+										<DataTrigger Binding="{Binding RelativeSource={RelativeSource PreviousData}}" Value="{x:Null}">
+											<Setter Property="Visibility" TargetName="commaTextBlock" Value="Collapsed"/>
+										</DataTrigger>
+									</DataTemplate.Triggers>
+								</DataTemplate>
+							</ItemsControl.ItemTemplate>
+						</ItemsControl>
+						<TextBlock Text="{} }"/>
 					</StackPanel>
 				</DataTemplate>
 				<DataTemplate DataType="{x:Type viewmodels:IntegerNodeViewModel}">
