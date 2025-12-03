@@ -129,8 +129,8 @@ namespace CG.Test.Editor.FrontEnd.ViewModels
 
         partial void OnHistoryIndexChanged(int oldValue, int newValue)
         {
-            IsBackButtonEnabled = _historyIndex > 0;
-            IsForwardButtonEnabled = _historyIndex < _history.Count - 1;
+            IsBackButtonEnabled = newValue > 0;
+            IsForwardButtonEnabled = newValue < _history.Count - 1;
         }
 
         partial void OnCurrentChanged(NodeViewModelBase? oldValue, NodeViewModelBase newValue)
