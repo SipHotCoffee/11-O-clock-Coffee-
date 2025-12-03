@@ -8,7 +8,7 @@ namespace CG.Test.Editor.FrontEnd.ViewModels
 		[ObservableProperty]
 		private long _value;
 
-		public IntegerNodeViewModel(NodeViewModelBase? parent, SchemaIntegerType type, long value) : base(parent)
+		public IntegerNodeViewModel(FileInstanceViewModel editor, NodeViewModelBase? parent, SchemaIntegerType type, long value) : base(editor, parent)
 		{
 			Type  = type;
 			Value = value;
@@ -16,6 +16,6 @@ namespace CG.Test.Editor.FrontEnd.ViewModels
 
 		public override SchemaIntegerType Type { get; }
 
-		public override IntegerNodeViewModel Clone(NodeViewModelBase? parent) => new(parent, Type, Value);
+		public override IntegerNodeViewModel Clone(NodeViewModelBase? parent) => new(Editor, parent, Type, Value);
     }
 }

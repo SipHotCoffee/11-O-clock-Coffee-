@@ -17,28 +17,28 @@
 
 			<ResourceDictionary x:Key="NodeVeryCompactDataTemplates">
 				<DataTemplate DataType="{x:Type viewmodels:ArrayNodeViewModel}">
-					<TextBlock Text="[...]"/>
+					<TextBlock FontFamily="Cascadia Mono" Text="[...]"/>
 				</DataTemplate>
 				<DataTemplate DataType="{x:Type viewmodels:ObjectNodeViewModel}">
 					<StackPanel Orientation="Horizontal">
-						<TextBlock Text="{Binding Type.Name}"/>
-						<TextBlock Text="{} {...}"/>
+						<TextBlock FontFamily="Cascadia Mono" Text="{Binding Type.Name}"/>
+						<TextBlock FontFamily="Cascadia Mono" Text="{} {...}"/>
 					</StackPanel>
 				</DataTemplate>
 				<DataTemplate DataType="{x:Type viewmodels:IntegerNodeViewModel}">
-					<TextBlock Text="{Binding Value}"/>
+					<TextBlock FontFamily="Cascadia Mono" Text="{Binding Value}"/>
 				</DataTemplate>
 				<DataTemplate DataType="{x:Type viewmodels:NumberNodeViewModel}">
-					<TextBlock Text="{Binding Value}"/>
+					<TextBlock FontFamily="Cascadia Mono" Text="{Binding Value}"/>
 				</DataTemplate>
 				<DataTemplate DataType="{x:Type viewmodels:BooleanNodeViewModel}">
-					<TextBlock Text="{Binding Value}"/>
+					<TextBlock FontFamily="Cascadia Mono" Text="{Binding Value}"/>
 				</DataTemplate>
 				<DataTemplate DataType="{x:Type viewmodels:StringNodeViewModel}">
 					<StackPanel Orientation="Horizontal">
-						<TextBlock Text="&quot;"/>
-						<TextBlock Text="{Binding Value}"/>
-						<TextBlock Text="&quot;"/>
+						<TextBlock FontFamily="Cascadia Mono" Text="&quot;"/>
+						<TextBlock FontFamily="Cascadia Mono" Text="{Binding Value}"/>
+						<TextBlock FontFamily="Cascadia Mono" Text="&quot;"/>
 					</StackPanel>
 				</DataTemplate>
 			</ResourceDictionary>
@@ -46,11 +46,11 @@
 			<ResourceDictionary x:Key="NodeCompactDataTemplates">
 				<DataTemplate DataType="{x:Type viewmodels:ArrayNodeViewModel}">
 					<StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-						<TextBlock Text="{Binding Type.ElementType.Name}"/>
-						<TextBlock Text="["/>
-						<TextBlock Text="{Binding Elements.Count}"/>
-						<TextBlock Text="]"/>
-						<TextBlock Text="{} { "/>
+						<TextBlock FontFamily="Cascadia Mono" Text="{Binding Type.ElementType.Name}"/>
+						<TextBlock FontFamily="Cascadia Mono" Text="["/>
+						<TextBlock FontFamily="Cascadia Mono" Text="{Binding Elements.Count}"/>
+						<TextBlock FontFamily="Cascadia Mono" Text="]"/>
+						<TextBlock FontFamily="Cascadia Mono" Text="{} { "/>
 
 						<ItemsControl Resources="{StaticResource NodeVeryCompactDataTemplates}" ItemsSource="{Binding Elements}">
 							<ItemsControl.ItemsPanel>
@@ -61,7 +61,7 @@
 							<ItemsControl.ItemTemplate>
 								<DataTemplate>
 									<StackPanel Orientation="Horizontal">
-										<TextBlock x:Name="commaTextBlock" Text=", "/>
+										<TextBlock FontFamily="Cascadia Mono" x:Name="commaTextBlock" Text=", "/>
 										<ContentPresenter Content="{Binding}"/>
 									</StackPanel>
 									<DataTemplate.Triggers>
@@ -72,13 +72,13 @@
 								</DataTemplate>
 							</ItemsControl.ItemTemplate>
 						</ItemsControl>
-						<TextBlock Text="{} }"/>
+						<TextBlock FontFamily="Cascadia Mono" Text="{} }"/>
 					</StackPanel>
 				</DataTemplate>
 				<DataTemplate DataType="{x:Type viewmodels:ObjectNodeViewModel}">
 					<StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-						<TextBlock Text="{Binding Type.Name}"/>
-						<TextBlock Text="{} { "/>
+						<TextBlock FontFamily="Cascadia Mono" Text="{Binding Type.Name}"/>
+						<TextBlock FontFamily="Cascadia Mono" Text="{} { "/>
 						<ItemsControl Resources="{StaticResource NodeVeryCompactDataTemplates}" ItemsSource="{Binding Nodes}">
 							<ItemsControl.ItemsPanel>
 								<ItemsPanelTemplate>
@@ -88,7 +88,7 @@
 							<ItemsControl.ItemTemplate>
 								<DataTemplate>
 									<StackPanel Orientation="Horizontal">
-										<TextBlock x:Name="commaTextBlock" Text=", "/>
+										<TextBlock FontFamily="Cascadia Mono" x:Name="commaTextBlock" Text=", "/>
 										<ContentPresenter Content="{Binding Value}"/>
 									</StackPanel>
 									<DataTemplate.Triggers>
@@ -99,23 +99,23 @@
 								</DataTemplate>
 							</ItemsControl.ItemTemplate>
 						</ItemsControl>
-						<TextBlock Text="{} }"/>
+						<TextBlock FontFamily="Cascadia Mono" Text="{} }"/>
 					</StackPanel>
 				</DataTemplate>
 				<DataTemplate DataType="{x:Type viewmodels:IntegerNodeViewModel}">
-					<TextBlock Text="{Binding Value}"/>
+					<TextBlock FontFamily="Cascadia Mono" Text="{Binding Value}"/>
 				</DataTemplate>
 				<DataTemplate DataType="{x:Type viewmodels:NumberNodeViewModel}">
-					<TextBlock Text="{Binding Value}"/>
+					<TextBlock FontFamily="Cascadia Mono" Text="{Binding Value}"/>
 				</DataTemplate>
 				<DataTemplate DataType="{x:Type viewmodels:BooleanNodeViewModel}">
-					<TextBlock Text="{Binding Value}"/>
+					<TextBlock FontFamily="Cascadia Mono" Text="{Binding Value}"/>
 				</DataTemplate>
 				<DataTemplate DataType="{x:Type viewmodels:StringNodeViewModel}">
 					<StackPanel Orientation="Horizontal">
-						<TextBlock Text="&quot;"/>
-						<TextBlock Text="{Binding Value}"/>
-						<TextBlock Text="&quot;"/>
+						<TextBlock FontFamily="Cascadia Mono" Text="&quot;"/>
+						<TextBlock FontFamily="Cascadia Mono" Text="{Binding Value}"/>
+						<TextBlock FontFamily="Cascadia Mono" Text="&quot;"/>
 					</StackPanel>
 				</DataTemplate>
 			</ResourceDictionary>
@@ -137,7 +137,7 @@
 						  CommandParameter="{Binding RelativeSource={RelativeSource AncestorType={x:Type Window}}}"/>
 			</MenuItem>
 		</Menu>
-		<TabControl Grid.Row="1" ItemsSource="{Binding OpenFiles}">
+		<TabControl Grid.Row="1" ItemsSource="{Binding OpenFiles}" SelectedItem="{Binding SelectedFile}">
 			<TabControl.ItemTemplate>
 				<DataTemplate>
 					<Grid VerticalAlignment="Center" HorizontalAlignment="Stretch">
@@ -177,7 +177,7 @@
 								</ItemsControl.ItemsPanel>
 								<ItemsControl.ItemTemplate>
 									<DataTemplate>
-										<Button Content="{Binding Node.Name}" Margin="2.5, 5, 2.5, 5" 
+										<Button Content="{Binding Name}" Margin="2.5, 5, 2.5, 5" 
 												Command="{Binding  Path=NavigateCommand}" 
 												CommandParameter="{Binding Node}"/>
 									</DataTemplate>
@@ -193,12 +193,46 @@
 											<RowDefinition Height="*"/>
 										</Grid.RowDefinitions>
 										<ToolBar>
-											<Button FontFamily="{StaticResource SymbolFont}" FontSize="18" Content="&#xe948;" Command="{Binding InsertCommand}"/>
+											<ToolBar.Resources>
+												<Style x:Key="MultipleSelectionButton" TargetType="{x:Type Button}" BasedOn="{StaticResource {x:Static ToolBar.ButtonStyleKey}}">
+													<Style.Triggers>
+														<DataTrigger Binding="{Binding ElementName=_listView, Path=SelectedItems.Count}" Value="0">
+															<Setter Property="IsEnabled" Value="False"/>
+														</DataTrigger>
+													</Style.Triggers>
+												</Style>
+											</ToolBar.Resources>
 											
-											<Button x:Name="CUT"    FontFamily="{StaticResource SymbolFont}" FontSize="18" Content="&#xe8c6;"/>
-											<Button x:Name="COPY"   FontFamily="{StaticResource SymbolFont}" FontSize="18" Content="&#xe8c8;"/>
-											<Button x:Name="PASTE"  FontFamily="{StaticResource SymbolFont}" FontSize="18" Content="&#xe77f;"/>
-											<Button x:Name="DELETE" FontFamily="{StaticResource SymbolFont}" FontSize="18" Content="&#xe74d;"/>
+											<Button FontFamily="{StaticResource SymbolFont}" 
+													FontSize="18" 
+													Content="&#xe948;" 
+													Command="{Binding InsertCommand}"/>
+
+											<Button FontFamily="{StaticResource SymbolFont}" 
+													FontSize="18" 
+													Content="&#xe8c6;"
+													Command="{Binding CutElementsCommand}"
+													CommandParameter="{Binding ElementName=_listView, Path=SelectedItems}"
+													Style="{StaticResource MultipleSelectionButton}">
+												
+											</Button>
+											
+											<Button FontFamily="{StaticResource SymbolFont}" 
+													FontSize="18" 
+													Content="&#xe8c8;"
+													Command="{Binding CopyElementsCommand}"
+													CommandParameter="{Binding ElementName=_listView, Path=SelectedItems}"
+													Style="{StaticResource MultipleSelectionButton}"/>
+											
+											<Button FontFamily="{StaticResource SymbolFont}" 
+													FontSize="18" Content="&#xe77f;" 
+													Command="{Binding PasteElementsCommand}"/>
+											
+											<Button FontFamily="{StaticResource SymbolFont}"
+													FontSize="18" Content="&#xe74d;" 
+													Command="{Binding DeleteElementsCommand}"
+													CommandParameter="{Binding ElementName=_listView, Path=SelectedItems}"
+													Style="{StaticResource MultipleSelectionButton}"/>
 										</ToolBar>
 										<ScrollViewer Grid.Row="1">
 											<Grid>
@@ -208,7 +242,10 @@
 												</Grid.ColumnDefinitions>
 
 												<ListView Grid.Column="0" Margin="5" IsEnabled="False" 
-														  ItemsSource="{Binding Indices}" Background="Transparent" BorderBrush="Transparent">
+														  ItemsSource="{Binding Indices}" 
+														  Background="Transparent" 
+														  BorderBrush="Transparent" 
+														  SelectionMode="Multiple">
 													<ListView.ItemTemplate>
 														<DataTemplate>
 															<Grid>
@@ -217,14 +254,15 @@
 																	<ColumnDefinition Width="auto"/>
 																	<ColumnDefinition Width="auto"/>
 																</Grid.ColumnDefinitions>
-																<TextBlock Grid.Column="0" VerticalAlignment="Center" Text="["/>
-																<TextBlock Grid.Column="1" VerticalAlignment="Center" Text="{Binding}"/>
-																<TextBlock Grid.Column="2" VerticalAlignment="Center" Text="]: "/>
+																<TextBlock FontFamily="Cascadia Mono" Grid.Column="0" VerticalAlignment="Center" Text="["/>
+																<TextBlock FontFamily="Cascadia Mono" Grid.Column="1" VerticalAlignment="Center" Text="{Binding}"/>
+																<TextBlock FontFamily="Cascadia Mono" Grid.Column="2" VerticalAlignment="Center" Text="]: "/>
 															</Grid>
 														</DataTemplate>
 													</ListView.ItemTemplate>
 												</ListView>
-												<ListView Grid.Column="1" Margin="5" ItemsSource="{Binding Elements}" Resources="{StaticResource NodeCompactDataTemplates}">
+												<ListView x:Name="_listView" Grid.Column="1" Margin="5" 
+														  ItemsSource="{Binding Elements}" Resources="{StaticResource NodeCompactDataTemplates}">
 													<ListView.ItemContainerStyle>
 														<Style TargetType="{x:Type ListViewItem}" BasedOn="{StaticResource {x:Type ListViewItem}}">
 															<Setter Property="VerticalContentAlignment" Value="Center"/>
@@ -254,9 +292,9 @@
 															<DataTemplate>
 																<StackPanel Orientation="Horizontal" VerticalAlignment="Center">
 																	<TextBlock VerticalAlignment="Center" FontFamily="Cascadia Mono" 
-																			   FontWeight="Bold" FontSize="18" Text="{Binding Key}"/>
+																			   FontWeight="Bold" FontSize="16" Text="{Binding Key}"/>
 																	<TextBlock VerticalAlignment="Center" FontFamily="Cascadia Mono" 
-																			   FontWeight="Bold" FontSize="18" Text=": "/>
+																			   FontWeight="Bold" FontSize="16" Text=": "/>
 																</StackPanel>
 															</DataTemplate>
 														</GridViewColumn.CellTemplate>

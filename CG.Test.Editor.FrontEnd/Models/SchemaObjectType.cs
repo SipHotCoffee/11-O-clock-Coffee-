@@ -1,6 +1,4 @@
-﻿using System.Text.Json.Nodes;
-
-namespace CG.Test.Editor.FrontEnd.Models
+﻿namespace CG.Test.Editor.FrontEnd.Models
 {
     public readonly struct SchemaProperty
     {
@@ -9,6 +7,13 @@ namespace CG.Test.Editor.FrontEnd.Models
 
         public required int Index { get; init; }
     }
+
+    public class SchemaVariantType(IEnumerable<SchemaTypeBase> possibleTypes) : SchemaTypeBase
+    {
+        public IReadOnlySet<SchemaTypeBase> PossibleTypes { get; } = possibleTypes.ToHashSet();
+
+        public override bool IsConvertibleFrom(SchemaTypeBase sourceType) => PossibleTypes.Contains(sourceType);
+	}
 
     public class SchemaObjectType : SchemaTypeBase
     {
@@ -41,16 +46,6 @@ namespace CG.Test.Editor.FrontEnd.Models
             return false;
         }
 
-		public override JsonObject Create()
-        {
-            var result = new JsonObject();
-
-            foreach (var schemaProperty in Properties)
-            {
-                result.Add(schemaProperty.Name, schemaProperty.Type.Create());
-            }
-
-            return result;
-        }
+        public override bool IsConvertibleFrom(SchemaTypeBase sourceType) => sourceType == this;
     }
 }

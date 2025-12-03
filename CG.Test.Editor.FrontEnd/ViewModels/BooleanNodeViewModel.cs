@@ -8,7 +8,7 @@ namespace CG.Test.Editor.FrontEnd.ViewModels
         [ObservableProperty]
         private bool _value;
 
-        public BooleanNodeViewModel(NodeViewModelBase? parent, SchemaBooleanType type, bool value) : base(parent)
+        public BooleanNodeViewModel(FileInstanceViewModel editor, NodeViewModelBase? parent, SchemaBooleanType type, bool value) : base(editor, parent)
         {
             Type = type;
 
@@ -17,6 +17,6 @@ namespace CG.Test.Editor.FrontEnd.ViewModels
 
         public override SchemaBooleanType Type { get; }
 
-        public override BooleanNodeViewModel Clone(NodeViewModelBase? parent) => new(parent, Type, Value);
+        public override BooleanNodeViewModel Clone(NodeViewModelBase? parent) => new(Editor, parent, Type, Value);
     }
 }

@@ -1,9 +1,7 @@
-﻿using System.Text.Json.Nodes;
-
-namespace CG.Test.Editor.FrontEnd.Models
+﻿namespace CG.Test.Editor.FrontEnd.Models
 {
     public class SchemaBooleanType : SchemaTypeBase
     {
-        public override JsonNode Create() => JsonValue.Create(false);
+        public override bool IsConvertibleFrom(SchemaTypeBase sourceType) => sourceType is SchemaBooleanType;
     }
 }

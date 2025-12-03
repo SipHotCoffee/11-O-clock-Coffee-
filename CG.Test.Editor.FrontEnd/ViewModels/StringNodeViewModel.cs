@@ -8,7 +8,7 @@ namespace CG.Test.Editor.FrontEnd.ViewModels
 		[ObservableProperty]
 		private string _value;
 
-		public StringNodeViewModel(NodeViewModelBase? parent, SchemaStringType type, string value) : base(parent)
+		public StringNodeViewModel(FileInstanceViewModel editor, NodeViewModelBase? parent, SchemaStringType type, string value) : base(editor, parent)
 		{
 			Type  = type;
 			Value = value;
@@ -16,6 +16,6 @@ namespace CG.Test.Editor.FrontEnd.ViewModels
 
 		public override SchemaStringType Type { get; }
 
-		public override StringNodeViewModel Clone(NodeViewModelBase? parent) => new(parent, Type, Value);
+		public override StringNodeViewModel Clone(NodeViewModelBase? parent) => new(Editor, parent, Type, Value);
     }
 }

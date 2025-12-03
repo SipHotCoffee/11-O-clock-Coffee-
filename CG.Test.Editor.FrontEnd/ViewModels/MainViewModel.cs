@@ -24,8 +24,9 @@ namespace CG.Test.Editor.FrontEnd.ViewModels
         [RelayCommand]
         void NewFile(Window window)
         {
-            var instance = new FileInstanceViewModel(window, typeof(RootNode).GetSchemaFromType(null).Visit(new NodeViewModelGeneratorVisitor(null)));
-            OpenFiles.Add(instance);
+            var instance = new FileInstanceViewModel(window);
+            instance.Root = typeof(RootNode).GetSchemaFromType(null).Visit(new NodeViewModelGeneratorVisitor(instance, null));
+			OpenFiles.Add(instance);
             SelectedFile = instance;
 		}
 

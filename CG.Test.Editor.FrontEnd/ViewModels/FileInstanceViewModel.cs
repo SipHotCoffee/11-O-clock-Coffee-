@@ -75,19 +75,6 @@ namespace CG.Test.Editor.FrontEnd.ViewModels
 		}
 	}
 
-    public partial class AddressItem(FileInstanceViewModel editor, NodeViewModelBase node) : ObservableObject
-    {
-        private readonly FileInstanceViewModel _editor = editor;
-
-        public NodeViewModelBase Node { get; } = node;
-
-		[RelayCommand]
-        void Navigate()
-        {
-            _editor.Navigate(Node);
-        }
-    }
-
     public partial class FileInstanceViewModel : ObservableObject
     {
         private static int _lastId = 1;
@@ -106,10 +93,13 @@ namespace CG.Test.Editor.FrontEnd.ViewModels
         [ObservableProperty]
         private string _name;
 
-        [ObservableProperty]
-		private NodeViewModelBase _current;
+		[ObservableProperty]
+		private NodeViewModelBase? _root;
 
-        public FileInstanceViewModel(Window ownerWindow, NodeViewModelBase root)
+		[ObservableProperty]
+		private NodeViewModelBase? _current;
+
+        public FileInstanceViewModel(Window ownerWindow)
         {
             _history = [];
 
@@ -121,11 +111,19 @@ namespace CG.Test.Editor.FrontEnd.ViewModels
 
 			AddressItems = [];
 
-			Root = root;
-
-            Current = root;
-            AddPage();
+            ClipboardNodes = [];
 		}
+
+		public Window OwnerWindow { get; }
+
+		public ObservableCollection<NodeViewModelBase> AddressItems { get; }
+
+        public List<NodeViewModelBase> ClipboardNodes { get; }
+
+		partial void OnRootChanged(NodeViewModelBase? oldValue, NodeViewModelBase? newValue)
+        {
+            Current = newValue;
+        }
 
         partial void OnHistoryIndexChanged(int oldValue, int newValue)
         {
@@ -133,23 +131,27 @@ namespace CG.Test.Editor.FrontEnd.ViewModels
             IsForwardButtonEnabled = newValue < _history.Count - 1;
         }
 
-        partial void OnCurrentChanged(NodeViewModelBase? oldValue, NodeViewModelBase newValue)
+        partial void OnCurrentChanged(NodeViewModelBase? oldValue, NodeViewModelBase? newValue)
         {
-            AddressItems.Clear();
-            for (var current = Current; current is not null; current = current.Parent)
+            if (newValue is null)
             {
-                AddressItems.Insert(0, new AddressItem(this, current));
+                return;
+            }
+
+            AddressItems.Clear();
+            for (var current = newValue; current is not null; current = current.Parent)
+            {
+                AddressItems.Insert(0, current);
             }
 		}
 
-        public Window OwnerWindow { get; }
-
-		public NodeViewModelBase Root { get; }
-
-        public ObservableCollection<AddressItem> AddressItems { get; }
-
         private void AddPage()
         {
+            if (Current is null)
+            {
+                return;
+            }
+
             var nextIndex = HistoryIndex + 1;
             if (nextIndex < _history.Count)
             {
@@ -162,7 +164,7 @@ namespace CG.Test.Editor.FrontEnd.ViewModels
         [RelayCommand]
         void MoveUp()
         {
-			Current = Current.Parent ?? throw new NullReferenceException();
+			Current = Current?.Parent ?? throw new NullReferenceException();
 			AddPage();
 		}
 

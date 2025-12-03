@@ -6,6 +6,6 @@ namespace CG.Test.Editor.FrontEnd.Models
     {
         public int MaximumLength { get; } = maximumLength;
 
-        public override JsonValue Create() => JsonValue.Create(string.Empty);
+        public override bool IsConvertibleFrom(SchemaTypeBase sourceType) => sourceType is SchemaStringType;
     }
 }

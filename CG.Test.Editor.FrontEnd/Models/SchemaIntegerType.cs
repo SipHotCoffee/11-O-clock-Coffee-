@@ -7,6 +7,6 @@ namespace CG.Test.Editor.FrontEnd.Models
 		public long Minimum { get; } = minimum;
 		public long Maximum { get; } = maximum;
 
-		public override JsonValue Create() => JsonValue.Create(Minimum);
-	}
+		public override bool IsConvertibleFrom(SchemaTypeBase sourceType) => sourceType is SchemaIntegerType;
+    }
 }

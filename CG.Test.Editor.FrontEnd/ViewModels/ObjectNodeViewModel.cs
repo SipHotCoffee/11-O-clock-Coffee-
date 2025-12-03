@@ -3,7 +3,7 @@ using System.Collections.ObjectModel;
 
 namespace CG.Test.Editor.FrontEnd.ViewModels
 {
-    public class ObjectNodeViewModel(NodeViewModelBase? parent, SchemaObjectType type) : NodeViewModelBase(parent)
+    public class ObjectNodeViewModel(FileInstanceViewModel editor, NodeViewModelBase? parent, SchemaObjectType type) : NodeViewModelBase(editor, parent)
     {
         public ObservableCollection<KeyValuePair<string, NodeViewModelBase>> Nodes { get; } = [];
 
@@ -11,7 +11,7 @@ namespace CG.Test.Editor.FrontEnd.ViewModels
 
         public override ObjectNodeViewModel Clone(NodeViewModelBase? parent)
         {
-            var result = new ObjectNodeViewModel(parent, Type);
+            var result = new ObjectNodeViewModel(Editor, parent, Type);
 
 			foreach (var property in Type.Properties)
             {
@@ -23,6 +23,11 @@ namespace CG.Test.Editor.FrontEnd.ViewModels
 
         protected override string GetName(NodeViewModelBase item)
         {
+            if (Type.TryGetProperty("name", out var property) && Nodes[property.Index].Value is StringNodeViewModel stringNode)
+            {
+                return stringNode.Value;
+            }
+
             foreach (var pair in Nodes)
             {
                 if (pair.Value == item)

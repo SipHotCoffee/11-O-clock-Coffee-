@@ -33,5 +33,5 @@ namespace CG.Test.Editor.FrontEnd.Views
 				node.Visit(new NodeEditorVisitor(ViewModel.SelectedFile));
 			}
 		}
-	}
+    }
 }

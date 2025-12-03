@@ -6,6 +6,6 @@ namespace CG.Test.Editor.FrontEnd.Models
     {
         public SchemaTypeBase ElementType { get; } = elementType;
 
-        public override JsonArray Create() => [];
+        public override bool IsConvertibleFrom(SchemaTypeBase sourceType) => sourceType is SchemaArrayType sourceArrayType && ElementType.IsConvertibleFrom(sourceArrayType.ElementType);
     }
 }
