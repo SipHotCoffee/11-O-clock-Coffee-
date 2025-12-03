@@ -83,8 +83,10 @@
 							<RowDefinition Height="*"/>
 						</Grid.RowDefinitions>
 						<ToolBar Grid.Row="0">
-							<Button Margin="5, 5, 2.5, 5"   Content="&#xe72b;" FontFamily="{StaticResource SymbolFont}"/>
-							<Button Margin="2.5, 5, 2.5, 5" Content="&#xe72a;" FontFamily="{StaticResource SymbolFont}"/>
+							<Button Margin="5, 5, 2.5, 5"   Content="&#xe72b;" FontFamily="{StaticResource SymbolFont}"
+									IsEnabled="{Binding IsBackButtonEnabled}" Command="{Binding MoveBackCommand}"/>
+							<Button Margin="2.5, 5, 2.5, 5" Content="&#xe72a;" FontFamily="{StaticResource SymbolFont}" 
+									IsEnabled="{Binding IsForwardButtonEnabled}" Command="{Binding MoveForwardCommand}"/>
 							<Separator/>
 							<Button Margin="2.5, 5, 5, 5" Content="&#xe74a;" FontFamily="{StaticResource SymbolFont}" Command="{Binding MoveUpCommand}" 
 									IsEnabled="{Binding Current.Parent, Converter={StaticResource IsNotNullConverter}}"/>

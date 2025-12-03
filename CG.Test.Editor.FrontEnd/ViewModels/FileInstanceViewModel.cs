@@ -12,12 +12,12 @@ namespace CG.Test.Editor.FrontEnd.ViewModels
 
 		public void Visit(ArrayNodeViewModel arrayNode)
         {
-            _editor.Current = arrayNode;
+            _editor.Navigate(arrayNode);
         }
 
 		public void Visit(ObjectNodeViewModel objectNode)
 		{
-			_editor.Current = objectNode;
+			_editor.Navigate(objectNode);
 		}
 
         public void Visit(NumberNodeViewModel numberNode)
@@ -92,6 +92,17 @@ namespace CG.Test.Editor.FrontEnd.ViewModels
     {
         private static int _lastId = 1;
 
+        private readonly List<NodeViewModelBase> _history;
+
+        [ObservableProperty]
+        private int _historyIndex;
+
+        [ObservableProperty]
+        private bool _isBackButtonEnabled;
+
+        [ObservableProperty]
+        private bool _isForwardButtonEnabled;
+
         [ObservableProperty]
         private string _name;
 
@@ -100,7 +111,11 @@ namespace CG.Test.Editor.FrontEnd.ViewModels
 
         public FileInstanceViewModel(Window ownerWindow, NodeViewModelBase root)
         {
-            OwnerWindow = ownerWindow;
+            _history = [];
+
+            _historyIndex = 0;
+
+			OwnerWindow = ownerWindow;
 
             Name = $"Untitled {_lastId++}";
 
@@ -109,7 +124,14 @@ namespace CG.Test.Editor.FrontEnd.ViewModels
 			Root = root;
 
             Current = root;
+            AddPage();
 		}
+
+        partial void OnHistoryIndexChanged(int oldValue, int newValue)
+        {
+            IsBackButtonEnabled = _historyIndex > 0;
+            IsForwardButtonEnabled = _historyIndex < _history.Count - 1;
+        }
 
         partial void OnCurrentChanged(NodeViewModelBase? oldValue, NodeViewModelBase newValue)
         {
@@ -126,15 +148,40 @@ namespace CG.Test.Editor.FrontEnd.ViewModels
 
         public ObservableCollection<AddressItem> AddressItems { get; }
 
+        private void AddPage()
+        {
+            var nextIndex = HistoryIndex + 1;
+            if (nextIndex < _history.Count)
+            {
+                _history.RemoveRange(nextIndex, _history.Count - nextIndex);
+            }
+            _history.Add(Current);
+			HistoryIndex = _history.Count - 1;
+		}
+
         [RelayCommand]
         void MoveUp()
         {
-            Current = Current.Parent ?? throw new NullReferenceException();
+			Current = Current.Parent ?? throw new NullReferenceException();
+			AddPage();
+		}
+
+        [RelayCommand]
+        void MoveBack()
+        {
+            Current = _history[--HistoryIndex];
         }
+
+        [RelayCommand]
+        void MoveForward()
+        {
+			Current = _history[++HistoryIndex];
+		}
 
         public void Navigate(NodeViewModelBase target)
         {
-            Current = target;
-        }
+			Current = target;
+			AddPage();
+		}
 	}
 }

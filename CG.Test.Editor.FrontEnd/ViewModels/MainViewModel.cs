@@ -1,11 +1,12 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using System.Collections.ObjectModel;
+using System.ComponentModel.DataAnnotations;
 using System.Windows;
 
 namespace CG.Test.Editor.FrontEnd.ViewModels
 {
-    public struct Vector3(float x, float y, float z);
+    public struct Vector3([Range(-100, 100)] float x, [Range(-100, 100)] float y, [Range(-100, 100)]  float z);
     public struct Transformation(Vector3 position, Vector3 rotation, Vector3 scale);
 
     public class RootNode(Transformation transformation, bool booleanValue, string stringValue, string[] names, bool[] flags)
@@ -23,7 +24,7 @@ namespace CG.Test.Editor.FrontEnd.ViewModels
         [RelayCommand]
         void NewFile(Window window)
         {
-            var instance = new FileInstanceViewModel(window, typeof(RootNode).GetSchemaFromType().Visit(new NodeViewModelGeneratorVisitor(null)));
+            var instance = new FileInstanceViewModel(window, typeof(RootNode).GetSchemaFromType(null).Visit(new NodeViewModelGeneratorVisitor(null)));
             OpenFiles.Add(instance);
             SelectedFile = instance;
 		}
