@@ -1,9 +1,11 @@
 ﻿using CG.Test.Editor.FrontEnd.Models;
-using CommunityToolkit.Mvvm.ComponentModel;
+using CG.Test.Editor.FrontEnd.Views.Dialogs;
 using CommunityToolkit.Mvvm.Input;
 using System.Collections;
 using System.Collections.ObjectModel;
 using System.Windows.Controls;
+using System.Windows.Data;
+using System.Xml.Linq;
 
 namespace CG.Test.Editor.FrontEnd.ViewModels
 {
@@ -163,5 +165,19 @@ namespace CG.Test.Editor.FrontEnd.ViewModels
 			(Elements[currentIndex], Elements[newIndex]) = (Elements[newIndex], Elements[currentIndex]);
 			listBox.SelectedIndex = newIndex;
 		}
+
+        [RelayCommand]
+        void SearchElements()
+        {
+            var dialog = new SearchArrayDialog()
+            {
+                NodeCollection = CollectionViewSource.GetDefaultView(new ObservableCollection<NodeViewModelBase>(Elements))
+            };
+
+            if (dialog.ShowDialog() == true)
+            {
+				dialog.SelectedNode.Visit(new NodeEditorVisitor(Editor));
+			}
+        }
 	}
 }

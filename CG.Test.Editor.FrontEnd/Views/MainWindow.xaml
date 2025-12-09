@@ -14,111 +14,6 @@
 	<Window.Resources>
 		<ResourceDictionary>
 			<converters:IsNotNullConverter x:Key="IsNotNullConverter"/>
-
-			<ResourceDictionary x:Key="NodeVeryCompactDataTemplates">
-				<DataTemplate DataType="{x:Type viewmodels:ArrayNodeViewModel}">
-					<TextBlock FontFamily="Cascadia Mono" Text="[...]"/>
-				</DataTemplate>
-				<DataTemplate DataType="{x:Type viewmodels:ObjectNodeViewModel}">
-					<StackPanel Orientation="Horizontal">
-						<TextBlock FontFamily="Cascadia Mono" Text="{Binding Type.Name}"/>
-						<TextBlock FontFamily="Cascadia Mono" Text="{} {...}"/>
-					</StackPanel>
-				</DataTemplate>
-				<DataTemplate DataType="{x:Type viewmodels:IntegerNodeViewModel}">
-					<TextBlock FontFamily="Cascadia Mono" Text="{Binding Value}"/>
-				</DataTemplate>
-				<DataTemplate DataType="{x:Type viewmodels:NumberNodeViewModel}">
-					<TextBlock FontFamily="Cascadia Mono" Text="{Binding Value}"/>
-				</DataTemplate>
-				<DataTemplate DataType="{x:Type viewmodels:BooleanNodeViewModel}">
-					<TextBlock FontFamily="Cascadia Mono" Text="{Binding Value}"/>
-				</DataTemplate>
-				<DataTemplate DataType="{x:Type viewmodels:StringNodeViewModel}">
-					<StackPanel Orientation="Horizontal">
-						<TextBlock FontFamily="Cascadia Mono" Text="&quot;"/>
-						<TextBlock FontFamily="Cascadia Mono" Text="{Binding Value}"/>
-						<TextBlock FontFamily="Cascadia Mono" Text="&quot;"/>
-					</StackPanel>
-				</DataTemplate>
-			</ResourceDictionary>
-
-			<ResourceDictionary x:Key="NodeCompactDataTemplates">
-				<DataTemplate DataType="{x:Type viewmodels:ArrayNodeViewModel}">
-					<StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-						<TextBlock FontFamily="Cascadia Mono" Text="{Binding Type.ElementType.Name}"/>
-						<TextBlock FontFamily="Cascadia Mono" Text="["/>
-						<TextBlock FontFamily="Cascadia Mono" Text="{Binding Elements.Count}"/>
-						<TextBlock FontFamily="Cascadia Mono" Text="]"/>
-						<TextBlock FontFamily="Cascadia Mono" Text="{} { "/>
-
-						<ItemsControl Resources="{StaticResource NodeVeryCompactDataTemplates}" ItemsSource="{Binding Elements}">
-							<ItemsControl.ItemsPanel>
-								<ItemsPanelTemplate>
-									<StackPanel Orientation="Horizontal"/>
-								</ItemsPanelTemplate>
-							</ItemsControl.ItemsPanel>
-							<ItemsControl.ItemTemplate>
-								<DataTemplate>
-									<StackPanel Orientation="Horizontal">
-										<TextBlock FontFamily="Cascadia Mono" x:Name="commaTextBlock" Text=", "/>
-										<ContentPresenter Content="{Binding}"/>
-									</StackPanel>
-									<DataTemplate.Triggers>
-										<DataTrigger Binding="{Binding RelativeSource={RelativeSource PreviousData}}" Value="{x:Null}">
-											<Setter Property="Visibility" TargetName="commaTextBlock" Value="Collapsed"/>
-										</DataTrigger>
-									</DataTemplate.Triggers>
-								</DataTemplate>
-							</ItemsControl.ItemTemplate>
-						</ItemsControl>
-						<TextBlock FontFamily="Cascadia Mono" Text="{} }"/>
-					</StackPanel>
-				</DataTemplate>
-				<DataTemplate DataType="{x:Type viewmodels:ObjectNodeViewModel}">
-					<StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-						<TextBlock FontFamily="Cascadia Mono" Text="{Binding Type.Name}"/>
-						<TextBlock FontFamily="Cascadia Mono" Text="{} { "/>
-						<ItemsControl Resources="{StaticResource NodeVeryCompactDataTemplates}" ItemsSource="{Binding Nodes}">
-							<ItemsControl.ItemsPanel>
-								<ItemsPanelTemplate>
-									<StackPanel Orientation="Horizontal"/>
-								</ItemsPanelTemplate>
-							</ItemsControl.ItemsPanel>
-							<ItemsControl.ItemTemplate>
-								<DataTemplate>
-									<StackPanel Orientation="Horizontal">
-										<TextBlock FontFamily="Cascadia Mono" x:Name="commaTextBlock" Text=", "/>
-										<ContentPresenter Content="{Binding Value}"/>
-									</StackPanel>
-									<DataTemplate.Triggers>
-										<DataTrigger Binding="{Binding RelativeSource={RelativeSource PreviousData}}" Value="{x:Null}">
-											<Setter Property="Visibility" TargetName="commaTextBlock" Value="Collapsed"/>
-										</DataTrigger>
-									</DataTemplate.Triggers>
-								</DataTemplate>
-							</ItemsControl.ItemTemplate>
-						</ItemsControl>
-						<TextBlock FontFamily="Cascadia Mono" Text="{} }"/>
-					</StackPanel>
-				</DataTemplate>
-				<DataTemplate DataType="{x:Type viewmodels:IntegerNodeViewModel}">
-					<TextBlock FontFamily="Cascadia Mono" Text="{Binding Value}"/>
-				</DataTemplate>
-				<DataTemplate DataType="{x:Type viewmodels:NumberNodeViewModel}">
-					<TextBlock FontFamily="Cascadia Mono" Text="{Binding Value}"/>
-				</DataTemplate>
-				<DataTemplate DataType="{x:Type viewmodels:BooleanNodeViewModel}">
-					<TextBlock FontFamily="Cascadia Mono" Text="{Binding Value}"/>
-				</DataTemplate>
-				<DataTemplate DataType="{x:Type viewmodels:StringNodeViewModel}">
-					<StackPanel Orientation="Horizontal">
-						<TextBlock FontFamily="Cascadia Mono" Text="&quot;"/>
-						<TextBlock FontFamily="Cascadia Mono" Text="{Binding Value}"/>
-						<TextBlock FontFamily="Cascadia Mono" Text="&quot;"/>
-					</StackPanel>
-				</DataTemplate>
-			</ResourceDictionary>
 		</ResourceDictionary>
 	</Window.Resources>
     <Grid>
@@ -319,6 +214,12 @@
 													Command="{Binding MoveElementsDownCommand}"
 													CommandParameter="{Binding ElementName=_listView}"
 													Style="{StaticResource SingleSelectionButton}"/>
+
+											<Separator/>
+
+											<Button FontFamily="{StaticResource SymbolFont}"
+													FontSize="18" Content="&#xe721;" 
+													Command="{Binding SearchElementsCommand}"/>
 										</ToolBar>
 										<ScrollViewer Grid.Row="1">
 											<Grid>

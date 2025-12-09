@@ -1,9 +1,9 @@
 ﻿<Application x:Class="CG.Test.Editor.FrontEnd.App"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:local="clr-namespace:CG.Test.Editor.FrontEnd.Views" xmlns:dialogs="clr-namespace:CG.Test.Editor.FrontEnd.Views.Dialogs"
+             xmlns:local="clr-namespace:CG.Test.Editor.FrontEnd.Views" xmlns:dialogs="clr-namespace:CG.Test.Editor.FrontEnd.Views.Dialogs" xmlns:viewmodels="clr-namespace:CG.Test.Editor.FrontEnd.ViewModels"
 			 StartupUri="Views/MainWindow.xaml">
-    <Application.Resources>
+	<Application.Resources>
 		<ResourceDictionary>
 			<ResourceDictionary.MergedDictionaries>
 				<ResourceDictionary Source="/Resources/Styles/Modern/ColorSchemes/Dark.xaml"/>
@@ -12,6 +12,113 @@
 			<Style TargetType="{x:Type local:MainWindow}"          BasedOn="{StaticResource BaseWindowStyle}"/>
 			<Style TargetType="{x:Type dialogs:NumberValueDialog}" BasedOn="{StaticResource BaseWindowStyle}"/>
 			<Style TargetType="{x:Type dialogs:StringValueDialog}" BasedOn="{StaticResource BaseWindowStyle}"/>
+			<Style TargetType="{x:Type dialogs:SearchArrayDialog}" BasedOn="{StaticResource BaseWindowStyle}"/>
+
+
+			<ResourceDictionary x:Key="NodeVeryCompactDataTemplates">
+				<DataTemplate DataType="{x:Type viewmodels:ArrayNodeViewModel}">
+					<TextBlock FontFamily="Cascadia Mono" Text="[...]"/>
+				</DataTemplate>
+				<DataTemplate DataType="{x:Type viewmodels:ObjectNodeViewModel}">
+					<StackPanel Orientation="Horizontal">
+						<TextBlock FontFamily="Cascadia Mono" Text="{Binding Type.Name}"/>
+						<TextBlock FontFamily="Cascadia Mono" Text="{} {...}"/>
+					</StackPanel>
+				</DataTemplate>
+				<DataTemplate DataType="{x:Type viewmodels:IntegerNodeViewModel}">
+					<TextBlock FontFamily="Cascadia Mono" Text="{Binding Value}"/>
+				</DataTemplate>
+				<DataTemplate DataType="{x:Type viewmodels:NumberNodeViewModel}">
+					<TextBlock FontFamily="Cascadia Mono" Text="{Binding Value}"/>
+				</DataTemplate>
+				<DataTemplate DataType="{x:Type viewmodels:BooleanNodeViewModel}">
+					<TextBlock FontFamily="Cascadia Mono" Text="{Binding Value}"/>
+				</DataTemplate>
+				<DataTemplate DataType="{x:Type viewmodels:StringNodeViewModel}">
+					<StackPanel Orientation="Horizontal">
+						<TextBlock FontFamily="Cascadia Mono" Text="&quot;"/>
+						<TextBlock FontFamily="Cascadia Mono" Text="{Binding Value}"/>
+						<TextBlock FontFamily="Cascadia Mono" Text="&quot;"/>
+					</StackPanel>
+				</DataTemplate>
+			</ResourceDictionary>
+
+			<ResourceDictionary x:Key="NodeCompactDataTemplates">
+				<DataTemplate DataType="{x:Type viewmodels:ArrayNodeViewModel}">
+					<StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+						<TextBlock FontFamily="Cascadia Mono" Text="{Binding Type.ElementType.Name}"/>
+						<TextBlock FontFamily="Cascadia Mono" Text="["/>
+						<TextBlock FontFamily="Cascadia Mono" Text="{Binding Elements.Count}"/>
+						<TextBlock FontFamily="Cascadia Mono" Text="]"/>
+						<TextBlock FontFamily="Cascadia Mono" Text="{} { "/>
+
+						<ItemsControl Resources="{StaticResource NodeVeryCompactDataTemplates}" ItemsSource="{Binding Elements}">
+							<ItemsControl.ItemsPanel>
+								<ItemsPanelTemplate>
+									<StackPanel Orientation="Horizontal"/>
+								</ItemsPanelTemplate>
+							</ItemsControl.ItemsPanel>
+							<ItemsControl.ItemTemplate>
+								<DataTemplate>
+									<StackPanel Orientation="Horizontal">
+										<TextBlock FontFamily="Cascadia Mono" x:Name="commaTextBlock" Text=", "/>
+										<ContentPresenter Content="{Binding}"/>
+									</StackPanel>
+									<DataTemplate.Triggers>
+										<DataTrigger Binding="{Binding RelativeSource={RelativeSource PreviousData}}" Value="{x:Null}">
+											<Setter Property="Visibility" TargetName="commaTextBlock" Value="Collapsed"/>
+										</DataTrigger>
+									</DataTemplate.Triggers>
+								</DataTemplate>
+							</ItemsControl.ItemTemplate>
+						</ItemsControl>
+						<TextBlock FontFamily="Cascadia Mono" Text="{} }"/>
+					</StackPanel>
+				</DataTemplate>
+				<DataTemplate DataType="{x:Type viewmodels:ObjectNodeViewModel}">
+					<StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+						<TextBlock FontFamily="Cascadia Mono" Text="{Binding Type.Name}"/>
+						<TextBlock FontFamily="Cascadia Mono" Text="{} { "/>
+						<ItemsControl Resources="{StaticResource NodeVeryCompactDataTemplates}" ItemsSource="{Binding Nodes}">
+							<ItemsControl.ItemsPanel>
+								<ItemsPanelTemplate>
+									<StackPanel Orientation="Horizontal"/>
+								</ItemsPanelTemplate>
+							</ItemsControl.ItemsPanel>
+							<ItemsControl.ItemTemplate>
+								<DataTemplate>
+									<StackPanel Orientation="Horizontal">
+										<TextBlock FontFamily="Cascadia Mono" x:Name="commaTextBlock" Text=", "/>
+										<ContentPresenter Content="{Binding Value}"/>
+									</StackPanel>
+									<DataTemplate.Triggers>
+										<DataTrigger Binding="{Binding RelativeSource={RelativeSource PreviousData}}" Value="{x:Null}">
+											<Setter Property="Visibility" TargetName="commaTextBlock" Value="Collapsed"/>
+										</DataTrigger>
+									</DataTemplate.Triggers>
+								</DataTemplate>
+							</ItemsControl.ItemTemplate>
+						</ItemsControl>
+						<TextBlock FontFamily="Cascadia Mono" Text="{} }"/>
+					</StackPanel>
+				</DataTemplate>
+				<DataTemplate DataType="{x:Type viewmodels:IntegerNodeViewModel}">
+					<TextBlock FontFamily="Cascadia Mono" Text="{Binding Value}"/>
+				</DataTemplate>
+				<DataTemplate DataType="{x:Type viewmodels:NumberNodeViewModel}">
+					<TextBlock FontFamily="Cascadia Mono" Text="{Binding Value}"/>
+				</DataTemplate>
+				<DataTemplate DataType="{x:Type viewmodels:BooleanNodeViewModel}">
+					<TextBlock FontFamily="Cascadia Mono" Text="{Binding Value}"/>
+				</DataTemplate>
+				<DataTemplate DataType="{x:Type viewmodels:StringNodeViewModel}">
+					<StackPanel Orientation="Horizontal">
+						<TextBlock FontFamily="Cascadia Mono" Text="&quot;"/>
+						<TextBlock FontFamily="Cascadia Mono" Text="{Binding Value}"/>
+						<TextBlock FontFamily="Cascadia Mono" Text="&quot;"/>
+					</StackPanel>
+				</DataTemplate>
+			</ResourceDictionary>
 		</ResourceDictionary>
 	</Application.Resources>
 </Application>
