@@ -83,11 +83,7 @@ namespace CG.Test.Editor.FrontEnd.ViewModels
 		[RelayCommand]
         void CutElements(IEnumerable selectedItems)
         {
-            Editor.ClipboardNodes.Clear();
-            foreach (var selectedItem in selectedItems.OfType<NodeViewModelBase>())
-            {
-                Editor.ClipboardNodes.Add(selectedItem);
-            }
+            Editor.ClipboardNodes = new(selectedItems.OfType<NodeViewModelBase>());
 
             foreach (var node in Editor.ClipboardNodes)
             {
@@ -98,17 +94,13 @@ namespace CG.Test.Editor.FrontEnd.ViewModels
         [RelayCommand]
         void CopyElements(IEnumerable selectedItems)
         {
-            Editor.ClipboardNodes.Clear();
-			foreach (var selectedItem in selectedItems.OfType<NodeViewModelBase>().Select((node) => node.Clone(null)))
-			{
-				Editor.ClipboardNodes.Add(selectedItem);
-			}
+            Editor.ClipboardNodes = new(selectedItems.OfType<NodeViewModelBase>().Select((node) => node.Clone(null)));
 		}
 
         [RelayCommand]
         void PasteElements()
         {
-            foreach (var node in Editor.ClipboardNodes.Where((node) => Type.ElementType.IsConvertibleFrom(node.Type)))
+            foreach (var node in Editor.ClipboardNodes!.Where((node) => Type.ElementType.IsConvertibleFrom(node.Type)))
             {
                 Elements.Add(node.Clone(this));
             }
@@ -118,7 +110,7 @@ namespace CG.Test.Editor.FrontEnd.ViewModels
         void PasteAboveElements(int selectedIndex)
         {
             var index = selectedIndex;
-			foreach (var node in Editor.ClipboardNodes.Where((node) => Type.ElementType.IsConvertibleFrom(node.Type)))
+			foreach (var node in Editor.ClipboardNodes!.Where((node) => Type.ElementType.IsConvertibleFrom(node.Type)))
 			{
 				Elements.Insert(index++, node.Clone(this));
 			}
@@ -128,7 +120,7 @@ namespace CG.Test.Editor.FrontEnd.ViewModels
 		void PasteBelowElements(int selectedIndex)
 		{
 			var index = selectedIndex + 1;
-			foreach (var node in Editor.ClipboardNodes.Where((node) => Type.ElementType.IsConvertibleFrom(node.Type)))
+			foreach (var node in Editor.ClipboardNodes!.Where((node) => Type.ElementType.IsConvertibleFrom(node.Type)))
 			{
 				Elements.Insert(index++, node.Clone(this));
 			}

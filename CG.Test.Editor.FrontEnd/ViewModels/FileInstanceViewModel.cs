@@ -101,7 +101,13 @@ namespace CG.Test.Editor.FrontEnd.ViewModels
 		[ObservableProperty]
 		private NodeViewModelBase? _current;
 
-        public FileInstanceViewModel(MainViewModel mainViewModel, Window ownerWindow)
+        [ObservableProperty]
+        private bool _hasClipboardNodes;
+
+		[ObservableProperty]
+		private ObservableCollection<NodeViewModelBase>? _clipboardNodes;
+
+		public FileInstanceViewModel(MainViewModel mainViewModel, Window ownerWindow)
         {
             _mainViewModel = mainViewModel;
 
@@ -115,14 +121,17 @@ namespace CG.Test.Editor.FrontEnd.ViewModels
 
 			AddressItems = [];
 
-            ClipboardNodes = [];
+            HasClipboardNodes = false;
 		}
 
 		public Window OwnerWindow { get; }
 
 		public ObservableCollection<NodeViewModelBase> AddressItems { get; }
 
-        public ObservableCollection<NodeViewModelBase> ClipboardNodes { get; }
+        partial void OnClipboardNodesChanged(ObservableCollection<NodeViewModelBase>? oldValue, ObservableCollection<NodeViewModelBase>? newValue)
+        {
+            HasClipboardNodes = newValue is not null;
+        }
 
 		partial void OnRootChanged(NodeViewModelBase? oldValue, NodeViewModelBase? newValue)
         {
