@@ -6,7 +6,8 @@
                        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
                        xmlns:local="clr-namespace:CG.Test.Editor.FrontEnd.Views.Dialogs"
                        mc:Ignorable="d"
-                       Title="Select variant type" Height="400" Width="600" WindowStartupLocation="CenterScreen" DataContext="{Binding RelativeSource={RelativeSource Mode=Self}}">
+                       Title="Select variant type" Height="400" Width="600" WindowStartupLocation="CenterScreen" 
+					   MinimizeButtonVisibility="Collapsed" IsCloseButtonEnabled="False" DataContext="{Binding RelativeSource={RelativeSource Mode=Self}}">
     <Grid>
 		<Grid.RowDefinitions>
 			<RowDefinition Height="*"/>
@@ -26,15 +27,17 @@
 				</ListView.ItemTemplate>
 			</ListView>
 
-			<ListView Grid.Column="1" Margin="2.5, 5, 5, 2.5" ItemsSource="{Binding SelectedType.Properties}">
-				<ListView.ItemTemplate>
-					<DataTemplate>
-						<TextBlock Text="{Binding Name}"/>
-					</DataTemplate>
-				</ListView.ItemTemplate>
-			</ListView>
+			<GroupBox Grid.Column="1" Margin="2.5, 2.5, 5, 2.5" Header="Properties">
+				<ItemsControl MinWidth="150" Margin="2.5, 2.5, 5, 2.5" ItemsSource="{Binding SelectedType.Properties}">
+					<ItemsControl.ItemTemplate>
+						<DataTemplate>
+							<TextBlock Margin="5" Text="{Binding Name}"/>
+						</DataTemplate>
+					</ItemsControl.ItemTemplate>
+				</ItemsControl>
+			</GroupBox>
 		</Grid>
 			
-		<Button Grid.Row="1" HorizontalAlignment="Right" Width="150" Content="OK" Margin="5, 2.5, 5, 5" Click="Ok_Button_Click"/>
+		<Button Grid.Row="1" HorizontalAlignment="Right" Width="150" Content="OK" Margin="5, 2.5, 5, 5" IsDefault="True" Click="Ok_Button_Click"/>
 	</Grid>
 </frontend:CustomWindow>

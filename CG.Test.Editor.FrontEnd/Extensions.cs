@@ -135,7 +135,7 @@ namespace CG.Test.Editor.FrontEnd
 				var index = 0;
 				foreach (var pair in objectNode)
 				{
-					if (pair.Value is not null && pair.Value.TryParseSchemaType(logger, out var type))
+					if (pair.Key != "$type" && pair.Value is not null && pair.Value.TryParseSchemaType(logger, out var type))
 					{
 						yield return new SchemaProperty()
 						{
@@ -181,12 +181,12 @@ namespace CG.Test.Editor.FrontEnd
 
 			public bool TryParseSchemaStringType(ILogger<SchemaParsingMessage> logger, [NotNullWhen(true)] out SchemaTypeBase? type)
 			{
-				if (objectNode.TryGetValue<int>("maxLength", logger, out var maxLength))
+				if (!objectNode.TryGetValue<int>("maxLength", logger, out var maxLength))
 				{
 					maxLength = int.MaxValue;
 				}
 				type = new SchemaStringType(maxLength);
-				return false;
+				return true;
 			}
 
 			public bool TryParseSchemaObjectType(ILogger<SchemaParsingMessage> logger, [NotNullWhen(true)] out SchemaTypeBase? type)
