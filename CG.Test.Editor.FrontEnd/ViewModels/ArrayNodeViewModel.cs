@@ -61,7 +61,7 @@ namespace CG.Test.Editor.FrontEnd.ViewModels
                     return $"Item: [{i}]";
 				}
 			}
-            return base.GetName(item);
+            return "Item [(Index not found!)]";
 		}
 
         [RelayCommand]

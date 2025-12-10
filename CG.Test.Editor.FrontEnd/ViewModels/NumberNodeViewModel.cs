@@ -17,5 +17,7 @@ namespace CG.Test.Editor.FrontEnd.ViewModels
 		public override SchemaNumberType Type { get; }
 
 		public override NumberNodeViewModel Clone(NodeViewModelBase? parent) => new(Editor, parent, Type, Value);
+
+        protected override string GetName(NodeViewModelBase item) => string.Format("{0:F2}", Value);
     }
 }

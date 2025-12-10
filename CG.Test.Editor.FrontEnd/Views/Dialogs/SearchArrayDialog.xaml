@@ -6,7 +6,7 @@
                        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
                        xmlns:local="clr-namespace:CG.Test.Editor.FrontEnd.Views.Dialogs"
                        mc:Ignorable="d"
-                       Title="Search in array" Height="400" Width="400" WindowStartupLocation="CenterScreen">
+                       Title="Search in array" Height="400" Width="400" WindowStartupLocation="CenterScreen" DataContext="{Binding RelativeSource={RelativeSource Mode=Self}}">
     <Grid>
 		<Grid.RowDefinitions>
 			<RowDefinition Height="auto"/>
@@ -14,12 +14,11 @@
 		</Grid.RowDefinitions>
 
 		<TextBox Grid.Row="0" Margin="5, 5, 5, 2.5" 
-				 Text="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type local:SearchArrayDialog}}, 
-								Path=SearchText, UpdateSourceTrigger=PropertyChanged}"/>
+				 Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}"/>
 
 		<ListView Grid.Row="1" Margin="5, 2.5, 5, 5" Resources="{StaticResource NodeCompactDataTemplates}" 
-				  SelectedItem="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type local:SearchArrayDialog}}, Path=SelectedNode}"
-				  ItemsSource="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type local:SearchArrayDialog}}, Path=NodeCollection}">
+				  SelectedItem="{Binding SelectedNode}"
+				  ItemsSource="{Binding NodeCollection}">
 			<ListView.ItemContainerStyle>
 				<Style TargetType="{x:Type ListViewItem}" BasedOn="{StaticResource {x:Type ListViewItem}}">
 					<Setter Property="VerticalContentAlignment" Value="Center"/>

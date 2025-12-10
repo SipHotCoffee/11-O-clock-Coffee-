@@ -1,9 +1,13 @@
 ﻿using CG.Test.Editor.FrontEnd.Models;
 using System.Collections;
 using System.ComponentModel.DataAnnotations;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Numerics;
 using System.Reflection;
+using System.Text.Json;
+using System.Text.Json.Nodes;
+using System.Xml.Linq;
 
 namespace CG.Test.Editor.FrontEnd
 {
@@ -89,6 +93,203 @@ namespace CG.Test.Editor.FrontEnd
 						Type = parameter.ParameterType.GetSchemaFromType(parameter)
 					}));
 				}
+			}
+		}
+
+		extension(JsonArray arrayNode)
+		{
+
+			public IEnumerable<SchemaTypeBase> EnumerateVariantTypes(ILogger<SchemaParsingMessage> logger)
+			{
+				foreach (var node in arrayNode)
+				{
+					if (node is not null && node.TryParseSchemaType(logger, out var type))
+					{
+						yield return type;
+					}
+				}
+			}
+		}
+
+		extension(JsonObject objectNode)
+		{
+			private bool TryGetValue<TValue>(string propertyName, ILogger<SchemaParsingMessage> logger, [MaybeNullWhen(false)] out TValue value)
+			{
+				if (objectNode.TryGetPropertyValue(propertyName, out var childNode))
+				{
+					if (childNode is JsonValue childValueNode && childValueNode.TryGetValue(out value))
+					{
+						return true;
+					}
+					else
+					{
+						logger.Log(new SchemaParsingMessage($"Property of name: '{propertyName}', must be a '{typeof(JsonValue)}' of type '{typeof(TValue)}'.", objectNode));
+					}
+				}
+				value = default;
+				return false;
+			}
+
+			public IEnumerable<SchemaProperty> EnumerateProperties(ILogger<SchemaParsingMessage> logger)
+			{
+				var index = 0;
+				foreach (var pair in objectNode)
+				{
+					if (pair.Value is not null && pair.Value.TryParseSchemaType(logger, out var type))
+					{
+						yield return new SchemaProperty()
+						{
+							Name  = pair.Key,
+							Type  = type,
+							Index = index++,
+						};
+					}
+				}
+			}
+
+
+			public bool TryParseSchemaIntegerType(ILogger<SchemaParsingMessage> logger, [NotNullWhen(true)] out SchemaTypeBase? type)
+			{
+				if (!objectNode.TryGetValue<long>("minimum", logger, out var minimum))
+				{
+					minimum = long.MinValue;
+				}
+
+				if (!objectNode.TryGetValue<long>("maximum", logger, out var maximum))
+				{
+					maximum = long.MaxValue;
+				}
+
+				type = new SchemaIntegerType(minimum, maximum);
+				return true;
+			}
+
+			public bool TryParseSchemaNumberType(ILogger<SchemaParsingMessage> logger, [NotNullWhen(true)] out SchemaTypeBase? type)
+			{
+				if (!objectNode.TryGetValue<double>("minimum", logger, out var minimum))
+				{
+					minimum = double.MinValue;
+				}
+
+				if (!objectNode.TryGetValue<double>("maximum", logger, out var maximum))
+				{
+					maximum = double.MaxValue;
+				}
+				type = new SchemaNumberType(minimum, maximum);
+				return true;
+			}
+
+			public bool TryParseSchemaStringType(ILogger<SchemaParsingMessage> logger, [NotNullWhen(true)] out SchemaTypeBase? type)
+			{
+				if (objectNode.TryGetValue<int>("maxLength", logger, out var maxLength))
+				{
+					maxLength = int.MaxValue;
+				}
+				type = new SchemaStringType(maxLength);
+				return false;
+			}
+
+			public bool TryParseSchemaObjectType(ILogger<SchemaParsingMessage> logger, [NotNullWhen(true)] out SchemaTypeBase? type)
+			{
+				if (objectNode.TryGetPropertyValue("properties", out var propertiesNode))
+				{
+					if (propertiesNode is JsonObject propertiesObjectNode)
+					{
+						if (propertiesObjectNode.TryGetPropertyValue("$type", out var typeNode) &&
+							typeNode is JsonObject typeObjectNode && typeObjectNode.TryGetValue<string>("const", logger, out var typeName))
+						{
+							type = new SchemaObjectType(typeName, propertiesObjectNode.EnumerateProperties(logger));
+							return true;
+						}
+						else
+						{
+							logger.Log(new SchemaParsingMessage($"Object properties must all have a '$type' of type: '{typeof(string)}'", propertiesObjectNode));
+						}
+					}
+					else
+					{
+						logger.Log(new SchemaParsingMessage($"Property of name 'properties' in object type, must be of type: '{typeof(JsonObject)}'", propertiesNode!));
+					}
+				}
+				else if (objectNode.TryGetPropertyValue("oneOf", out var oneOfNode))
+				{
+					if (oneOfNode is JsonArray arrayNode)
+					{
+						type = new SchemaVariantType(arrayNode.EnumerateVariantTypes(logger));
+						return true;
+					}
+					else
+					{
+						logger.Log(new SchemaParsingMessage($"Property of name 'oneOf' in object type, must be of type: '{typeof(JsonArray)}'", oneOfNode!));
+					}
+				}
+				else
+				{
+					logger.Log(new SchemaParsingMessage($"Node of type 'object' must contain a 'properties' object or a 'oneOf' array.", objectNode));
+				}
+				type = null;
+				return false;
+			}
+
+			public bool TryParseSchemaArrayType(ILogger<SchemaParsingMessage> logger, [NotNullWhen(true)] out SchemaTypeBase? type)
+			{
+				if (objectNode.TryGetPropertyValue("items", out var itemsNode) && itemsNode is not null)
+				{
+					if (itemsNode.TryParseSchemaType(logger, out var elementType))
+					{
+						type = new SchemaArrayType(elementType);
+						return true;
+					}
+				}
+				else
+				{
+					logger.Log(new SchemaParsingMessage($"Node of type 'array' must contain an 'items' object.", objectNode));
+				}
+				type = null;
+				return false;
+			}
+		}
+
+		extension(JsonNode node)
+		{
+			public bool TryParseSchemaType(ILogger<SchemaParsingMessage> logger, [NotNullWhen(true)] out SchemaTypeBase? type)
+			{
+				if (node is JsonObject objectNode)
+				{
+					if (objectNode.TryGetPropertyValue("type", out var childNode) && childNode is not null)
+					{
+						if (childNode is JsonValue childValueNode && childValueNode.TryGetValue<string>(out var typeName))
+						{
+							switch (typeName)
+							{
+								case "boolean":
+									type = new SchemaBooleanType();
+									return true;
+								case "integer":
+									return TryParseSchemaIntegerType(objectNode, logger, out type);
+								case "number":
+									return TryParseSchemaNumberType(objectNode, logger, out type);
+								case "string":
+									return TryParseSchemaStringType(objectNode, logger, out type);
+								case "object":
+									return TryParseSchemaObjectType(objectNode, logger, out type);
+								case "array":
+									return TryParseSchemaArrayType(objectNode, logger, out type);
+							}
+						}
+						else
+						{
+							logger.Log(new SchemaParsingMessage("Expecting 'type' node to be a string", childNode));
+						}
+					}
+				}
+				else
+				{
+					logger.Log(new SchemaParsingMessage($"Expecting '{typeof(JsonObject)}' for type schema.", node));
+				}
+
+				type = null;
+				return false;
 			}
 		}
 	}

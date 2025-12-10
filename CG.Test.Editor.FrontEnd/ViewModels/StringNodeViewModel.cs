@@ -17,5 +17,7 @@ namespace CG.Test.Editor.FrontEnd.ViewModels
 		public override SchemaStringType Type { get; }
 
 		public override StringNodeViewModel Clone(NodeViewModelBase? parent) => new(Editor, parent, Type, Value);
+
+		protected override string GetName(NodeViewModelBase item) => $"\"{Value}\"";
     }
 }

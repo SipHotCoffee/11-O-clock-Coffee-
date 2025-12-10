@@ -18,5 +18,7 @@ namespace CG.Test.Editor.FrontEnd.ViewModels
         public override SchemaBooleanType Type { get; }
 
         public override BooleanNodeViewModel Clone(NodeViewModelBase? parent) => new(Editor, parent, Type, Value);
+
+        protected override string GetName(NodeViewModelBase item) => Value.ToString();
     }
 }

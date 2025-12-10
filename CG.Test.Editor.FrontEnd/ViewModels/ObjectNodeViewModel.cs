@@ -35,7 +35,7 @@ namespace CG.Test.Editor.FrontEnd.ViewModels
                     return pair.Key;
                 }
             }
-			return base.GetName(item);
+			return "Child not found!";
 		}
     }
 }

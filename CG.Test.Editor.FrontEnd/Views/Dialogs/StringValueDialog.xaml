@@ -13,7 +13,8 @@
 					   ResizeMode="NoResize" Topmost="False" ShowInTaskbar="False" 
 					   Title="Enter Text"
 					   MinimizeButtonVisibility="Collapsed"
-					   MaximizeButtonVisibility="Collapsed">
+					   MaximizeButtonVisibility="Collapsed" 
+					   DataContext="{Binding RelativeSource={RelativeSource Mode=Self}}">
 	<Grid>
 		<Grid.RowDefinitions>
 			<RowDefinition Height="auto"/>
@@ -21,8 +22,8 @@
 		</Grid.RowDefinitions>
 
 		<TextBox Margin="5, 5, 5, 2.5"
-				 MaxLength="{Binding RelativeSource={RelativeSource AncestorType={x:Type local:StringValueDialog}}, Path=MaximumLength}"
-				 Text="{Binding RelativeSource={RelativeSource AncestorType={x:Type local:StringValueDialog}}, Path=Text}"/>
+				 MaxLength="{Binding MaximumLength}"
+				 Text="{Binding Text}"/>
 
 		<Grid Grid.Row="1">
 			<Grid.ColumnDefinitions>

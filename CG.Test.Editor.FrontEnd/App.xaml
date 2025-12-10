@@ -9,15 +9,20 @@
 				<ResourceDictionary Source="/Resources/Styles/Modern/ColorSchemes/Dark.xaml"/>
 				<ResourceDictionary Source="/Resources/Styles/Modern/Modern.xaml"/>
 			</ResourceDictionary.MergedDictionaries>
-			<Style TargetType="{x:Type local:MainWindow}"          BasedOn="{StaticResource BaseWindowStyle}"/>
-			<Style TargetType="{x:Type dialogs:NumberValueDialog}" BasedOn="{StaticResource BaseWindowStyle}"/>
-			<Style TargetType="{x:Type dialogs:StringValueDialog}" BasedOn="{StaticResource BaseWindowStyle}"/>
-			<Style TargetType="{x:Type dialogs:SearchArrayDialog}" BasedOn="{StaticResource BaseWindowStyle}"/>
+			<Style TargetType="{x:Type local:MainWindow}"                  BasedOn="{StaticResource BaseWindowStyle}"/>
+			<Style TargetType="{x:Type dialogs:NumberValueDialog}"         BasedOn="{StaticResource BaseWindowStyle}"/>
+			<Style TargetType="{x:Type dialogs:StringValueDialog}"         BasedOn="{StaticResource BaseWindowStyle}"/>
+			<Style TargetType="{x:Type dialogs:SearchArrayDialog}"         BasedOn="{StaticResource BaseWindowStyle}"/>
+			<Style TargetType="{x:Type dialogs:VariantTypeSelectorDialog}" BasedOn="{StaticResource BaseWindowStyle}"/>
 
 
 			<ResourceDictionary x:Key="NodeVeryCompactDataTemplates">
 				<DataTemplate DataType="{x:Type viewmodels:ArrayNodeViewModel}">
-					<TextBlock FontFamily="Cascadia Mono" Text="[...]"/>
+					<StackPanel Orientation="Horizontal">
+						<TextBlock FontFamily="Cascadia Mono" Text="["/>
+						<TextBlock FontFamily="Cascadia Mono" Text="{Binding Elements.Count}"/>
+						<TextBlock FontFamily="Cascadia Mono" Text="]"/>
+					</StackPanel>
 				</DataTemplate>
 				<DataTemplate DataType="{x:Type viewmodels:ObjectNodeViewModel}">
 					<StackPanel Orientation="Horizontal">

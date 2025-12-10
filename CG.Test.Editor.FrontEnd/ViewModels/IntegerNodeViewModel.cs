@@ -17,5 +17,7 @@ namespace CG.Test.Editor.FrontEnd.ViewModels
 		public override SchemaIntegerType Type { get; }
 
 		public override IntegerNodeViewModel Clone(NodeViewModelBase? parent) => new(Editor, parent, Type, Value);
+
+        protected override string GetName(NodeViewModelBase item) => Value.ToString();
     }
 }

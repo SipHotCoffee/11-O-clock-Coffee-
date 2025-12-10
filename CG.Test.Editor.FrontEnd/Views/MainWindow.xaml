@@ -23,7 +23,9 @@
 		</Grid.RowDefinitions>
 		<Menu Grid.Row="0">
 			<MenuItem Header="File">
-				<MenuItem Header="New"     InputGestureText="Ctrl+N" Command="{Binding NewFileCommand}"/>
+				<MenuItem Header="New" InputGestureText="Ctrl+N" Command="{Binding NewFileCommand}" 
+						  CommandParameter="{Binding RelativeSource={RelativeSource AncestorType={x:Type Window}}}"/>
+				
 				<MenuItem Header="Open..." InputGestureText="Ctrl+O"/>
 				<MenuItem Header="Save"    InputGestureText="Ctrl+S"/>
 				<MenuItem Header="Save As..."/>
