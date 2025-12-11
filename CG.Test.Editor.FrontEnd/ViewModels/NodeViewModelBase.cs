@@ -3,6 +3,8 @@ using CG.Test.Editor.FrontEnd.Views.Dialogs;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using System.Collections.ObjectModel;
+using System.IO;
+using System.Text.Json;
 using System.Xml.Linq;
 
 namespace CG.Test.Editor.FrontEnd.ViewModels
@@ -62,6 +64,14 @@ namespace CG.Test.Editor.FrontEnd.ViewModels
 
     public abstract partial class NodeViewModelBase(FileInstanceViewModel editor, NodeViewModelBase? parent) : ObservableObject
     {
+        [ObservableProperty]
+        private bool _hasChanges;
+
+        partial void OnHasChangesChanged(bool oldValue, bool newValue)
+        {
+            Parent?.HasChanges = newValue;   
+        }
+
         public FileInstanceViewModel Editor { get; } = editor;
 
         public NodeViewModelBase? Parent { get; } = parent;
@@ -72,7 +82,9 @@ namespace CG.Test.Editor.FrontEnd.ViewModels
 
         public abstract NodeViewModelBase Clone(NodeViewModelBase? parent);
 
-        protected abstract string GetName(NodeViewModelBase item);
+        public abstract void SerializeTo(Utf8JsonWriter writer);
+
+		protected abstract string GetName(NodeViewModelBase item);
 
 		[RelayCommand]
 		void Navigate()

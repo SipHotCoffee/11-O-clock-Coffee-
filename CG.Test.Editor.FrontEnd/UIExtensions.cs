@@ -174,17 +174,5 @@ namespace CG.Test.Editor.FrontEnd
                 return result;
             }   
         }
-        extension(TreeViewItem item)
-        {
-            public void SetRecursive(Action<TreeViewItem> modifier)
-            {
-                modifier(item);
-
-                foreach (var child in item.Items.OfType<TreeViewItem>())
-                {
-                    SetRecursive(child, modifier);
-                }
-            }
-        }
 	}
 }

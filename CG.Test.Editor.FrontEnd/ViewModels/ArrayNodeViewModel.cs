@@ -3,9 +3,10 @@ using CG.Test.Editor.FrontEnd.Views.Dialogs;
 using CommunityToolkit.Mvvm.Input;
 using System.Collections;
 using System.Collections.ObjectModel;
+using System.Collections.Specialized;
+using System.Text.Json;
 using System.Windows.Controls;
 using System.Windows.Data;
-using System.Xml.Linq;
 
 namespace CG.Test.Editor.FrontEnd.ViewModels
 {
@@ -28,8 +29,10 @@ namespace CG.Test.Editor.FrontEnd.ViewModels
 
 		public override SchemaArrayType Type { get; }
 
-		private void Elements_CollectionChanged(object? sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+		private void Elements_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
         {
+            HasChanges = true;
+
             for (var i = Indices.Count; i < Elements.Count; i++)
             {
                 Indices.Add(i);
@@ -179,5 +182,15 @@ namespace CG.Test.Editor.FrontEnd.ViewModels
 				dialog.SelectedNode.Visit(new NodeEditorVisitor(Editor));
 			}
         }
-	}
+
+        public override void SerializeTo(Utf8JsonWriter writer)
+        {
+            writer.WriteStartArray();
+            foreach (var element in Elements)
+            {
+                element.SerializeTo(writer);
+            }
+            writer.WriteEndArray();
+        }
+    }
 }

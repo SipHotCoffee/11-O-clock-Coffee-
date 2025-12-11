@@ -64,7 +64,10 @@
                 <Setter Property="Background"  Value="{StaticResource Item.Selected.Background}"/>
                 <Setter Property="BorderBrush" Value="{StaticResource Item.Selected.Border}"/>
             </Trigger>
-            <Trigger Property="IsSubmenuOpen" Value="True">
+			<Trigger Property="IsEnabled" Value="False">
+				<Setter Property="Foreground" Value="{StaticResource Window.Active.Foreground.Disabled}"/>
+			</Trigger>
+			<Trigger Property="IsSubmenuOpen" Value="True">
                 <Setter Property="Background"  Value="{StaticResource Item.Selected.Background}"/>
                 <Setter Property="BorderBrush" Value="{StaticResource Item.Selected.Border}"/>
                 
@@ -109,9 +112,12 @@
             </Trigger>
             <Trigger Property="IsSubmenuOpen" Value="True">
                 <Setter Property="Background"  Value="{StaticResource Item.Selected.Background}"/>
-                <Setter Property="BorderBrush" Value="{StaticResource Item.Selected.Border}"/>
-            </Trigger>
-        </ControlTemplate.Triggers>
+				<Setter Property="BorderBrush" Value="{StaticResource Item.Selected.Border}"/>
+			</Trigger>
+			<Trigger Property="IsEnabled" Value="False">
+				<Setter Property="Foreground" Value="{StaticResource Window.Active.Foreground.Disabled}"/>
+			</Trigger>
+		</ControlTemplate.Triggers>
     </ControlTemplate>
 
     <Style TargetType="{x:Type MenuItem}">
@@ -128,9 +134,9 @@
             <Trigger Property="Role" Value="SubmenuHeader">
                 <Setter Property="Template" Value="{StaticResource SubMenuItem}"/>
             </Trigger>
-            <Trigger Property="Role" Value="SubmenuItem">
-                <Setter Property="Template" Value="{StaticResource SubMenuItem}"/>
-            </Trigger>
-        </Style.Triggers>
+			<Trigger Property="Role" Value="SubmenuItem">
+				<Setter Property="Template" Value="{StaticResource SubMenuItem}"/>
+			</Trigger>
+		</Style.Triggers>
     </Style>
 </ResourceDictionary>

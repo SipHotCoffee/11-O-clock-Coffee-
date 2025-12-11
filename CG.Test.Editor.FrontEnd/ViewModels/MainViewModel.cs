@@ -1,24 +1,14 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.Win32;
-using System;
 using System.Collections.ObjectModel;
-using System.ComponentModel.DataAnnotations;
-using System.Diagnostics.CodeAnalysis;
+using System.IO;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Windows;
 
 namespace CG.Test.Editor.FrontEnd.ViewModels
 {
-    public struct Vector3([Range(-100, 100)] float x, [Range(-100, 100)] float y, [Range(-100, 100)]  float z);
-    public struct Transformation(Vector3 position, Vector3 rotation, Vector3 scale);
-
-    public class RootNode(Transformation transformation, bool booleanValue, string stringValue, string[] names, bool[] flags)
-    {
-        
-    }
-
     public class SchemaParsingMessageComparer : IEqualityComparer<SchemaParsingMessage>
     {
         public bool Equals(SchemaParsingMessage x, SchemaParsingMessage y)
@@ -26,12 +16,11 @@ namespace CG.Test.Editor.FrontEnd.ViewModels
             return x.Message == y.Message;
         }
 
-        public int GetHashCode([DisallowNull] SchemaParsingMessage obj)
+        public int GetHashCode(SchemaParsingMessage obj)
         {
             return obj.Message.GetHashCode();
         }
     }
-
 
 	public class CollectionLogger<TItem>(ICollection<TItem> targetCollection) : ILogger<TItem>
     {
@@ -50,15 +39,37 @@ namespace CG.Test.Editor.FrontEnd.ViewModels
 
         public ObservableCollection<FileInstanceViewModel> OpenFiles { get; } = [];
 
-        [RelayCommand]
+        private async Task SaveFileAsync(Stream stream)
+        {
+			await using var writer = new Utf8JsonWriter(stream);
+			SelectedFile!.Root!.SerializeTo(writer);
+			await writer.FlushAsync();
+            SelectedFile.Root.HasChanges = false;
+		}
+
+		private async Task SaveAsFileAsync()
+        {
+            var saveFileDialog = new SaveFileDialog()
+            {
+                Filter = "Json Schema files (*.json)|*.json"
+            };
+
+            if (saveFileDialog.ShowDialog() == true)
+            {
+                await using var stream = saveFileDialog.OpenFile();
+                await SaveFileAsync(stream);
+			}
+        }
+
+		[RelayCommand]
         async Task NewFile(Window window)
         {
             ArgumentNullException.ThrowIfNull(window, nameof(window));
-            var instance = new FileInstanceViewModel(this, window);
+            var instance = new FileInstanceViewModel(this, null, window);
 
             var openFileDialog = new OpenFileDialog
             {
-                Filter = "Json Schema files (*.json) | *json"
+                Filter = "Json Schema files (*.json)|*.json"
             };
 
             if (openFileDialog.ShowDialog() == true)
@@ -66,7 +77,6 @@ namespace CG.Test.Editor.FrontEnd.ViewModels
                 try
                 {
                     await using var stream = openFileDialog.OpenFile();
-
                     var node = await JsonNode.ParseAsync(stream);
 
                     var messages = new HashSet<SchemaParsingMessage>(10, new SchemaParsingMessageComparer());
@@ -96,6 +106,26 @@ namespace CG.Test.Editor.FrontEnd.ViewModels
         {
 
         }
+
+        [RelayCommand]
+        async Task SaveFile()
+        {
+            if (SelectedFile!.File?.Exists != true)
+            {
+                await SaveAsFileAsync();
+            }
+            else if (SelectedFile!.Root!.HasChanges)
+            {
+                await using var stream = SelectedFile.File.OpenWrite();
+                await SaveFileAsync(stream);
+            }
+        }
+
+        [RelayCommand]
+        async Task SaveFileAs()
+        {
+			await SaveAsFileAsync();
+		}
 
         [RelayCommand]
         void Exit(Window window)

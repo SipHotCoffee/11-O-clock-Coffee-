@@ -1,13 +1,29 @@
 ﻿using CG.Test.Editor.FrontEnd.Models;
+using System.Collections;
 using System.Collections.ObjectModel;
+using System.Collections.Specialized;
+using System.Text.Json;
 
 namespace CG.Test.Editor.FrontEnd.ViewModels
 {
-    public class ObjectNodeViewModel(FileInstanceViewModel editor, NodeViewModelBase? parent, SchemaObjectType type) : NodeViewModelBase(editor, parent)
+    public class ObjectNodeViewModel : NodeViewModelBase
     {
-        public ObservableCollection<KeyValuePair<string, NodeViewModelBase>> Nodes { get; } = [];
+		public ObjectNodeViewModel(FileInstanceViewModel editor, NodeViewModelBase? parent, SchemaObjectType type) : base(editor, parent)
+		{
+			Type = type;
 
-        public override SchemaObjectType Type { get; } = type;
+            Nodes = [];
+            Nodes.CollectionChanged += Nodes_CollectionChanged;
+		}
+
+        private void Nodes_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
+        {
+            HasChanges = true;
+        }
+
+        public ObservableCollection<KeyValuePair<string, NodeViewModelBase>> Nodes { get; }
+
+        public override SchemaObjectType Type { get; }
 
         public override ObjectNodeViewModel Clone(NodeViewModelBase? parent)
         {
@@ -37,5 +53,17 @@ namespace CG.Test.Editor.FrontEnd.ViewModels
             }
 			return "Child not found!";
 		}
+
+		public override void SerializeTo(Utf8JsonWriter writer)
+		{
+			writer.WriteStartObject();
+			foreach (var pair in Nodes)
+			{
+				writer.WritePropertyName(pair.Key);
+                pair.Value.SerializeTo(writer);
+			}
+			writer.WriteEndObject();
+		}
+
     }
 }

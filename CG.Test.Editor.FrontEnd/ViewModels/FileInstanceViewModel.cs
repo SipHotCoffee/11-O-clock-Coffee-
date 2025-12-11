@@ -2,6 +2,7 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using System.Collections.ObjectModel;
+using System.IO;
 using System.Windows;
 
 namespace CG.Test.Editor.FrontEnd.ViewModels
@@ -107,13 +108,15 @@ namespace CG.Test.Editor.FrontEnd.ViewModels
 		[ObservableProperty]
 		private ObservableCollection<NodeViewModelBase>? _clipboardNodes;
 
-		public FileInstanceViewModel(MainViewModel mainViewModel, Window ownerWindow)
+		public FileInstanceViewModel(MainViewModel mainViewModel, FileInfo? file, Window ownerWindow)
         {
             _mainViewModel = mainViewModel;
 
 			_history = [];
 
             _historyIndex = 0;
+
+            File = file;
 
 			OwnerWindow = ownerWindow;
 
@@ -123,6 +126,8 @@ namespace CG.Test.Editor.FrontEnd.ViewModels
 
             HasClipboardNodes = false;
 		}
+
+        public FileInfo? File { get; }
 
 		public Window OwnerWindow { get; }
 
@@ -135,12 +140,12 @@ namespace CG.Test.Editor.FrontEnd.ViewModels
 
 		partial void OnRootChanged(NodeViewModelBase? oldValue, NodeViewModelBase? newValue)
         {
-            Current = newValue;
+			Current = newValue;
         }
 
         partial void OnHistoryIndexChanged(int oldValue, int newValue)
         {
-            IsBackButtonEnabled = newValue > 0;
+               IsBackButtonEnabled = newValue > 0;
             IsForwardButtonEnabled = newValue < _history.Count - 1;
         }
 

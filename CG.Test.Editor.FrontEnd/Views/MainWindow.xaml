@@ -27,8 +27,31 @@
 						  CommandParameter="{Binding RelativeSource={RelativeSource AncestorType={x:Type Window}}}"/>
 				
 				<MenuItem Header="Open..." InputGestureText="Ctrl+O"/>
-				<MenuItem Header="Save"    InputGestureText="Ctrl+S"/>
-				<MenuItem Header="Save As..."/>
+				<MenuItem Header="Save"    InputGestureText="Ctrl+S" Command="{Binding SaveFileCommand}">
+					<MenuItem.Style>
+						<Style TargetType="{x:Type MenuItem}" BasedOn="{StaticResource {x:Type MenuItem}}">
+							<Style.Triggers>
+								<DataTrigger Binding="{Binding OpenFiles.Count}" Value="0">
+									<Setter Property="IsEnabled" Value="False"/>
+								</DataTrigger>
+								<DataTrigger Binding="{Binding SelectedFile.Root.HasChanges}" Value="False">
+									<Setter Property="IsEnabled" Value="False"/>
+								</DataTrigger>
+							</Style.Triggers>
+						</Style>
+					</MenuItem.Style>
+				</MenuItem>
+				<MenuItem Header="Save As..." Command="{Binding SaveFileAsCommand}">
+					<MenuItem.Style>
+						<Style TargetType="{x:Type MenuItem}" BasedOn="{StaticResource {x:Type MenuItem}}">
+							<Style.Triggers>
+								<DataTrigger Binding="{Binding OpenFiles.Count}" Value="0">
+									<Setter Property="IsEnabled" Value="False"/>
+								</DataTrigger>
+							</Style.Triggers>
+						</Style>
+					</MenuItem.Style>
+				</MenuItem>
 				<Separator/>
 				<MenuItem Header="Exit" InputGestureText="Alt+F4" Command="{Binding ExitCommand}"
 						  CommandParameter="{Binding RelativeSource={RelativeSource AncestorType={x:Type Window}}}"/>
