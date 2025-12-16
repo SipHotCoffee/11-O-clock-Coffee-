@@ -1,4 +1,6 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
+﻿using CG.Test.Editor.FrontEnd.Models;
+using CG.Test.Editor.FrontEnd.Views.Dialogs;
+using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.Win32;
 using System.Collections.ObjectModel;
@@ -61,51 +63,87 @@ namespace CG.Test.Editor.FrontEnd.ViewModels
 			}
         }
 
+        private static async Task<SchemaTypeBase?> LoadSchema(Window window)
+        {
+			ArgumentNullException.ThrowIfNull(window, nameof(window));
+
+            var recentSchemasDialog = new RecentSchemasDialog();
+
+			if (recentSchemasDialog.ShowDialog() == true)
+			{
+				try
+				{
+					await using var stream = File.OpenRead(recentSchemasDialog.SelectedSchema);
+					var node = await JsonNode.ParseAsync(stream);
+
+					var messages = new HashSet<SchemaParsingMessage>(10, new SchemaParsingMessageComparer());
+					var logger = new CollectionLogger<SchemaParsingMessage>(messages);
+
+					if (node is not null && node.TryParseSchemaType(logger, out var type))
+					{
+                        return type;
+					}
+
+					foreach (var message in messages)
+					{
+						window.ShowMessage(message.Message);
+					}
+				}
+				catch (Exception exception)
+				{
+					window.ShowMessage(exception.ToString());
+				}
+			}
+            return null;
+		}
+
 		[RelayCommand]
         async Task NewFile(Window window)
         {
-            ArgumentNullException.ThrowIfNull(window, nameof(window));
-            var instance = new FileInstanceViewModel(this, null, window);
-
-            var openFileDialog = new OpenFileDialog
+			var instance = new FileInstanceViewModel(this, null, window);
+            var schemaType = await LoadSchema(window);
+            if (schemaType is not null)
             {
-                Filter = "Json Schema files (*.json)|*.json"
-            };
-
-            if (openFileDialog.ShowDialog() == true)
-            {
-                try
-                {
-                    await using var stream = openFileDialog.OpenFile();
-                    var node = await JsonNode.ParseAsync(stream);
-
-                    var messages = new HashSet<SchemaParsingMessage>(10, new SchemaParsingMessageComparer());
-                    var logger = new CollectionLogger<SchemaParsingMessage>(messages);
-
-                    if (node is not null && node.TryParseSchemaType(logger, out var type))
-                    {
-                        instance.Root = type.Visit(new NodeViewModelGeneratorVisitor(instance, null));
-                        OpenFiles.Add(instance);
-                        SelectedFile = instance;
-                    }
-
-                    foreach (var message in messages)
-                    {
-                        window.ShowMessage(message.Message);
-                    }
-                }
-                catch (Exception exception)
-                {
-                    window.ShowMessage(exception.ToString());
-                }
+                instance.Root = schemaType.Visit(new NodeViewModelGeneratorVisitor(instance, null));
+                OpenFiles.Add(instance);
+                SelectedFile = instance;
             }
 		}
 
 		[RelayCommand]
-		void OpenFile(Window window)
+		async Task OpenFile(Window window)
         {
+			var instance = new FileInstanceViewModel(this, null, window);
+			var schemaType = await LoadSchema(window);
 
-        }
+			var openFileDialog = new OpenFileDialog()
+			{
+				Filter = "Json files (*.json)|*.json"
+			};
+
+			if (openFileDialog.ShowDialog() == true)
+			{
+				await using var stream = openFileDialog.OpenFile();
+                try
+                {
+                    var node = await JsonNode.ParseAsync(stream);
+
+					var messages = new List<string>();
+					var logger = new CollectionLogger<string>(messages);
+
+                    var nodeViewModel = schemaType!.Visit(new NodeParserVisitor(instance, null, logger, node));
+
+					instance.Root = nodeViewModel;
+					OpenFiles.Add(instance);
+					SelectedFile = instance;
+					
+				}
+                catch (Exception exception)
+                {
+                    window.ShowMessage(exception.ToString());
+                }
+			}
+		}
 
         [RelayCommand]
         async Task SaveFile()

@@ -181,6 +181,25 @@ namespace CG.Test.Editor.FrontEnd
 
 			public bool TryParseSchemaStringType(ILogger<SchemaParsingMessage> logger, [NotNullWhen(true)] out SchemaTypeBase? type)
 			{
+				if (objectNode.TryGetPropertyValue("enum", out var node) && node is JsonArray arrayNode)
+				{
+					var successful = true;
+					type = new SchemaEnumType(arrayNode.OfType<JsonValue>().Select((valueNode) =>
+					{
+						if (valueNode.TryGetValue<string>(out var elementName))
+						{
+							return elementName;
+						}
+						else
+						{
+							logger.Log(new SchemaParsingMessage("Enum value must be of type 'string'.", valueNode));
+							successful = false;
+							return string.Empty;
+						}
+					}));
+					return successful;
+				}
+
 				if (!objectNode.TryGetValue<int>("maxLength", logger, out var maxLength))
 				{
 					maxLength = int.MaxValue;

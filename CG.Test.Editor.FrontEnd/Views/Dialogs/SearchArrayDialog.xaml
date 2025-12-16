@@ -6,7 +6,7 @@
                        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
                        xmlns:local="clr-namespace:CG.Test.Editor.FrontEnd.Views.Dialogs"
                        mc:Ignorable="d"
-                       Title="Search in array" Height="400" Width="400" WindowStartupLocation="CenterScreen" DataContext="{Binding RelativeSource={RelativeSource Mode=Self}}">
+                       Title="Search in array" Height="400" Width="400" MinimizeButtonVisibility="Collapsed" WindowStartupLocation="CenterScreen" DataContext="{Binding RelativeSource={RelativeSource Mode=Self}}">
     <Grid>
 		<Grid.RowDefinitions>
 			<RowDefinition Height="auto"/>

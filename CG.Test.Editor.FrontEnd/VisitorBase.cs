@@ -12,8 +12,8 @@ namespace CG.Test.Editor.FrontEnd
         {
             _methodMap = GetType().GetMethods(BindingFlags.Instance | BindingFlags.Public).Where((method) => method.Name == "Visit" && 
                                                                                                              method.GetParameters().Length == 1 && 
-                                                                                                             method.ReturnType == typeof(void) || 
-                                                                                                             method.ReturnType.IsAssignableTo(returnType))
+                                                                                                            (method.ReturnType == typeof(void) || 
+                                                                                                             method.ReturnType.IsAssignableTo(returnType)))
 											                                              .Select((method) => new KeyValuePair<Type, MethodInfo>(method.GetParameters()[0].ParameterType, method))
 											                                              .ToDictionary();
 		}

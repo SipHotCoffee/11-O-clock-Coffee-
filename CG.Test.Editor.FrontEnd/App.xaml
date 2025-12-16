@@ -1,20 +1,23 @@
 ﻿<Application x:Class="CG.Test.Editor.FrontEnd.App"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:local="clr-namespace:CG.Test.Editor.FrontEnd.Views" xmlns:dialogs="clr-namespace:CG.Test.Editor.FrontEnd.Views.Dialogs" xmlns:viewmodels="clr-namespace:CG.Test.Editor.FrontEnd.ViewModels"
+             xmlns:local="clr-namespace:CG.Test.Editor.FrontEnd.Views" 
+			 xmlns:dialogs="clr-namespace:CG.Test.Editor.FrontEnd.Views.Dialogs" 
+			 xmlns:viewmodels="clr-namespace:CG.Test.Editor.FrontEnd.ViewModels"
 			 StartupUri="Views/MainWindow.xaml">
 	<Application.Resources>
 		<ResourceDictionary>
 			<ResourceDictionary.MergedDictionaries>
 				<ResourceDictionary Source="/Resources/Styles/Modern/ColorSchemes/Dark.xaml"/>
-				<ResourceDictionary Source="/Resources/Styles/Modern/Modern.xaml"/>
+				<ResourceDictionary Source="/Resources/Styles/Modern/Style.xaml"/>
 			</ResourceDictionary.MergedDictionaries>
 			<Style TargetType="{x:Type local:MainWindow}"                  BasedOn="{StaticResource BaseWindowStyle}"/>
 			<Style TargetType="{x:Type dialogs:NumberValueDialog}"         BasedOn="{StaticResource BaseWindowStyle}"/>
 			<Style TargetType="{x:Type dialogs:StringValueDialog}"         BasedOn="{StaticResource BaseWindowStyle}"/>
 			<Style TargetType="{x:Type dialogs:SearchArrayDialog}"         BasedOn="{StaticResource BaseWindowStyle}"/>
 			<Style TargetType="{x:Type dialogs:VariantTypeSelectorDialog}" BasedOn="{StaticResource BaseWindowStyle}"/>
-
+			<Style TargetType="{x:Type dialogs:EnumValueDialog}"           BasedOn="{StaticResource BaseWindowStyle}"/>
+			<Style TargetType="{x:Type dialogs:RecentSchemasDialog}"       BasedOn="{StaticResource BaseWindowStyle}"/>
 
 			<ResourceDictionary x:Key="NodeVeryCompactDataTemplates">
 				<DataTemplate DataType="{x:Type viewmodels:ArrayNodeViewModel}">
@@ -45,6 +48,9 @@
 						<TextBlock FontFamily="Cascadia Mono" Text="{Binding Value}"/>
 						<TextBlock FontFamily="Cascadia Mono" Text="&quot;"/>
 					</StackPanel>
+				</DataTemplate>
+				<DataTemplate DataType="{x:Type viewmodels:EnumNodeViewModel}">
+					<TextBlock FontFamily="Cascadia Mono" Text="{Binding SelectedItem}"/>
 				</DataTemplate>
 			</ResourceDictionary>
 
@@ -122,6 +128,9 @@
 						<TextBlock FontFamily="Cascadia Mono" Text="{Binding Value}"/>
 						<TextBlock FontFamily="Cascadia Mono" Text="&quot;"/>
 					</StackPanel>
+				</DataTemplate>
+				<DataTemplate DataType="{x:Type viewmodels:EnumNodeViewModel}">
+					<TextBlock FontFamily="Cascadia Mono" Text="{Binding SelectedItem}"/>
 				</DataTemplate>
 			</ResourceDictionary>
 		</ResourceDictionary>
