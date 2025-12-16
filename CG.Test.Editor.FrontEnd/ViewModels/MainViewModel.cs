@@ -1,5 +1,6 @@
 ﻿using CG.Test.Editor.FrontEnd.Models;
 using CG.Test.Editor.FrontEnd.Views.Dialogs;
+using CG.Test.Editor.FrontEnd.Visitors;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.Win32;
@@ -128,10 +129,15 @@ namespace CG.Test.Editor.FrontEnd.ViewModels
                 {
                     var node = await JsonNode.ParseAsync(stream);
 
-					var messages = new List<string>();
-					var logger = new CollectionLogger<string>(messages);
+					var messages = new List<NodeParsingMessage>();
+					var logger = new CollectionLogger<NodeParsingMessage>(messages);
 
-                    var nodeViewModel = schemaType!.Visit(new NodeParserVisitor(instance, null, logger, node));
+                    var nodeViewModel = schemaType!.Visit(new NodeParserVisitor(instance, [ "Root" ], null, logger, node));
+
+                    foreach (var message in messages)
+                    {
+                        window.ShowMessage($"Error: {message.Message} Error occured here: '{string.Join("/", message.Path)}'");
+                    }
 
 					instance.Root = nodeViewModel;
 					OpenFiles.Add(instance);

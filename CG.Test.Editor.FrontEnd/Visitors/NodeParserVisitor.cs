@@ -4,15 +4,29 @@ using System.Text.Json.Nodes;
 
 namespace CG.Test.Editor.FrontEnd.Visitors
 {
-    public class NodeParserVisitor(FileInstanceViewModel editor, NodeViewModelBase? parent, ILogger<string> logger, JsonNode? sourceNode) : VisitorBase<SchemaTypeBase, NodeViewModelBase?>
+	public class NodeParsingMessage(string message, IEnumerable<object> path)
+	{
+		public string Message { get; } = message;
+
+		public IEnumerable<object> Path { get; } = path;
+	}
+
+    public class NodeParserVisitor(FileInstanceViewModel editor, IEnumerable<object> currentPath, NodeViewModelBase? parent, ILogger<NodeParsingMessage> logger, JsonNode? sourceNode) : VisitorBase<SchemaTypeBase, NodeViewModelBase?>
     {
         private readonly FileInstanceViewModel _editor = editor;
 
-        private readonly ILogger<string> _logger = logger;
+        private readonly ILogger<NodeParsingMessage> _logger = logger;
 
         public NodeViewModelBase? Parent { get; set; } = parent;
 
-        public JsonNode? SourceNode { get; set; } = sourceNode;
+		public IEnumerable<object> CurrentPath { get; set; } = currentPath;
+
+		public JsonNode? SourceNode { get; set; } = sourceNode;
+
+		private void LogMessage(string message)
+		{
+			_logger.Log(new NodeParsingMessage(message, CurrentPath));
+		}
 
         public NumberNodeViewModel? Visit(SchemaNumberType numberType)
         {
@@ -20,16 +34,23 @@ namespace CG.Test.Editor.FrontEnd.Visitors
 			{
 				if (valueNode.TryGetValue<double>(out var value))
 				{
-                    return new NumberNodeViewModel(_editor, Parent, numberType, value);
+					if (value >= numberType.Minimum && value <= numberType.Maximum)
+					{
+						return new NumberNodeViewModel(_editor, Parent, numberType, value);
+					}
+					else
+					{
+						LogMessage($"Value must be between '{numberType.Minimum}' and '{numberType.Maximum}'");
+					}
 				}
 				else
 				{
-					_logger.Log($"Failed to convert value of '{valueNode.GetType()}' to '{typeof(double)}'.");
+					LogMessage($"Failed to convert value of '{valueNode.GetType()}' to '{typeof(double)}'.");
 				}
 			}
 			else
 			{
-				_logger.Log($"'{SourceNode}' must be of type '{typeof(JsonValue)}' and the value must be convertible to type '{typeof(double)}'.");
+				LogMessage($"Expecting node of type '{typeof(JsonValue)}' and the value must be convertible to type '{typeof(double)}'.");
 			}
             return null;
 		}
@@ -44,12 +65,59 @@ namespace CG.Test.Editor.FrontEnd.Visitors
 				}
 				else
 				{
-					_logger.Log($"Failed to convert value of '{valueNode.GetType()}' to '{typeof(long)}'.");
+					LogMessage($"Failed to convert value of '{valueNode.GetType()}' to '{typeof(long)}'.");
 				}
 			}
 			else
 			{
-				_logger.Log($"'{SourceNode}' must be of type '{typeof(JsonValue)}' and the value must be convertible to type '{typeof(long)}'.");
+				LogMessage($"Expecting node of type '{typeof(JsonValue)}' and the value must be convertible to type '{typeof(long)}'.");
+			}
+			return null;
+		}
+
+		public EnumNodeViewModel? Visit(SchemaEnumType enumType)
+		{
+			if (SourceNode is JsonValue valueNode)
+			{
+				if (valueNode.TryGetValue<string>(out var value))
+				{
+					if (enumType.TryFindIndex(value, out var index))
+					{
+						return new EnumNodeViewModel(_editor, Parent, enumType, index);
+					}
+					else
+					{
+						LogMessage($"No enum member is called '{value}'. Accepted values: [{string.Join(", ", enumType.PossibleValues)}]");
+					}
+				}
+				else
+				{
+					LogMessage($"Failed to convert value of '{valueNode.GetType()}' to '{typeof(bool)}'.");
+				}
+			}
+			else
+			{
+				LogMessage($"Expecting node of type '{typeof(JsonValue)}' and the value must be convertible to type '{typeof(bool)}'.");
+			}
+			return null;
+		}
+
+		public BooleanNodeViewModel? Visit(SchemaBooleanType booleanType)
+		{
+			if (SourceNode is JsonValue valueNode)
+			{
+				if (valueNode.TryGetValue<bool>(out var value))
+				{
+					return new BooleanNodeViewModel(_editor, Parent, booleanType, value);
+				}
+				else
+				{
+					LogMessage($"Failed to convert value of '{valueNode.GetType()}' to '{typeof(bool)}'.");
+				}
+			}
+			else
+			{
+				LogMessage($"Expecting node of type '{typeof(JsonValue)}' and the value must be convertible to type '{typeof(bool)}'.");
 			}
 			return null;
 		}
@@ -64,12 +132,12 @@ namespace CG.Test.Editor.FrontEnd.Visitors
 				}
 				else
 				{
-					_logger.Log($"Failed to convert value of '{valueNode.GetType()}' to '{typeof(string)}'.");
+					LogMessage($"Failed to convert value of '{valueNode.GetType()}' to '{typeof(string)}'.");
 				}
 			}
 			else
 			{
-				_logger.Log($"'{SourceNode}' must be of type '{typeof(JsonValue)}' and the value must be convertible to type '{typeof(string)}'.");
+				LogMessage($"Expecting node of type '{typeof(JsonValue)}' and the value must be convertible to type '{typeof(string)}'.");
 			}
 			return null;
 		}
@@ -79,10 +147,12 @@ namespace CG.Test.Editor.FrontEnd.Visitors
 			if (SourceNode is JsonArray arrayNode)
 			{
 				var result = new ArrayNodeViewModel(_editor, Parent, arrayType);
-				var elementVisitor = new NodeParserVisitor(_editor, result, _logger, null);
-				foreach (var node in arrayNode)
+				var elementVisitor = new NodeParserVisitor(_editor, CurrentPath, result, _logger, null);
+                for (var i = 0; i < arrayNode.Count; i++)
 				{
-					elementVisitor.SourceNode = node;
+                    var node = arrayNode[i];
+                    elementVisitor.SourceNode = node;
+					elementVisitor.CurrentPath = CurrentPath.Append(i);
 					var nodeViewModel = arrayType.ElementType.Visit(elementVisitor);
 
 					if (nodeViewModel is not null)
@@ -94,7 +164,7 @@ namespace CG.Test.Editor.FrontEnd.Visitors
 			}
 			else
 			{
-				_logger.Log($"'{SourceNode}' must be of type '{typeof(JsonArray)}'.");
+				LogMessage($"Expecting node of type '{typeof(JsonArray)}'.");
 			}
 			return null;
 		}
@@ -104,36 +174,42 @@ namespace CG.Test.Editor.FrontEnd.Visitors
 			if (SourceNode is JsonObject objectNode)
 			{
 				var result = new ObjectNodeViewModel(_editor, Parent, objectType);
-				var nodeVisitor = new NodeParserVisitor(_editor, result, _logger, null);
+				var nodeVisitor = new NodeParserVisitor(_editor, CurrentPath, result, _logger, null);
 				foreach (var property in objectType.Properties)
 				{
 					if (objectNode.TryGetPropertyValue(property.Name, out var node))
 					{
 						nodeVisitor.SourceNode = node;
+						nodeVisitor.CurrentPath = CurrentPath.Append(property.Name);
 						var childNode = property.Type.Visit(nodeVisitor);
 						if (childNode is not null)
 						{
 							result.Nodes.Add(new KeyValuePair<string, NodeViewModelBase>(property.Name, childNode));
 						}
 					}
+					else
+					{
+						LogMessage($"Value for property '{property.Name}', has not been found.");
+					}
 				}
 				return result;
 			}
 			else
 			{
-				_logger.Log($"'{SourceNode}' must be of type '{typeof(JsonArray)}'.");
+				LogMessage($"Expecting node of type '{typeof(JsonObject)}'.");
 			}
 			return null;
 		}
 
 		public NodeViewModelBase? Visit(SchemaVariantType variantType)
 		{
-			var messages = new List<string>();
-			var logger = new CollectionLogger<string>(messages);
+			var messages = new List<NodeParsingMessage>();
+			var logger = new CollectionLogger<NodeParsingMessage>(messages);
 			
 			foreach (var possibleType in variantType.PossibleTypes)
 			{
-				var nodeViewModel = possibleType.Visit(new NodeParserVisitor(_editor, Parent, logger, SourceNode));
+				messages.Clear();
+				var nodeViewModel = possibleType.Visit(new NodeParserVisitor(_editor, CurrentPath, Parent, logger, SourceNode));
 				if (nodeViewModel is not null && messages.Count == 0)
 				{
 					return nodeViewModel;
