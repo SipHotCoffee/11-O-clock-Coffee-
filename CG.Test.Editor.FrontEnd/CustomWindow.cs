@@ -1,4 +1,5 @@
-﻿using Microsoft.Win32;
+﻿using DependencyPropertyToolkit;
+using Microsoft.Win32;
 using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Controls;
@@ -11,7 +12,7 @@ using System.Windows.Media.Imaging;
 
 namespace CG.Test.Editor.FrontEnd
 {
-    public class CustomWindow : Window
+    public partial class CustomWindow : Window
     {
        private static RenderTargetBitmap CreateResizedImage(ImageSource source, int width, int height)
         {
@@ -27,16 +28,6 @@ namespace CG.Test.Editor.FrontEnd
             resizedImage.Render(drawingVisual);
             return resizedImage;
         }
-
-        public static readonly DependencyProperty IsMicaBackgroundEnabledProperty = DependencyProperty.Register(nameof(IsMicaBackgroundEnabled), typeof(bool), typeof(CustomWindow));
-
-        public static readonly DependencyProperty MinimizeButtonVisibilityProperty = DependencyProperty.Register(nameof(MinimizeButtonVisibility), typeof(Visibility), typeof(CustomWindow));
-        public static readonly DependencyProperty MaximizeButtonVisibilityProperty = DependencyProperty.Register(nameof(MaximizeButtonVisibility), typeof(Visibility), typeof(CustomWindow));
-
-        public static readonly DependencyProperty IsCloseButtonEnabledProperty = DependencyProperty.Register(nameof(IsCloseButtonEnabled), typeof(bool), typeof(CustomWindow));
-
-        public static readonly DependencyProperty IsHorizontallyResizableProperty = DependencyProperty.Register(nameof(IsHorizontallyResizable), typeof(bool), typeof(CustomWindow), new PropertyMetadata(true));
-        public static readonly DependencyProperty   IsVerticallyResizableProperty = DependencyProperty.Register(nameof(IsVerticallyResizable), typeof(bool), typeof(CustomWindow), new PropertyMetadata(true));
 
         private static readonly ImageSource? _blurredBackground;
 
@@ -110,42 +101,23 @@ namespace CG.Test.Editor.FrontEnd
             AllowsTransparency = true;
         }
 
-        public bool IsMicaBackgroundEnabled
-        {
-            get => (bool)GetValue(IsMicaBackgroundEnabledProperty);
-            set => SetValue(IsMicaBackgroundEnabledProperty, value);
-        }
+		[DependencyProperty]
+		public partial bool IsMicaBackgroundEnabled { get; set; }
 
-        public Visibility MinimizeButtonVisibility
-        {
-            get => (Visibility)GetValue(MinimizeButtonVisibilityProperty);
-            set => SetValue(MinimizeButtonVisibilityProperty, value);
-        }
+        [DependencyProperty]
+        public partial Visibility MinimizeButtonVisibility { get; set; }
 
-        public Visibility MaximizeButtonVisibility
-        {
-            get => (Visibility)GetValue(MaximizeButtonVisibilityProperty);
-            set => SetValue(MaximizeButtonVisibilityProperty, value);
-        }
+		[DependencyProperty]
+		public partial Visibility MaximizeButtonVisibility { get; set; }
 
-        public bool IsCloseButtonEnabled
-        {
-            get => (bool)GetValue(IsCloseButtonEnabledProperty);
-            set => SetValue(IsCloseButtonEnabledProperty, value);
-        }
+		[DependencyProperty]
+		public partial bool IsCloseButtonEnabled { get; set; }
 
-        public bool IsHorizontallyResizable
-        {
-            get => (bool)GetValue(IsHorizontallyResizableProperty);
-            set => SetValue(IsHorizontallyResizableProperty, value);
-        }
+        [DependencyProperty(true)]
+		public partial bool IsHorizontallyResizable { get; set; }
 
-        public bool IsVerticallyResizable
-        {
-            get => (bool)GetValue(IsVerticallyResizableProperty);
-            set => SetValue(IsVerticallyResizableProperty, value);
-        }
-
+        [DependencyProperty(true)]
+		public partial bool IsVerticallyResizable { get; set; }
 
         private void OnMoveOrResize(object? sender, EventArgs e)
         {

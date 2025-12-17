@@ -1,4 +1,5 @@
-﻿using System.Windows;
+﻿using DependencyPropertyToolkit;
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 
@@ -9,7 +10,6 @@ namespace CG.Test.Editor.FrontEnd.Views.Controls
 		public static readonly DependencyProperty      ValueProperty = DependencyProperty.Register(nameof(Value)  ,    typeof(double), typeof(SpinButton), new FrameworkPropertyMetadata(0.0, null, LimitValueCallBack));
 		public static readonly DependencyProperty    MinimumProperty = DependencyProperty.Register(nameof(Minimum),    typeof(double), typeof(SpinButton));
 		public static readonly DependencyProperty    MaximumProperty = DependencyProperty.Register(nameof(Maximum),    typeof(double), typeof(SpinButton));
-		public static readonly DependencyProperty       StepProperty = DependencyProperty.Register(nameof(Step),       typeof(double), typeof(SpinButton));
 		public static readonly DependencyProperty IsIntegralProperty = DependencyProperty.Register(nameof(IsIntegral), typeof(bool)  , typeof(SpinButton));
 
 		static SpinButton()
@@ -83,11 +83,8 @@ namespace CG.Test.Editor.FrontEnd.Views.Controls
 			}
 		}
 
-		public double Step
-		{
-			get => (double)GetValue(StepProperty);
-			set => SetValue(StepProperty, value);
-		}
+		[DependencyProperty]
+		public partial double Step { get; set; }
 
 		public bool IsIntegral
 		{
@@ -141,7 +138,11 @@ namespace CG.Test.Editor.FrontEnd.Views.Controls
 		private static object LimitValueCallBack(DependencyObject dependencyObject, object baseValue)
 		{
 			var value = (double)baseValue;
-			return Math.Clamp(value, (double)dependencyObject.GetValue(MinimumProperty), (double)dependencyObject.GetValue(MaximumProperty));
+			if (dependencyObject is SpinButton spinButton)
+			{
+				return Math.Clamp(value, spinButton.Minimum, spinButton.Maximum);
+			}
+			return 0.0;
 		}
 	}
 }

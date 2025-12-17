@@ -11,7 +11,7 @@ namespace CG.Test.Editor.FrontEnd.Visitors
 		public IEnumerable<object> Path { get; } = path;
 	}
 
-    public class NodeParserVisitor(FileInstanceViewModel editor, IEnumerable<object> currentPath, NodeViewModelBase? parent, ILogger<NodeParsingMessage> logger, JsonNode? sourceNode) : VisitorBase<SchemaTypeBase, NodeViewModelBase?>
+    public class NodeParserVisitor(FileInstanceViewModel editor, IEnumerable<object> currentPath, NodeViewModelBase? parent, ILogger<NodeParsingMessage> logger, JsonNode? sourceNode) : Visitor<NodeParserVisitor, SchemaTypeBase, NodeViewModelBase?>
     {
         private readonly FileInstanceViewModel _editor = editor;
 

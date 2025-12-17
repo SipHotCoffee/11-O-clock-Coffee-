@@ -2,52 +2,53 @@
 
 namespace CG.Test.Editor.FrontEnd
 {
-    public abstract class VisitorBase<TBase> where TBase : class
-    {
-        private readonly Dictionary<Type, MethodInfo> _methodMap;
+	public interface IVisitor<TBase, TResult>
+	{
+		TResult Invoke(TBase parameter);
+	}
 
-        public VisitorBase() : this(typeof(void)) {}
+	public struct Void;
 
-		protected VisitorBase(Type returnType)
-        {
-            _methodMap = GetType().GetMethods(BindingFlags.Instance | BindingFlags.Public).Where((method) => method.Name == "Visit" && 
-                                                                                                             method.GetParameters().Length == 1 && 
-                                                                                                            (method.ReturnType == typeof(void) || 
-                                                                                                             method.ReturnType.IsAssignableTo(returnType)))
-											                                              .Select((method) => new KeyValuePair<Type, MethodInfo>(method.GetParameters()[0].ParameterType, method))
-											                                              .ToDictionary();
+	public class Visitor<TSelf, TBase, TResult> : IVisitor<TBase, TResult> where TSelf : Visitor<TSelf, TBase, TResult> where TBase : class
+	{
+		private static readonly Dictionary<Type, MethodInfo> _methods;
+
+		static Visitor()
+		{
+			_methods = typeof(TSelf).GetMethods(BindingFlags.Instance | BindingFlags.Public).Where((method) =>
+			{
+				var parameters = method.GetParameters();
+				return method.Name == "Visit" && parameters.Length == 1 && parameters[0].ParameterType.IsAssignableTo(typeof(TBase)) && (typeof(TResult) == typeof(Void) || method.ReturnType.IsAssignableTo(typeof(TResult)));
+			}).Select((method) =>
+			{
+				var parameters = method.GetParameters();
+				return new KeyValuePair<Type, MethodInfo>(parameters[0].ParameterType, method);
+			}).ToDictionary();
 		}
 
-        protected object? InvokeVisitInternal(TBase value)
-        {
-            if (_methodMap.TryGetValue(value.GetType(), out var method))
-            {
-                return method.Invoke(this, [ value ]);
-            }
-            else
-            {
-                throw new NotImplementedException();
-            }
+		public TResult Invoke(TBase parameter)
+		{
+			if (_methods.TryGetValue(parameter.GetType(), out var method))
+			{
+				var result = method.Invoke(this, [parameter]);
+				if (typeof(TResult) == typeof(Void))
+				{
+					return default!;
+				}
+				return (TResult)result!;
+			}
+			else
+			{
+				throw new NotImplementedException($"Visitor does not handle type: '{parameter.GetType()}'.");
+			}
+		}
+	}
+
+	public static class VisitorExtensions
+	{
+		extension<TValue>(TValue value) where TValue : class
+		{
+            public TResult Visit<TResult>(IVisitor<TValue, TResult> visitor) => visitor.Invoke(value);
         }
-    }
-
-    public class VisitorVoidBase<TBase> : VisitorBase<TBase> where TBase : class
-    {
-        public void InvokeVisit(TBase value) => InvokeVisitInternal(value);
-    }
-
-	public abstract class VisitorBase<TBase, TReturnType>() : VisitorBase<TBase>(typeof(TReturnType)) where TBase : class
-    {
-        public TReturnType InvokeVisit(TBase value) => (TReturnType)InvokeVisitInternal(value)!;
-    }
-
-    public static class VisitorExtensions
-    {
-        extension<TValue>(TValue value) where TValue : class
-        {
-            public void Visit(VisitorVoidBase<TValue> visitor) => visitor.InvokeVisit(value);
-
-            public TReturnType Visit<TReturnType>(VisitorBase<TValue, TReturnType> visitor) => visitor.InvokeVisit(value);
-        }
-    }
+	}
 }

@@ -1,4 +1,5 @@
 ﻿using CG.Test.Editor.FrontEnd.Models;
+using DependencyPropertyToolkit;
 using System.Collections.ObjectModel;
 using System.Windows;
 
@@ -9,27 +10,18 @@ namespace CG.Test.Editor.FrontEnd.Views.Dialogs
     /// </summary>
     public partial class VariantTypeSelectorDialog : CustomWindow
     {
-		public static readonly DependencyProperty PossibleTypesProperty = DependencyProperty.Register(nameof(PossibleTypes), typeof(ObservableCollection<SchemaObjectType>), typeof(VariantTypeSelectorDialog));
-		public static readonly DependencyProperty SelectedTypeProperty = DependencyProperty.Register(nameof(SelectedType), typeof(SchemaObjectType), typeof(VariantTypeSelectorDialog));
-
 		public VariantTypeSelectorDialog()
         {
             InitializeComponent();
         }
 
-		public ObservableCollection<SchemaObjectType> PossibleTypes
-		{
-			get => (ObservableCollection<SchemaObjectType>)GetValue(PossibleTypesProperty);
-			set => SetValue(PossibleTypesProperty, value);
-		}
+        [DependencyProperty]
+		public partial ObservableCollection<SchemaObjectType> PossibleTypes { get; set; }
 
-		public SchemaObjectType SelectedType
-		{
-			get => (SchemaObjectType)GetValue(SelectedTypeProperty);
-			set => SetValue(SelectedTypeProperty, value);
-		}
+		[DependencyProperty]
+		public partial SchemaObjectType SelectedType { get; set; }
 
-        private void Ok_Button_Click(object sender, RoutedEventArgs e)
+		private void Ok_Button_Click(object sender, RoutedEventArgs e)
         {
 			Close();
 		}

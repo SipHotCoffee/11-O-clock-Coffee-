@@ -88,10 +88,15 @@
 							<Button Margin="2.5, 5, 2.5, 5" Content="&#xe72a;" FontFamily="{StaticResource SymbolFont}" 
 									IsEnabled="{Binding IsForwardButtonEnabled}" Command="{Binding MoveForwardCommand}"/>
 							<Separator/>
-							<Button Margin="2.5, 5, 5, 5" Content="&#xe74a;" FontFamily="{StaticResource SymbolFont}" Command="{Binding MoveUpCommand}" 
+							<Button Margin="2.5, 5, 2.5, 5" Content="&#xe74a;" FontFamily="{StaticResource SymbolFont}" Command="{Binding MoveUpCommand}" 
 									IsEnabled="{Binding Current.Parent, Converter={StaticResource IsNotNullConverter}}"/>
 							<Separator/>
 
+							<Button Margin="2.5, 5, 5, 5" Content="&#xe90f;" FontFamily="{StaticResource SymbolFont}" Command="{Binding }" 
+								IsEnabled="{Binding Current.Parent, Converter={StaticResource IsNotNullConverter}}"/>
+							
+							<Separator/>
+							
 							<ItemsControl ItemsSource="{Binding AddressItems}">
 								<ItemsControl.ItemsPanel>
 									<ItemsPanelTemplate>

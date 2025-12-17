@@ -4,7 +4,7 @@ using System.Collections.ObjectModel;
 
 namespace CG.Test.Editor.FrontEnd.Visitors
 {
-    public class NodeEditorVisitor(FileInstanceViewModel editor) : VisitorVoidBase<NodeViewModelBase>
+    public class NodeEditorVisitor(FileInstanceViewModel editor) : Visitor<NodeEditorVisitor, NodeViewModelBase, Void>
     {
         private readonly FileInstanceViewModel _editor = editor;
 

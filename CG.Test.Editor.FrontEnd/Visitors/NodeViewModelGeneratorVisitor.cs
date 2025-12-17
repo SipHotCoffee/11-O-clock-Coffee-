@@ -6,7 +6,7 @@ using System.Collections.ObjectModel;
 
 namespace CG.Test.Editor.FrontEnd.Visitors
 {
-    public class NodeViewModelGeneratorVisitor(FileInstanceViewModel editor, NodeViewModelBase? parent) : VisitorBase<SchemaTypeBase, NodeViewModelBase>
+    public class NodeViewModelGeneratorVisitor(FileInstanceViewModel editor, NodeViewModelBase? parent) : Visitor<NodeViewModelGeneratorVisitor, SchemaTypeBase, NodeViewModelBase>
     {
         private readonly FileInstanceViewModel _editor = editor;
 

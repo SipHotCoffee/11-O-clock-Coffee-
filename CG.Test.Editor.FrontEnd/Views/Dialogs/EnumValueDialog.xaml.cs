@@ -1,36 +1,24 @@
-﻿using System.Collections.ObjectModel;
+﻿using DependencyPropertyToolkit;
+using System.Collections.ObjectModel;
 using System.Windows;
 
 namespace CG.Test.Editor.FrontEnd.Views.Dialogs
 {
     public partial class EnumValueDialog : CustomWindow
     {
-        public static readonly DependencyProperty  SelectedIndexProperty = DependencyProperty.Register(nameof(SelectedIndex), typeof(int), typeof(EnumValueDialog));
-		public static readonly DependencyProperty   SelectedItemProperty = DependencyProperty.Register(nameof(SelectedItem), typeof(string), typeof(EnumValueDialog));
-		public static readonly DependencyProperty PossibleValuesProperty = DependencyProperty.Register(nameof(PossibleValues), typeof(ObservableCollection<string>), typeof(EnumValueDialog));
-
 		public EnumValueDialog()
         {
             InitializeComponent();
         }
 
-        public int SelectedIndex
-        {
-            get => (int)GetValue(SelectedIndexProperty);
-            set => SetValue(SelectedIndexProperty, value);
-        }
+        [DependencyProperty]
+        public partial int SelectedIndex { get; set; }
 
-		public string SelectedItem
-		{
-			get => (string)GetValue(SelectedItemProperty);
-			set => SetValue(SelectedItemProperty, value);
-		}
+        [DependencyProperty]
+		public partial string SelectedItem { get; set; }
 
-		public ObservableCollection<string> PossibleValues
-        {
-            get => (ObservableCollection<string>)GetValue(PossibleValuesProperty);
-            set => SetValue(PossibleValuesProperty, value);
-        }
+        [DependencyProperty]
+		public partial ObservableCollection<string> PossibleValues { get; set; }
 
         private void OkButton_Click(object sender, RoutedEventArgs e)
         {

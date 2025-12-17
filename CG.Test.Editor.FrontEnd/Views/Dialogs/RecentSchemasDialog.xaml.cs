@@ -1,4 +1,5 @@
-﻿using Microsoft.Win32;
+﻿using DependencyPropertyToolkit;
+using Microsoft.Win32;
 using System.IO;
 using System.Text.Json;
 using System.Windows;
@@ -8,9 +9,6 @@ namespace CG.Test.Editor.FrontEnd.Views.Dialogs
     public partial class RecentSchemasDialog : CustomWindow
     {
         private const string SAVE_FILE_NAME = "save.json";
-
-        public static readonly DependencyProperty  RecentSchemasProperty = DependencyProperty.Register(nameof(RecentSchemas), typeof(HashSet<string>), typeof(RecentSchemasDialog));
-        public static readonly DependencyProperty SelectedSchemaProperty = DependencyProperty.Register(nameof(SelectedSchema), typeof(string), typeof(RecentSchemasDialog));
 
         public RecentSchemasDialog()
         {
@@ -33,17 +31,11 @@ namespace CG.Test.Editor.FrontEnd.Views.Dialogs
             RecentSchemas = [.. saveInfo!.RecentSchemas.Where(File.Exists)];
 		}
 
-		public HashSet<string> RecentSchemas
-        {
-            get => (HashSet<string>)GetValue(RecentSchemasProperty);
-            set => SetValue(RecentSchemasProperty, value);
-        }
+		[DependencyProperty]
+		public partial HashSet<string> RecentSchemas { get; set; }
 
-        public string SelectedSchema
-        {
-            get => (string)GetValue(SelectedSchemaProperty);
-            set => SetValue(SelectedSchemaProperty, value);
-        }
+        [DependencyProperty]
+        public partial string SelectedSchema { get; set; }
 
 		private async void BrowseButton_Click(object sender, RoutedEventArgs e)
         {

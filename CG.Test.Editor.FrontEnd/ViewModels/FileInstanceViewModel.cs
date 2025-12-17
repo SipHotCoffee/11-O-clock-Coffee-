@@ -135,6 +135,12 @@ namespace CG.Test.Editor.FrontEnd.ViewModels
             _mainViewModel.OpenFiles.Remove(this);
 		}
 
+        [RelayCommand]
+        void Repair()
+        {
+
+        }
+
 		public void Navigate(NodeViewModelBase target)
         {
 			Current = target;

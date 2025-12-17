@@ -1,3 +1,4 @@
 <Solution>
   <Project Path="CG.Test.Editor.FrontEnd/CG.Test.Editor.FrontEnd.csproj" Id="c30fb198-bb17-4f45-9b07-2b4c9e3e3c42" />
+  <Project Path="DependencyPropertyToolkit/DependencyPropertyToolkit.csproj" Id="61b2ca87-ca5f-4e0c-98ec-70f0ca2993c3" />
 </Solution>
