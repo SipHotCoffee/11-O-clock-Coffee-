@@ -184,6 +184,8 @@ namespace CG.Test.Editor.FrontEnd.ViewModels
 			}
         }
 
+        public override IReadOnlyList<NodeViewModelBase> Children => Elements;
+
         public override void SerializeTo(Utf8JsonWriter writer)
         {
             writer.WriteStartArray();

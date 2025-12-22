@@ -6,6 +6,8 @@ namespace CG.Test.Editor.FrontEnd.Models
     {
         public int MaximumLength { get; } = maximumLength;
 
+        public override bool IsValueType => true;
+
         public override bool IsConvertibleFrom(SchemaTypeBase sourceType) => sourceType is SchemaStringType;
     }
 }

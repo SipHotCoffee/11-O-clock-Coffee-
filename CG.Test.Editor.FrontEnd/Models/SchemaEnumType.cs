@@ -8,6 +8,8 @@
 
         public bool TryFindIndex(string name, out int index) => _possibleValueSet.TryGetValue(name, out index);
 
-        public override bool IsConvertibleFrom(SchemaTypeBase sourceType) => sourceType == this;
+		public override bool IsValueType => true;
+
+		public override bool IsConvertibleFrom(SchemaTypeBase sourceType) => sourceType == this;
     }
 }

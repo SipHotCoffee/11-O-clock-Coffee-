@@ -23,6 +23,10 @@ namespace CG.Test.Editor.FrontEnd.ViewModels
 
         public abstract SchemaTypeBase Type { get; }
 
+        public virtual IEnumerable<NodeViewModelBase> Children { get; } = [];
+
+        public IEnumerable<NodeViewModelBase> AllChildren => Children.Concat(Children.SelectMany((child) => child.AllChildren));
+
         public abstract NodeViewModelBase Clone(NodeViewModelBase? parent);
 
         public abstract void SerializeTo(Utf8JsonWriter writer);

@@ -18,6 +18,7 @@
 			<Style TargetType="{x:Type dialogs:VariantTypeSelectorDialog}" BasedOn="{StaticResource BaseWindowStyle}"/>
 			<Style TargetType="{x:Type dialogs:EnumValueDialog}"           BasedOn="{StaticResource BaseWindowStyle}"/>
 			<Style TargetType="{x:Type dialogs:RecentSchemasDialog}"       BasedOn="{StaticResource BaseWindowStyle}"/>
+			<Style TargetType="{x:Type dialogs:RepairDialog}"              BasedOn="{StaticResource BaseWindowStyle}"/>
 
 			<ResourceDictionary x:Key="NodeVeryCompactDataTemplates">
 				<DataTemplate DataType="{x:Type viewmodels:ArrayNodeViewModel}">

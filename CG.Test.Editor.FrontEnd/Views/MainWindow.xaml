@@ -92,8 +92,7 @@
 									IsEnabled="{Binding Current.Parent, Converter={StaticResource IsNotNullConverter}}"/>
 							<Separator/>
 
-							<Button Margin="2.5, 5, 5, 5" Content="&#xe90f;" FontFamily="{StaticResource SymbolFont}" Command="{Binding }" 
-								IsEnabled="{Binding Current.Parent, Converter={StaticResource IsNotNullConverter}}"/>
+							<Button Margin="2.5, 5, 5, 5" Content="&#xe90f;" FontFamily="{StaticResource SymbolFont}" Command="{Binding RepairCommand}"/>
 							
 							<Separator/>
 							

@@ -1,4 +1,6 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
+﻿using CG.Test.Editor.FrontEnd.Models;
+using CG.Test.Editor.FrontEnd.Views.Dialogs;
+using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using System.Collections.ObjectModel;
 using System.Diagnostics.CodeAnalysis;
@@ -138,7 +140,13 @@ namespace CG.Test.Editor.FrontEnd.ViewModels
         [RelayCommand]
         void Repair()
         {
+            var availableTypes = Current!.AllChildren.Select((node) => node.Type).OfType<SchemaObjectType>().ToHashSet();
 
+			var repairDialog = new RepairDialog()
+            {
+                AvailableTypes = new(availableTypes)
+            };
+            repairDialog.ShowDialog();
         }
 
 		public void Navigate(NodeViewModelBase target)

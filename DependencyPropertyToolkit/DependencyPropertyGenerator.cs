@@ -128,20 +128,20 @@ namespace DependencyPropertyToolkit
 			}
 
 			var result = $@"
-	{dependencyPropertyCode}
+		{dependencyPropertyCode}
 
-	private static void {triggerFunctionName}(System.Windows.DependencyObject dependencyObject, System.Windows.DependencyPropertyChangedEventArgs e)
-	{{
-		(({classInfo.ClassName})dependencyObject).On{property.Name}Changed(({property.Type})e.OldValue, ({property.Type})e.NewValue);
-	}}
+		private static void {triggerFunctionName}(System.Windows.DependencyObject dependencyObject, System.Windows.DependencyPropertyChangedEventArgs e)
+		{{
+			(({classInfo.ClassName})dependencyObject).On{property.Name}Changed(({property.Type})e.OldValue, ({property.Type})e.NewValue);
+		}}
 
-	partial void On{property.Name}Changed({property.Type} oldValue, {property.Type} newValue);
+		partial void On{property.Name}Changed({property.Type} oldValue, {property.Type} newValue);
 
-	public partial {property.Type} {property.Name} 
-	{{
-		get => ({property.Type})GetValue({property.Name}Property);
-		set => SetValue({property.Name}Property, value);
-	}}";
+		public partial {property.Type} {property.Name} 
+		{{
+			get => ({property.Type})GetValue({property.Name}Property);
+			set => SetValue({property.Name}Property, value);
+		}}";
 
 			return result;
 		}

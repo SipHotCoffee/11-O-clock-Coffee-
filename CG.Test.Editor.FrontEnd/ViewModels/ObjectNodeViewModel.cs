@@ -54,6 +54,8 @@ namespace CG.Test.Editor.FrontEnd.ViewModels
 			return "Child not found!";
 		}
 
+        public override IEnumerable<NodeViewModelBase> Children => Nodes.Select((pair) => pair.Value);
+
 		public override void SerializeTo(Utf8JsonWriter writer)
 		{
 			writer.WriteStartObject();

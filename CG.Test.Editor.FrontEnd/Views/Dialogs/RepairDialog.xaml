@@ -5,16 +5,78 @@
                        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
                        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
                        xmlns:local="clr-namespace:CG.Test.Editor.FrontEnd.Views.Dialogs"
+					   xmlns:models="clr-namespace:CG.Test.Editor.FrontEnd.Models"
                        mc:Ignorable="d"
-                       Title="Repair" Height="400" Width="600">
+                       Title="Repair" Height="400" Width="600" WindowStartupLocation="CenterScreen" DataContext="{Binding RelativeSource={RelativeSource Mode=Self}}">
     <Grid>
+		<Grid.Resources>
+			<local:FieldValueFilterConverter x:Key="FieldValueFilterConverter"/>
+		</Grid.Resources>
+		<Grid.ColumnDefinitions>
+			<ColumnDefinition Width="*"/>
+			<ColumnDefinition Width="*"/>
+		</Grid.ColumnDefinitions>
+		
 		<Grid.RowDefinitions>
 			<RowDefinition Height="*"/>
 			<RowDefinition Height="auto"/>
 		</Grid.RowDefinitions>
 
-		<TreeView Margin="5, 5, 5, 2.5">
-			
-		</TreeView>
-    </Grid>
+		<ListView Grid.Column="0" 
+				  Margin="5, 5, 2.5, 2.5" 
+				  ItemsSource="{Binding AvailableTypes}" 
+				  SelectedItem="{Binding Properties, Mode=OneWayToSource, Converter={StaticResource FieldValueFilterConverter}}">
+			<ListView.ItemTemplate>
+				<DataTemplate>
+					<TextBlock Text="{Binding Name}"/>
+				</DataTemplate>
+			</ListView.ItemTemplate>
+		</ListView>
+
+		<ListView Grid.Column="1" Margin="2.5, 5, 5, 2.5" ItemsSource="{Binding Properties, Mode=OneWay}">
+			<ListView.View>
+				<GridView>
+					<GridView.Columns>
+						<GridViewColumn Header="Name">
+							<GridViewColumn.CellTemplate>
+								<DataTemplate>
+									<StackPanel Orientation="Horizontal">
+										<TextBlock FontFamily="Cascadia Mono" FontWeight="Bold" VerticalAlignment="Center" Text="{Binding Name}"/>
+										<TextBlock FontFamily="Cascadia Mono" FontWeight="Bold" VerticalAlignment="Center" Text=":"/>
+									</StackPanel>
+								</DataTemplate>
+							</GridViewColumn.CellTemplate>
+						</GridViewColumn>
+
+						<GridViewColumn Header="Type">
+							<GridViewColumn.CellTemplate>
+								<DataTemplate>
+									<DataTemplate.Resources>
+										<DataTemplate DataType="{x:Type models:SchemaBooleanType}">
+											<TextBlock FontFamily="Cascadia Mono" VerticalAlignment="Center" Text="Boolean"/>
+										</DataTemplate>
+										<DataTemplate DataType="{x:Type models:SchemaStringType}">
+											<TextBlock FontFamily="Cascadia Mono" VerticalAlignment="Center" Text="String"/>
+										</DataTemplate>
+										<DataTemplate DataType="{x:Type models:SchemaNumberType}">
+											<TextBlock FontFamily="Cascadia Mono" VerticalAlignment="Center" Text="Number"/>
+										</DataTemplate>
+										<DataTemplate DataType="{x:Type models:SchemaIntegerType}">
+											<TextBlock FontFamily="Cascadia Mono" VerticalAlignment="Center" Text="Integer"/>
+										</DataTemplate>
+									</DataTemplate.Resources>
+									<ContentPresenter Content="{Binding Type}"/>
+								</DataTemplate>
+							</GridViewColumn.CellTemplate>
+						</GridViewColumn>
+					</GridView.Columns>
+				</GridView>
+			</ListView.View>
+			<ListView.ItemTemplate>
+				<DataTemplate>
+					<TextBlock Text="{Binding Name}"/>
+				</DataTemplate>
+			</ListView.ItemTemplate>
+		</ListView>
+	</Grid>
 </frontend:CustomWindow>

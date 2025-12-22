@@ -7,8 +7,6 @@ namespace CG.Test.Editor.FrontEnd.Views.Dialogs
 {
     public partial class SearchArrayDialog : CustomWindow
     {
-       // public static readonly DependencyProperty SearchTextProperty = DependencyProperty.Register(nameof(SearchText), typeof(string), typeof(SearchArrayDialog), new PropertyMetadata(string.Empty, SearchTextChanged));
-
         public SearchArrayDialog()
         {
             InitializeComponent();
@@ -17,11 +15,6 @@ namespace CG.Test.Editor.FrontEnd.Views.Dialogs
         [DependencyProperty]
         public partial ICollectionView NodeCollection { get; set; }
 
-        //public string SearchText
-        //      {
-        //          get => (string)GetValue(SearchTextProperty);
-        //          set => SetValue(SearchTextProperty, value);
-        //      }
 
         [DependencyProperty("")]
         public partial string SearchText { get; set; }
