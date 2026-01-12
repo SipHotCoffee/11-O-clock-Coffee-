@@ -3,7 +3,8 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:local="clr-namespace:CG.Test.Editor.FrontEnd.Views" 
 			 xmlns:dialogs="clr-namespace:CG.Test.Editor.FrontEnd.Views.Dialogs" 
-			 xmlns:viewmodels="clr-namespace:CG.Test.Editor.FrontEnd.ViewModels"
+			 xmlns:viewmodels="clr-namespace:CG.Test.Editor.FrontEnd.ViewModels" 
+			 xmlns:viewmodelnodes="clr-namespace:CG.Test.Editor.FrontEnd.ViewModels.Nodes"
 			 StartupUri="Views/MainWindow.xaml">
 	<Application.Resources>
 		<ResourceDictionary>
@@ -21,42 +22,42 @@
 			<Style TargetType="{x:Type dialogs:RepairDialog}"              BasedOn="{StaticResource BaseWindowStyle}"/>
 
 			<ResourceDictionary x:Key="NodeVeryCompactDataTemplates">
-				<DataTemplate DataType="{x:Type viewmodels:ArrayNodeViewModel}">
+				<DataTemplate DataType="{x:Type viewmodelnodes:ArrayNodeViewModel}">
 					<StackPanel Orientation="Horizontal">
 						<TextBlock FontFamily="Cascadia Mono" Text="["/>
 						<TextBlock FontFamily="Cascadia Mono" Text="{Binding Elements.Count}"/>
 						<TextBlock FontFamily="Cascadia Mono" Text="]"/>
 					</StackPanel>
 				</DataTemplate>
-				<DataTemplate DataType="{x:Type viewmodels:ObjectNodeViewModel}">
+				<DataTemplate DataType="{x:Type viewmodelnodes:ObjectNodeViewModel}">
 					<StackPanel Orientation="Horizontal">
 						<TextBlock FontFamily="Cascadia Mono" Text="{Binding Type.Name}"/>
 						<TextBlock FontFamily="Cascadia Mono" Text="{} {...}"/>
 					</StackPanel>
 				</DataTemplate>
-				<DataTemplate DataType="{x:Type viewmodels:IntegerNodeViewModel}">
+				<DataTemplate DataType="{x:Type viewmodelnodes:IntegerNodeViewModel}">
 					<TextBlock FontFamily="Cascadia Mono" Text="{Binding Value}"/>
 				</DataTemplate>
-				<DataTemplate DataType="{x:Type viewmodels:NumberNodeViewModel}">
+				<DataTemplate DataType="{x:Type viewmodelnodes:NumberNodeViewModel}">
 					<TextBlock FontFamily="Cascadia Mono" Text="{Binding Value}"/>
 				</DataTemplate>
-				<DataTemplate DataType="{x:Type viewmodels:BooleanNodeViewModel}">
+				<DataTemplate DataType="{x:Type viewmodelnodes:BooleanNodeViewModel}">
 					<TextBlock FontFamily="Cascadia Mono" Text="{Binding Value}"/>
 				</DataTemplate>
-				<DataTemplate DataType="{x:Type viewmodels:StringNodeViewModel}">
+				<DataTemplate DataType="{x:Type viewmodelnodes:StringNodeViewModel}">
 					<StackPanel Orientation="Horizontal">
 						<TextBlock FontFamily="Cascadia Mono" Text="&quot;"/>
 						<TextBlock FontFamily="Cascadia Mono" Text="{Binding Value}"/>
 						<TextBlock FontFamily="Cascadia Mono" Text="&quot;"/>
 					</StackPanel>
 				</DataTemplate>
-				<DataTemplate DataType="{x:Type viewmodels:EnumNodeViewModel}">
+				<DataTemplate DataType="{x:Type viewmodelnodes:EnumNodeViewModel}">
 					<TextBlock FontFamily="Cascadia Mono" Text="{Binding SelectedItem}"/>
 				</DataTemplate>
 			</ResourceDictionary>
 
 			<ResourceDictionary x:Key="NodeCompactDataTemplates">
-				<DataTemplate DataType="{x:Type viewmodels:ArrayNodeViewModel}">
+				<DataTemplate DataType="{x:Type viewmodelnodes:ArrayNodeViewModel}">
 					<StackPanel Orientation="Horizontal" VerticalAlignment="Center">
 						<TextBlock FontFamily="Cascadia Mono" Text="{Binding Type.ElementType.Name}"/>
 						<TextBlock FontFamily="Cascadia Mono" Text="["/>
@@ -87,7 +88,7 @@
 						<TextBlock FontFamily="Cascadia Mono" Text="{} }"/>
 					</StackPanel>
 				</DataTemplate>
-				<DataTemplate DataType="{x:Type viewmodels:ObjectNodeViewModel}">
+				<DataTemplate DataType="{x:Type viewmodelnodes:ObjectNodeViewModel}">
 					<StackPanel Orientation="Horizontal" VerticalAlignment="Center">
 						<TextBlock FontFamily="Cascadia Mono" Text="{Binding Type.Name}"/>
 						<TextBlock FontFamily="Cascadia Mono" Text="{} { "/>
@@ -114,23 +115,23 @@
 						<TextBlock FontFamily="Cascadia Mono" Text="{} }"/>
 					</StackPanel>
 				</DataTemplate>
-				<DataTemplate DataType="{x:Type viewmodels:IntegerNodeViewModel}">
+				<DataTemplate DataType="{x:Type viewmodelnodes:IntegerNodeViewModel}">
 					<TextBlock FontFamily="Cascadia Mono" Text="{Binding Value}"/>
 				</DataTemplate>
-				<DataTemplate DataType="{x:Type viewmodels:NumberNodeViewModel}">
+				<DataTemplate DataType="{x:Type viewmodelnodes:NumberNodeViewModel}">
 					<TextBlock FontFamily="Cascadia Mono" Text="{Binding Value}"/>
 				</DataTemplate>
-				<DataTemplate DataType="{x:Type viewmodels:BooleanNodeViewModel}">
+				<DataTemplate DataType="{x:Type viewmodelnodes:BooleanNodeViewModel}">
 					<TextBlock FontFamily="Cascadia Mono" Text="{Binding Value}"/>
 				</DataTemplate>
-				<DataTemplate DataType="{x:Type viewmodels:StringNodeViewModel}">
+				<DataTemplate DataType="{x:Type viewmodelnodes:StringNodeViewModel}">
 					<StackPanel Orientation="Horizontal">
 						<TextBlock FontFamily="Cascadia Mono" Text="&quot;"/>
 						<TextBlock FontFamily="Cascadia Mono" Text="{Binding Value}"/>
 						<TextBlock FontFamily="Cascadia Mono" Text="&quot;"/>
 					</StackPanel>
 				</DataTemplate>
-				<DataTemplate DataType="{x:Type viewmodels:EnumNodeViewModel}">
+				<DataTemplate DataType="{x:Type viewmodelnodes:EnumNodeViewModel}">
 					<TextBlock FontFamily="Cascadia Mono" Text="{Binding SelectedItem}"/>
 				</DataTemplate>
 			</ResourceDictionary>

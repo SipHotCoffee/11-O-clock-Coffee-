@@ -1,6 +1,7 @@
 ﻿using CG.Test.Editor.FrontEnd;
 using CG.Test.Editor.FrontEnd.Models;
 using CG.Test.Editor.FrontEnd.ViewModels;
+using CG.Test.Editor.FrontEnd.ViewModels.Nodes;
 using CG.Test.Editor.FrontEnd.Views.Dialogs;
 using System.Collections.ObjectModel;
 
@@ -57,5 +58,7 @@ namespace CG.Test.Editor.FrontEnd.Visitors
         public StringNodeViewModel Visit(SchemaStringType stringType) => new(_editor, _parent, stringType, string.Empty);
 
 		public BooleanNodeViewModel Visit(SchemaBooleanType booleanType) => new(_editor, _parent, booleanType, false);
+
+        public ReferenceNodeViewModel Visit(SchemaReferenceType referenceType) => new(_editor, _parent, referenceType, null);
 	}
 }

@@ -2,7 +2,7 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using System.Text.Json;
 
-namespace CG.Test.Editor.FrontEnd.ViewModels
+namespace CG.Test.Editor.FrontEnd.ViewModels.Nodes
 {
     public partial class EnumNodeViewModel : NodeViewModelBase
     {

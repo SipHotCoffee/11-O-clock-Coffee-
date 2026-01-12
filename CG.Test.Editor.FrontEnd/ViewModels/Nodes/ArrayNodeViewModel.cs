@@ -9,7 +9,7 @@ using System.Text.Json;
 using System.Windows.Controls;
 using System.Windows.Data;
 
-namespace CG.Test.Editor.FrontEnd.ViewModels
+namespace CG.Test.Editor.FrontEnd.ViewModels.Nodes
 {
     public partial class ArrayNodeViewModel : NodeViewModelBase
     {
@@ -100,7 +100,7 @@ namespace CG.Test.Editor.FrontEnd.ViewModels
         [RelayCommand]
         void CopyElements(IEnumerable selectedItems)
         {
-            Editor.ClipboardNodes = new(selectedItems.OfType<NodeViewModelBase>().Select((node) => node.Clone(null)));
+            Editor.ClipboardNodes = new(selectedItems.OfType<NodeViewModelBase>().Select((node, index) => node.Clone(null)));
 		}
 
         [RelayCommand]
@@ -118,7 +118,8 @@ namespace CG.Test.Editor.FrontEnd.ViewModels
             var index = selectedIndex;
 			foreach (var node in Editor.ClipboardNodes!.Where((node) => Type.ElementType.IsConvertibleFrom(node.Type)))
 			{
-				Elements.Insert(index++, node.Clone(this));
+				Elements.Insert(index, node.Clone(this));
+                ++index;
 			}
 		}
 
@@ -128,7 +129,8 @@ namespace CG.Test.Editor.FrontEnd.ViewModels
 			var index = selectedIndex + 1;
 			foreach (var node in Editor.ClipboardNodes!.Where((node) => Type.ElementType.IsConvertibleFrom(node.Type)))
 			{
-				Elements.Insert(index++, node.Clone(this));
+				Elements.Insert(index, node.Clone(this));
+				++index;
 			}
 		}
 

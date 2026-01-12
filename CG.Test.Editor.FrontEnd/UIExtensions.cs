@@ -55,7 +55,7 @@ namespace CG.Test.Editor.FrontEnd
 
         extension(Window ownerWindow)
         {
-            public int ShowMessage(string message, string title = "", int defaultButtonIndex = 0, string first = "OK", params string[] buttons)
+            public int ShowMessage(string message, string title = "", int defaultButtonIndex = 0, string first = "OK", params IReadOnlyList<string> buttons)
             {
                 if (_isOpen)
                 {
@@ -97,7 +97,7 @@ namespace CG.Test.Editor.FrontEnd
                 Grid.SetRow(scrollViewer, 0);
                 Grid.SetColumn(scrollViewer, 0);
 
-                Grid.SetColumnSpan(scrollViewer, buttons.Length + 1);
+                Grid.SetColumnSpan(scrollViewer, buttons.Count + 1);
 
                 grid.Children.Add(scrollViewer);
 
@@ -145,7 +145,7 @@ namespace CG.Test.Editor.FrontEnd
                     window.Close();
                 };
 
-                for (var i = 0; i < buttons.Length; i++)
+                for (var i = 0; i < buttons.Count; i++)
                 {
                     var button = new Button()
                     {

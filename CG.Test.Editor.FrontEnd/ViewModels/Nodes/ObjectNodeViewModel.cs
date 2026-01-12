@@ -1,10 +1,11 @@
-﻿using CG.Test.Editor.FrontEnd.Models;
+﻿using CG.Test.Editor.FrontEnd;
+using CG.Test.Editor.FrontEnd.Models;
 using System.Collections;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Text.Json;
 
-namespace CG.Test.Editor.FrontEnd.ViewModels
+namespace CG.Test.Editor.FrontEnd.ViewModels.Nodes
 {
     public class ObjectNodeViewModel : NodeViewModelBase
     {

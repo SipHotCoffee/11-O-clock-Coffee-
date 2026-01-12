@@ -1,4 +1,5 @@
 ﻿using CG.Test.Editor.FrontEnd.ViewModels;
+using CG.Test.Editor.FrontEnd.ViewModels.Nodes;
 using CG.Test.Editor.FrontEnd.Views.Dialogs;
 using System.Collections.ObjectModel;
 
@@ -86,5 +87,10 @@ namespace CG.Test.Editor.FrontEnd.Visitors
 				stringNode.Value = stringValueDialog.Text;
 			}
 		}
+
+        public void Visit(ReferenceNodeViewModel referenceNode)
+        {
+            
+        }
 	}
 }

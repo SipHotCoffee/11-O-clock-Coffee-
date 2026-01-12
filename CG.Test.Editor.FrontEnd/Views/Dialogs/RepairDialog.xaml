@@ -5,27 +5,54 @@
                        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
                        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
                        xmlns:local="clr-namespace:CG.Test.Editor.FrontEnd.Views.Dialogs"
-					   xmlns:models="clr-namespace:CG.Test.Editor.FrontEnd.Models"
-                       mc:Ignorable="d"
-                       Title="Repair" Height="400" Width="600" WindowStartupLocation="CenterScreen" DataContext="{Binding RelativeSource={RelativeSource Mode=Self}}">
-    <Grid>
+					   xmlns:models="clr-namespace:CG.Test.Editor.FrontEnd.Models" 
+					   xmlns:viewmodelnodes="clr-namespace:CG.Test.Editor.FrontEnd.ViewModels.Nodes" 
+					   xmlns:viewmodels="clr-namespace:CG.Test.Editor.FrontEnd.ViewModels" 
+					   xmlns:converters="clr-namespace:CG.Test.Editor.FrontEnd.Converters"
+					   mc:Ignorable="d"
+                       Title="Repair" Height="500" Width="600" WindowStartupLocation="CenterScreen" DataContext="{Binding RelativeSource={RelativeSource Mode=Self}}">
+	<Grid>
 		<Grid.Resources>
+			<converters:IsNotNullConverter x:Key="IsNotNullConverter"/>
+
 			<local:FieldValueFilterConverter x:Key="FieldValueFilterConverter"/>
+
+			<DataTemplate DataType="{x:Type viewmodelnodes:NumberNodeViewModel}">
+				<TextBlock Text="{Binding Value}"/>
+			</DataTemplate>
+
+			<DataTemplate DataType="{x:Type viewmodelnodes:IntegerNodeViewModel}">
+				<TextBlock Text="{Binding Value}"/>
+			</DataTemplate>
+
+			<DataTemplate DataType="{x:Type viewmodelnodes:BooleanNodeViewModel}">
+				<TextBlock Text="{Binding Value}"/>
+			</DataTemplate>
+
+			<DataTemplate DataType="{x:Type viewmodelnodes:StringNodeViewModel}">
+				<StackPanel Orientation="Horizontal">
+					<TextBlock Text="&quot;"/>
+					<TextBlock Text="{Binding Value}"/>
+					<TextBlock Text="&quot;"/>
+				</StackPanel>
+			</DataTemplate>
 		</Grid.Resources>
 		<Grid.ColumnDefinitions>
 			<ColumnDefinition Width="*"/>
 			<ColumnDefinition Width="*"/>
 		</Grid.ColumnDefinitions>
-		
+
 		<Grid.RowDefinitions>
 			<RowDefinition Height="*"/>
+			<RowDefinition Height="auto"/>
 			<RowDefinition Height="auto"/>
 		</Grid.RowDefinitions>
 
 		<ListView Grid.Column="0" 
+				  FontFamily="Cascadia Mono"
 				  Margin="5, 5, 2.5, 2.5" 
 				  ItemsSource="{Binding AvailableTypes}" 
-				  SelectedItem="{Binding Properties, Mode=OneWayToSource, Converter={StaticResource FieldValueFilterConverter}}">
+				  SelectedItem="{Binding Path=SelectedType, Mode=OneWayToSource}">
 			<ListView.ItemTemplate>
 				<DataTemplate>
 					<TextBlock Text="{Binding Name}"/>
@@ -33,7 +60,9 @@
 			</ListView.ItemTemplate>
 		</ListView>
 
-		<ListView Grid.Column="1" Margin="2.5, 5, 5, 2.5" ItemsSource="{Binding Properties, Mode=OneWay}">
+		<ListView Grid.Column="1" Margin="2.5, 5, 5, 2.5"
+				  ItemsSource="{Binding SelectedType.Properties, Mode=OneWay, Converter={StaticResource FieldValueFilterConverter}}" 
+				  SelectedItem="{Binding SelectedProperty}">
 			<ListView.View>
 				<GridView>
 					<GridView.Columns>
@@ -78,5 +107,36 @@
 				</DataTemplate>
 			</ListView.ItemTemplate>
 		</ListView>
+		<Grid Grid.Row="1">
+			<Grid.ColumnDefinitions>
+				<ColumnDefinition Width="auto"/>
+				<ColumnDefinition Width="*"/>
+			</Grid.ColumnDefinitions>
+			<CheckBox Margin="2.5, 2.5, 2.5, 2.5" IsChecked="{Binding IsFilterEnabled}" Content="Filter" VerticalAlignment="Center"/>
+
+			<Button x:Name="_oldValueButton" 
+					Grid.Column="1" 
+					IsEnabled="{Binding IsFilterEnabled}"
+					Margin="5, 2.5, 2.5, 2.5"
+					VerticalAlignment="Center" 
+					Click="OldValueButton_Click">
+				<StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+					<TextBlock Text="Old Value: "/>
+					<ContentPresenter Content="{Binding OldValue}"/>
+				</StackPanel>
+			</Button>
+		</Grid>
+		<Button x:Name="_newValueButton" Grid.Column="1" Grid.Row="1" Margin="2.5, 2.5, 5, 2.5" VerticalAlignment="Center" Click="NewValueButton_Click">
+			<StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+				<TextBlock Text="New Value: "/>
+				<ContentPresenter Content="{Binding NewValue}"/>
+			</StackPanel>
+		</Button>
+
+		<Button x:Name="_replaceButton" 
+				Grid.Column="0" Grid.Row="2" Margin="5, 2.5, 2.5, 5" VerticalAlignment="Center" Content="Replace" IsDefault="True"
+				IsEnabled="{Binding SelectedProperty, Converter={StaticResource IsNotNullConverter}}" Click="ReplaceButton_Click"/>
+		
+		<Button x:Name="_closeButton" Grid.Column="1" Grid.Row="2" Margin="2.5, 2.5, 5, 5" VerticalAlignment="Center" Content="Close" Click="CloseButton_Click"/>
 	</Grid>
 </frontend:CustomWindow>

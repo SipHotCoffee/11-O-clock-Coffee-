@@ -3,7 +3,6 @@ using CG.Test.Editor.FrontEnd.Views.Dialogs;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using System.Collections.ObjectModel;
-using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Windows;
 
@@ -57,6 +56,8 @@ namespace CG.Test.Editor.FrontEnd.ViewModels
 
 			AddressItems = [];
 
+            CachedPaths = new();
+
             HasClipboardNodes = false;
 		}
 
@@ -65,6 +66,8 @@ namespace CG.Test.Editor.FrontEnd.ViewModels
 		public Window OwnerWindow { get; }
 
 		public ObservableCollection<NodeViewModelBase> AddressItems { get; }
+
+        public CachedNodeReferenceCollection CachedPaths { get; }
 
         partial void OnClipboardNodesChanged(ObservableCollection<NodeViewModelBase>? oldValue, ObservableCollection<NodeViewModelBase>? newValue)
         {
@@ -142,10 +145,11 @@ namespace CG.Test.Editor.FrontEnd.ViewModels
         {
             var availableTypes = Current!.AllChildren.Select((node) => node.Type).OfType<SchemaObjectType>().ToHashSet();
 
-			var repairDialog = new RepairDialog()
+            var repairDialog = new RepairDialog(this, Current)
             {
                 AvailableTypes = new(availableTypes)
             };
+
             repairDialog.ShowDialog();
         }
 

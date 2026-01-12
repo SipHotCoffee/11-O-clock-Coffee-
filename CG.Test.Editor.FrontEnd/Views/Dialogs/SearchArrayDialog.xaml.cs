@@ -1,4 +1,5 @@
 ﻿using CG.Test.Editor.FrontEnd.ViewModels;
+using CG.Test.Editor.FrontEnd.ViewModels.Nodes;
 using DependencyPropertyToolkit;
 using System.ComponentModel;
 using System.Windows;

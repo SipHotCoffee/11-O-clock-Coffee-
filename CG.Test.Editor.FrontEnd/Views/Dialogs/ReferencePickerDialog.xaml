@@ -1,0 +1,29 @@
+﻿<Window x:Class="CG.Test.Editor.FrontEnd.Views.Dialogs.ReferencePickerDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:CG.Test.Editor.FrontEnd.Views.Dialogs"
+        mc:Ignorable="d"
+        Title="Select node to reference" 
+		Height="400" Width="600"
+		
+		DataContext="{Binding RelativeSource={RelativeSource Mode=Self}}">
+    <Grid>
+		<Grid.ColumnDefinitions>
+			<ColumnDefinition Width="auto"/>
+			<ColumnDefinition Width="*"/>
+		</Grid.ColumnDefinitions>
+
+		<TreeView Grid.Column="0" ItemsSource="{Binding Root.Children}">
+			<TreeView.ItemTemplate>
+				<HierarchicalDataTemplate ItemsSource="{Binding Children}">
+					<TextBlock Text="{Binding Name}"/>
+				</HierarchicalDataTemplate>
+			</TreeView.ItemTemplate>
+		</TreeView>
+		<ContentControl>
+			
+		</ContentControl>
+	</Grid>
+</Window>

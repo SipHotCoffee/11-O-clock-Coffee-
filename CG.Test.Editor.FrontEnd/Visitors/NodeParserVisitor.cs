@@ -1,25 +1,28 @@
 ﻿using CG.Test.Editor.FrontEnd.Models;
 using CG.Test.Editor.FrontEnd.ViewModels;
+using CG.Test.Editor.FrontEnd.ViewModels.Nodes;
 using System.Text.Json.Nodes;
 
 namespace CG.Test.Editor.FrontEnd.Visitors
 {
-	public class NodeParsingMessage(string message, IEnumerable<object> path)
+	public class NodeParsingMessage(string message, NodePath path)
 	{
 		public string Message { get; } = message;
 
-		public IEnumerable<object> Path { get; } = path;
+		public NodePath Path { get; } = path;
 	}
 
-    public class NodeParserVisitor(FileInstanceViewModel editor, IEnumerable<object> currentPath, NodeViewModelBase? parent, ILogger<NodeParsingMessage> logger, JsonNode? sourceNode) : Visitor<NodeParserVisitor, SchemaTypeBase, NodeViewModelBase?>
+    public class NodeParserVisitor(FileInstanceViewModel editor, NodePath currentPath, Dictionary<ulong, List<ReferenceNodeViewModel>> referenceNodesToAssign, NodeViewModelBase? parent, ILogger<NodeParsingMessage> logger, JsonNode? sourceNode) : Visitor<NodeParserVisitor, SchemaTypeBase, NodeViewModelBase?>
     {
         private readonly FileInstanceViewModel _editor = editor;
 
         private readonly ILogger<NodeParsingMessage> _logger = logger;
 
-        public NodeViewModelBase? Parent { get; set; } = parent;
+		private readonly Dictionary<ulong, List<ReferenceNodeViewModel>> _referenceNodesToAssign = referenceNodesToAssign;
 
-		public IEnumerable<object> CurrentPath { get; set; } = currentPath;
+		public NodeViewModelBase? Parent { get; set; } = parent;
+
+		public NodePath CurrentPath { get; set; } = currentPath;
 
 		public JsonNode? SourceNode { get; set; } = sourceNode;
 
@@ -142,17 +145,44 @@ namespace CG.Test.Editor.FrontEnd.Visitors
 			return null;
 		}
 
-        public ArrayNodeViewModel? Visit(SchemaArrayType arrayType)
+		public ReferenceNodeViewModel? Visit(SchemaReferenceType referenceType)
+		{
+			if (SourceNode is JsonValue valueNode)
+			{
+				if (valueNode.TryGetValue<ulong>(out var value))
+				{
+					var result = new ReferenceNodeViewModel(_editor, Parent, referenceType, null);
+					if(!_referenceNodesToAssign.TryGetValue(value, out var referenceNodes))
+					{
+						referenceNodes = [];
+						_referenceNodesToAssign.Add(value, referenceNodes);
+					}
+					referenceNodes.Add(result);
+					return result;
+				}
+				else
+				{
+					LogMessage($"Failed to convert value of '{valueNode.GetType()}' to '{typeof(ulong)}'.");
+				}
+			}
+			else
+			{
+				LogMessage($"Expecting node of type '{typeof(JsonValue)}' and the value must be convertible to type '{typeof(ulong)}'.");
+			}
+			return null;
+		}
+
+		public ArrayNodeViewModel? Visit(SchemaArrayType arrayType)
         {
 			if (SourceNode is JsonArray arrayNode)
 			{
 				var result = new ArrayNodeViewModel(_editor, Parent, arrayType);
-				var elementVisitor = new NodeParserVisitor(_editor, CurrentPath, result, _logger, null);
+				var elementVisitor = new NodeParserVisitor(_editor, CurrentPath, _referenceNodesToAssign, result, _logger, null);
                 for (var i = 0; i < arrayNode.Count; i++)
 				{
                     var node = arrayNode[i];
                     elementVisitor.SourceNode = node;
-					elementVisitor.CurrentPath = CurrentPath.Append(i);
+					elementVisitor.CurrentPath = CurrentPath.GetChild(new IndexIdentifier(i));
 					var nodeViewModel = arrayType.ElementType.Visit(elementVisitor);
 
 					if (nodeViewModel is not null)
@@ -174,13 +204,13 @@ namespace CG.Test.Editor.FrontEnd.Visitors
 			if (SourceNode is JsonObject objectNode)
 			{
 				var result = new ObjectNodeViewModel(_editor, Parent, objectType);
-				var nodeVisitor = new NodeParserVisitor(_editor, CurrentPath, result, _logger, null);
+				var nodeVisitor = new NodeParserVisitor(_editor, CurrentPath, _referenceNodesToAssign, result, _logger, null);
 				foreach (var property in objectType.Properties)
 				{
 					if (objectNode.TryGetPropertyValue(property.Name, out var node))
 					{
 						nodeVisitor.SourceNode = node;
-						nodeVisitor.CurrentPath = CurrentPath.Append(property.Name);
+						nodeVisitor.CurrentPath = CurrentPath.GetChild(new NameIdentifier(property.Name));
 						var childNode = property.Type.Visit(nodeVisitor);
 						if (childNode is not null)
 						{
@@ -209,7 +239,7 @@ namespace CG.Test.Editor.FrontEnd.Visitors
 			foreach (var possibleType in variantType.PossibleTypes)
 			{
 				messages.Clear();
-				var nodeViewModel = possibleType.Visit(new NodeParserVisitor(_editor, CurrentPath, Parent, logger, SourceNode));
+				var nodeViewModel = possibleType.Visit(new NodeParserVisitor(_editor, CurrentPath, _referenceNodesToAssign, Parent, logger, SourceNode));
 				if (nodeViewModel is not null && messages.Count == 0)
 				{
 					return nodeViewModel;

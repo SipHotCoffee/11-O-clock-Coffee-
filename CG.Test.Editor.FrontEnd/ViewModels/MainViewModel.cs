@@ -1,11 +1,14 @@
 ﻿using CG.Test.Editor.FrontEnd.Models;
+using CG.Test.Editor.FrontEnd.ViewModels.Nodes;
 using CG.Test.Editor.FrontEnd.Views.Dialogs;
 using CG.Test.Editor.FrontEnd.Visitors;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.Win32;
 using System.Collections.ObjectModel;
+using System.Drawing.Drawing2D;
 using System.IO;
+using System.Linq.Expressions;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Windows;
@@ -45,7 +48,34 @@ namespace CG.Test.Editor.FrontEnd.ViewModels
         private async Task SaveFileAsync(Stream stream)
         {
 			await using var writer = new Utf8JsonWriter(stream);
-			SelectedFile!.Root!.SerializeTo(writer);
+            writer.WriteStartObject();
+            {
+                writer.WriteStartArray("referencePaths");
+                {
+                    foreach (var (node, id) in SelectedFile!.CachedPaths)
+                    {
+                        writer.WriteStartObject();
+                        {
+                            writer.WriteNumber("id", id);
+                            writer.WriteStartArray("path");
+                            {
+                                foreach (var element in node.Address)
+                                {
+                                    element.SerializeTo(writer);
+                                }
+                            }
+                            writer.WriteEndObject();
+                        }
+                        writer.WriteEndObject();
+                    }
+                }
+                writer.WriteEndArray();
+
+                writer.WritePropertyName("content");
+                SelectedFile!.Root!.SerializeTo(writer);
+            }
+            writer.WriteEndObject();
+
 			await writer.FlushAsync();
             SelectedFile.Root.HasChanges = false;
 		}
@@ -127,29 +157,77 @@ namespace CG.Test.Editor.FrontEnd.ViewModels
 				await using var stream = openFileDialog.OpenFile();
                 try
                 {
-                    var node = await JsonNode.ParseAsync(stream);
+                    var fileNode = await JsonNode.ParseAsync(stream);
 
+                    var fileObjectNode = fileNode!.AsObject();
+
+                    var referencePathsArrayNode = fileObjectNode["referencePaths"]!.AsArray();
+
+                    var paths = new Dictionary<ulong, NodePath>();
+                    
+                    foreach (var pathNode in referencePathsArrayNode)
+                    {
+                        var id = pathNode!["id"]!.GetValue<ulong>();
+
+                        var pathElementsArrayNode = pathNode["path"]!.AsArray();
+
+                        var path = NodePath.Root;
+
+						foreach (var pathElementValueNode in pathElementsArrayNode.OfType<JsonValue>())
+                        {
+                            switch (pathElementValueNode.GetValueKind())
+                            {
+                                case JsonValueKind.String:
+									path = path.GetChild(new NameIdentifier(pathElementValueNode.GetValue<string>()));
+									break;
+                                case JsonValueKind.Number:
+									path = path.GetChild(new IndexIdentifier(pathElementValueNode.GetValue<int>()));
+									break;
+                            }
+                        }
+
+                        paths.Add(id, path);
+                    }
+
+
+                    var contentNode = fileObjectNode["content"];
+                    
 					var messages = new List<NodeParsingMessage>();
 					var logger = new CollectionLogger<NodeParsingMessage>(messages);
 
-                    var nodeViewModel = schemaType!.Visit(new NodeParserVisitor(instance, [ "Root" ], null, logger, node));
+                    var referenceNodesToAssign = new Dictionary<ulong, List<ReferenceNodeViewModel>>();
+                    var rootNodeViewModel = schemaType!.Visit(new NodeParserVisitor(instance, NodePath.Root, referenceNodesToAssign, null, logger, contentNode));
 
-                    foreach (var message in messages)
+                    foreach (var (pathId, referenceNodes) in referenceNodesToAssign)
                     {
-                        window.ShowMessage($"Error: {message.Message} Error occured here: '{string.Join("/", message.Path)}'");
+                        if (rootNodeViewModel is not null && paths[pathId].TryNavigate(rootNodeViewModel, out var targetNode))
+                        {
+                            foreach (var referenceNode in referenceNodes)
+                            {
+                                referenceNode.Node = targetNode;
+                            }
+                        }
                     }
 
-					instance.Root = nodeViewModel;
+					foreach (var message in messages)
+                    {
+                        if (window.ShowMessage($"Error: {message.Message} Error occured here: '{string.Join("/", message.Path)}'", string.Empty, 0, "Next", [ "Cancel" ]) == 1)
+                        {
+                            return;
+                        }
+                    }
+
+					instance.Root = rootNodeViewModel;
 					OpenFiles.Add(instance);
 					SelectedFile = instance;
-					
-				}
+
+                }
                 catch (Exception exception)
                 {
                     window.ShowMessage(exception.ToString());
                 }
-			}
-		}
+            }
+        }
 
         [RelayCommand]
         async Task SaveFile()

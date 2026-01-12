@@ -86,7 +86,7 @@ namespace CG.Test.Editor.FrontEnd
 
             _backgroundBrush = new ImageBrush(_blurredBackground)
             {
-                TileMode      = TileMode.None,
+                TileMode      = TileMode.Tile,
                 Stretch       = Stretch.Fill,
                 AlignmentX    = AlignmentX.Left,
                 AlignmentY    = AlignmentY.Top,

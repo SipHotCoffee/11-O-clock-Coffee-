@@ -1,4 +1,5 @@
 ﻿using CG.Test.Editor.FrontEnd.Models;
+using CG.Test.Editor.FrontEnd.ViewModels.Nodes;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using System.Text.Json;
@@ -15,9 +16,47 @@ namespace CG.Test.Editor.FrontEnd.ViewModels
             Parent?.HasChanges = newValue;   
         }
 
-        public FileInstanceViewModel Editor { get; } = editor;
+        public NodeViewModelBase Root => Parent?.Root ?? this;
 
-        public NodeViewModelBase? Parent { get; } = parent;
+        public NodePath Address
+        {
+            get
+            {
+                if (Parent is null)
+                {
+					return NodePath.Root;
+				}
+
+                if (Parent is ArrayNodeViewModel arrayNode)
+                {
+                    for (var i = 0; i < arrayNode.Elements.Count; i++)
+                    {
+                        if (arrayNode.Elements[i] == this)
+                        {
+							return Parent.Address.GetChild(new IndexIdentifier(i));
+						}
+                    }
+                }
+
+                if (Parent is ObjectNodeViewModel objectNode)
+                {
+                    foreach (var (name, node) in objectNode.Nodes)
+                    {
+                        if (node == this)
+                        {
+							return Parent.Address.GetChild(new NameIdentifier(name));
+						}
+                    }
+                }
+
+                Parent = null;
+                return NodePath.Root;
+            }
+        }
+
+		public FileInstanceViewModel Editor { get; } = editor;
+
+        public NodeViewModelBase? Parent { get; private set; } = parent;
 
         public string Name => Parent?.GetName(this) ?? "(Root)";
 
