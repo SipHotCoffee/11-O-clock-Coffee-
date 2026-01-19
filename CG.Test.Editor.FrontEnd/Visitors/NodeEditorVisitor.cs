@@ -90,7 +90,11 @@ namespace CG.Test.Editor.FrontEnd.Visitors
 
         public void Visit(ReferenceNodeViewModel referenceNode)
         {
-            
+            var referenceDialog = new ReferencePickerDialog()
+            {
+                Root = new TreeNodeViewModel(referenceNode.Type.ElementType, referenceNode.Root)
+            };
+            referenceDialog.ShowDialog();
         }
 	}
 }

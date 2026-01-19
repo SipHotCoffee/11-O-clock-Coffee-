@@ -1,4 +1,6 @@
-﻿namespace CG.Test.Editor.FrontEnd.Models
+﻿using System.Collections.Immutable;
+
+namespace CG.Test.Editor.FrontEnd.Models
 {
     public readonly struct SchemaProperty
     {
@@ -8,9 +10,21 @@
         public required int Index { get; init; }
     }
 
+    public class SchemaTypeComparer : IComparer<SchemaTypeBase>
+    {
+        public int Compare(SchemaTypeBase? left, SchemaTypeBase? right)
+        {
+            if (left is SchemaObjectType leftObjectType && right is SchemaObjectType rightObjectType)
+            {
+                return leftObjectType.Name.CompareTo(rightObjectType.Name);
+            }
+            return -1;
+        }
+    }
+
     public class SchemaVariantType(IEnumerable<SchemaTypeBase> possibleTypes) : SchemaTypeBase
     {
-        public IReadOnlySet<SchemaTypeBase> PossibleTypes { get; } = possibleTypes.ToHashSet();
+        public IReadOnlySet<SchemaTypeBase> PossibleTypes { get; } = possibleTypes.ToImmutableSortedSet(new SchemaTypeComparer());
 
         public override bool IsConvertibleFrom(SchemaTypeBase sourceType) => PossibleTypes.Contains(sourceType);
 	}

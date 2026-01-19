@@ -99,13 +99,17 @@ namespace CG.Test.Editor.FrontEnd
 		extension(JsonArray arrayNode)
 		{
 
-			public IEnumerable<SchemaTypeBase> EnumerateVariantTypes(ILogger<SchemaParsingMessage> logger)
+			public IEnumerable<SchemaTypeBase?> EnumerateVariantTypes(ILogger<SchemaParsingMessage> logger, IReadOnlyDictionary<string, SchemaTypeBase> registeredTypes)
 			{
 				foreach (var node in arrayNode)
 				{
-					if (node is not null && node.TryParseSchemaType(logger, out var type))
+					if (node is not null && node.TryParseSchemaType(logger, registeredTypes, out var type))
 					{
 						yield return type;
+					}
+					else
+					{
+						yield return null;
 					}
 				}
 			}
@@ -113,6 +117,33 @@ namespace CG.Test.Editor.FrontEnd
 
 		extension(JsonObject objectNode)
 		{
+			public void ParseDefinitions(ILogger<SchemaParsingMessage> logger, Dictionary<string, SchemaTypeBase> types)
+			{
+				var typesToResolve = new DictionaryQueue<string, JsonNode>();
+
+				foreach (var (typeName, node) in objectNode)
+				{
+					if (node is null)
+					{
+						continue;
+					}
+
+					typesToResolve.Enqueue(typeName, node);
+				}
+
+				while (typesToResolve.TryDequeue(out var typeName, out var node))
+				{
+					if (node.AsObject().TryParseSchemaObjectType(logger, types, out var type))
+					{
+						types.Add(typeName, type);
+					}
+					else
+					{
+						typesToResolve.Enqueue(typeName, node);
+					}
+				}
+			}
+
 			private bool TryGetValue<TValue>(string propertyName, ILogger<SchemaParsingMessage> logger, [MaybeNullWhen(false)] out TValue value)
 			{
 				if (objectNode.TryGetPropertyValue(propertyName, out var childNode))
@@ -130,19 +161,26 @@ namespace CG.Test.Editor.FrontEnd
 				return false;
 			}
 
-			public IEnumerable<SchemaProperty> EnumerateProperties(ILogger<SchemaParsingMessage> logger)
+			public IEnumerable<SchemaProperty?> EnumerateProperties(ILogger<SchemaParsingMessage> logger, IReadOnlyDictionary<string, SchemaTypeBase> registeredTypes)
 			{
 				var index = 0;
 				foreach (var pair in objectNode)
 				{
-					if (pair.Key != "$type" && pair.Value is not null && pair.Value.TryParseSchemaType(logger, out var type))
+					if (pair.Key != "$type")
 					{
-						yield return new SchemaProperty()
+						if (pair.Value is not null && pair.Value.TryParseSchemaType(logger, registeredTypes, out var type))
 						{
-							Name  = pair.Key,
-							Type  = type,
-							Index = index++,
-						};
+							yield return new SchemaProperty()
+							{
+								Name = pair.Key,
+								Type = type,
+								Index = index++,
+							};
+						}
+						else
+						{
+							yield return null;
+						}
 					}
 				}
 			}
@@ -208,7 +246,7 @@ namespace CG.Test.Editor.FrontEnd
 				return true;
 			}
 
-			public bool TryParseSchemaObjectType(ILogger<SchemaParsingMessage> logger, [NotNullWhen(true)] out SchemaTypeBase? type)
+			public bool TryParseSchemaObjectType(ILogger<SchemaParsingMessage> logger, IReadOnlyDictionary<string, SchemaTypeBase> registeredTypes, [NotNullWhen(true)] out SchemaTypeBase? type)
 			{
 				if (objectNode.TryGetPropertyValue("properties", out var propertiesNode))
 				{
@@ -217,7 +255,17 @@ namespace CG.Test.Editor.FrontEnd
 						if (propertiesObjectNode.TryGetPropertyValue("$type", out var typeNode) &&
 							typeNode is JsonObject typeObjectNode && typeObjectNode.TryGetValue<string>("const", logger, out var typeName))
 						{
-							type = new SchemaObjectType(typeName, propertiesObjectNode.EnumerateProperties(logger));
+							var properties = propertiesObjectNode.EnumerateProperties(logger, registeredTypes);
+							foreach (var property in properties)
+							{
+								if (property is null)
+								{
+									type = null;
+									return false;
+								}
+							}
+
+							type = new SchemaObjectType(typeName, properties.Select(property => (SchemaProperty)property!));
 							return true;
 						}
 						else
@@ -234,7 +282,7 @@ namespace CG.Test.Editor.FrontEnd
 				{
 					if (oneOfNode is JsonArray arrayNode)
 					{
-						type = new SchemaVariantType(arrayNode.EnumerateVariantTypes(logger));
+						type = new SchemaVariantType(arrayNode.EnumerateVariantTypes(logger, registeredTypes));
 						return true;
 					}
 					else
@@ -250,11 +298,11 @@ namespace CG.Test.Editor.FrontEnd
 				return false;
 			}
 
-			public bool TryParseSchemaArrayType(ILogger<SchemaParsingMessage> logger, [NotNullWhen(true)] out SchemaTypeBase? type)
+			public bool TryParseSchemaArrayType(ILogger<SchemaParsingMessage> logger, IReadOnlyDictionary<string, SchemaTypeBase> registeredTypes, [NotNullWhen(true)] out SchemaTypeBase? type)
 			{
 				if (objectNode.TryGetPropertyValue("items", out var itemsNode) && itemsNode is not null)
 				{
-					if (itemsNode.TryParseSchemaType(logger, out var elementType))
+					if (itemsNode.TryParseSchemaType(logger, registeredTypes, out var elementType))
 					{
 						type = new SchemaArrayType(elementType);
 						return true;
@@ -267,15 +315,42 @@ namespace CG.Test.Editor.FrontEnd
 				type = null;
 				return false;
 			}
+
+			public bool TryParseSchemaReferenceType(ILogger<SchemaParsingMessage> logger, IReadOnlyDictionary<string, SchemaTypeBase> registeredTypes, [NotNullWhen(true)] out SchemaTypeBase? type)
+			{
+				if (objectNode.TryGetPropertyValue("target", out var targetNode) && targetNode is not null && targetNode.TryParseSchemaType(logger, registeredTypes, out var elementType))
+				{
+					type = new SchemaReferenceType(elementType);
+					return true;
+				}
+				else
+				{
+					logger.Log(new SchemaParsingMessage($"Node of type 'reference' must contain a 'target' object.", objectNode));
+				}
+				type = null;
+				return false;
+			}
 		}
 
 		extension(JsonNode node)
 		{
-			public bool TryParseSchemaType(ILogger<SchemaParsingMessage> logger, [NotNullWhen(true)] out SchemaTypeBase? type)
+			public bool TryParseSchemaType(ILogger<SchemaParsingMessage> logger, IReadOnlyDictionary<string, SchemaTypeBase> typeDefinitions, [NotNullWhen(true)] out SchemaTypeBase? type)
 			{
 				if (node is JsonObject objectNode)
 				{
-					if (objectNode.TryGetPropertyValue("type", out var childNode) && childNode is not null)
+					if (objectNode.TryGetPropertyValue("$ref", out var refNode) && refNode is JsonValue refValueNode && refValueNode.TryGetValue<string>(out var path))
+					{
+						var pathTokens = path.Split('/');
+						JsonNode? currentNode = node.Root;
+						for (var i = 1; i < pathTokens.Length; i++)
+						{
+							currentNode = currentNode?[pathTokens[i]];
+						}
+
+						var typeName = pathTokens[^1];
+						return typeDefinitions.TryGetValue(typeName, out type);
+					}
+					else if (objectNode.TryGetPropertyValue("type", out var childNode) && childNode is not null)
 					{
 						if (childNode is JsonValue childValueNode && childValueNode.TryGetValue<string>(out var typeName))
 						{
@@ -285,15 +360,17 @@ namespace CG.Test.Editor.FrontEnd
 									type = new SchemaBooleanType();
 									return true;
 								case "integer":
-									return TryParseSchemaIntegerType(objectNode, logger, out type);
-								case "number":
-									return TryParseSchemaNumberType(objectNode, logger, out type);
-								case "string":
-									return TryParseSchemaStringType(objectNode, logger, out type);
-								case "object":
-									return TryParseSchemaObjectType(objectNode, logger, out type);
-								case "array":
-									return TryParseSchemaArrayType(objectNode, logger, out type);
+									return objectNode.TryParseSchemaIntegerType  (logger, out type);
+								case "number":								     
+									return objectNode.TryParseSchemaNumberType   (logger, out type);
+								case "string":								     
+									return objectNode.TryParseSchemaStringType   (logger, out type);
+								case "object":								     
+									return objectNode.TryParseSchemaObjectType   (logger, typeDefinitions, out type);
+								case "array":								     
+									return objectNode.TryParseSchemaArrayType    (logger, typeDefinitions, out type);
+								case "reference":
+									return objectNode.TryParseSchemaReferenceType(logger, typeDefinitions, out type);
 							}
 						}
 						else

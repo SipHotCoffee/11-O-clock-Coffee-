@@ -110,9 +110,14 @@ namespace CG.Test.Editor.FrontEnd.ViewModels
 					var messages = new HashSet<SchemaParsingMessage>(10, new SchemaParsingMessageComparer());
 					var logger = new CollectionLogger<SchemaParsingMessage>(messages);
 
-					if (node is not null && node.TryParseSchemaType(logger, out var type))
-					{
-                        return type;
+                    if (node is JsonObject objectNode && objectNode.TryGetPropertyValue("$defs", out var defsNode) && defsNode is JsonObject defsObjectNode)
+                    {
+                        var types = new Dictionary<string, SchemaTypeBase>();
+						defsObjectNode.ParseDefinitions(logger, types);
+                        if (objectNode.TryParseSchemaType(logger, types, out var type))
+                        {
+							return type;
+						}
 					}
 
 					foreach (var message in messages)
