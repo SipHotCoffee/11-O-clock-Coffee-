@@ -1,4 +1,4 @@
-﻿using CG.Test.Editor.FrontEnd.Models;
+﻿using CG.Test.Editor.FrontEnd.Models.Types;
 using CG.Test.Editor.FrontEnd.Views.Dialogs;
 using CG.Test.Editor.FrontEnd.Visitors;
 using CommunityToolkit.Mvvm.Input;

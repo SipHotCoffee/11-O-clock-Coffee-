@@ -1,4 +1,4 @@
-﻿using CG.Test.Editor.FrontEnd.Models;
+﻿using CG.Test.Editor.FrontEnd.Models.Types;
 using DependencyPropertyToolkit;
 using System.Collections.ObjectModel;
 using System.Windows;

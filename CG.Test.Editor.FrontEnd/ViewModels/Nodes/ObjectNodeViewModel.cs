@@ -1,6 +1,5 @@
 ﻿using CG.Test.Editor.FrontEnd;
-using CG.Test.Editor.FrontEnd.Models;
-using System.Collections;
+using CG.Test.Editor.FrontEnd.Models.Types;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Text.Json;

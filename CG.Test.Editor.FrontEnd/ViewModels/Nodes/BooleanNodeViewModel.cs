@@ -1,4 +1,4 @@
-﻿using CG.Test.Editor.FrontEnd.Models;
+﻿using CG.Test.Editor.FrontEnd.Models.Types;
 using System.Text.Json;
 
 namespace CG.Test.Editor.FrontEnd.ViewModels.Nodes

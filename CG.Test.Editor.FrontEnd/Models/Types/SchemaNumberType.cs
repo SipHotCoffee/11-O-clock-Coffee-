@@ -1,4 +1,4 @@
-﻿namespace CG.Test.Editor.FrontEnd.Models
+﻿namespace CG.Test.Editor.FrontEnd.Models.Types
 {
     public class SchemaNumberType(double minimum, double maximum) : SchemaTypeBase
     {

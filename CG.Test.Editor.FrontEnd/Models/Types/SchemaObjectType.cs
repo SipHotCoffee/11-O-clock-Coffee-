@@ -1,6 +1,7 @@
-﻿using System.Collections.Immutable;
+﻿using CG.Test.Editor.FrontEnd;
+using System.Collections.Immutable;
 
-namespace CG.Test.Editor.FrontEnd.Models
+namespace CG.Test.Editor.FrontEnd.Models.Types
 {
     public readonly struct SchemaProperty
     {

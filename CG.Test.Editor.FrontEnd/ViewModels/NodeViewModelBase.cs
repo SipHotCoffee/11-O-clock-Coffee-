@@ -1,4 +1,4 @@
-﻿using CG.Test.Editor.FrontEnd.Models;
+﻿using CG.Test.Editor.FrontEnd.Models.Types;
 using CG.Test.Editor.FrontEnd.ViewModels.Nodes;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;

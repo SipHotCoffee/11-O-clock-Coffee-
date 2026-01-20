@@ -1,6 +1,6 @@
 ﻿using System.Text.Json.Nodes;
 
-namespace CG.Test.Editor.FrontEnd.Models
+namespace CG.Test.Editor.FrontEnd.Models.Types
 {
     public class SchemaIntegerType(long minimum, long maximum) : SchemaTypeBase
 	{

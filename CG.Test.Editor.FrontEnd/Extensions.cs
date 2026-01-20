@@ -1,10 +1,13 @@
-﻿using CG.Test.Editor.FrontEnd.Models;
+﻿using CG.Test.Editor.FrontEnd.Models.Types;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
+using System;
 using System.Collections;
 using System.ComponentModel.DataAnnotations;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Numerics;
 using System.Reflection;
+using System.Reflection.Metadata;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Xml.Linq;
@@ -99,17 +102,13 @@ namespace CG.Test.Editor.FrontEnd
 		extension(JsonArray arrayNode)
 		{
 
-			public IEnumerable<SchemaTypeBase?> EnumerateVariantTypes(ILogger<SchemaParsingMessage> logger, IReadOnlyDictionary<string, SchemaTypeBase> registeredTypes)
+			public IEnumerable<SchemaTypeBase> EnumerateVariantTypes(ILogger<SchemaParsingMessage> logger, IReadOnlyDictionary<string, SchemaTypeBase> registeredTypes, DictionaryQueue<string, JsonObject> typesToResolve)
 			{
 				foreach (var node in arrayNode)
 				{
-					if (node is not null && node.TryParseSchemaType(logger, registeredTypes, out var type))
+					if (node is not null && node.TryParseSchemaType(logger, registeredTypes, typesToResolve, out var type))
 					{
 						yield return type;
-					}
-					else
-					{
-						yield return null;
 					}
 				}
 			}
@@ -117,29 +116,56 @@ namespace CG.Test.Editor.FrontEnd
 
 		extension(JsonObject objectNode)
 		{
+
 			public void ParseDefinitions(ILogger<SchemaParsingMessage> logger, Dictionary<string, SchemaTypeBase> types)
 			{
-				var typesToResolve = new DictionaryQueue<string, JsonNode>();
+				var typesToResolve = new DictionaryQueue<string, JsonObject>();
 
-				foreach (var (typeName, node) in objectNode)
+				foreach (var (typeName, typeNode) in objectNode)
 				{
-					if (node is null)
+					if (typeNode is JsonObject childObjectNode)
 					{
-						continue;
+						typesToResolve.Enqueue(typeName, childObjectNode);
 					}
-
-					typesToResolve.Enqueue(typeName, node);
 				}
 
-				while (typesToResolve.TryDequeue(out var typeName, out var node))
+				while (typesToResolve.TryDequeue(out var typeName, out var typeObjectNode))
 				{
-					if (node.AsObject().TryParseSchemaObjectType(logger, types, out var type))
+					if (typeObjectNode.TryGetPropertyValue("oneOf", out var oneOfNode) && oneOfNode is JsonArray oneOfArrayNode)
 					{
-						types.Add(typeName, type);
+						foreach (var possibleTypeNode in oneOfArrayNode)
+						{
+							
+						}
 					}
-					else
+					else if (typeObjectNode.TryGetPropertyValue("properties", out var propertiesNode) && propertiesNode is JsonObject propertiesObjectNode)
 					{
-						typesToResolve.Enqueue(typeName, node);
+						var properties = new List<SchemaProperty>();
+
+						var index = 0;
+						foreach (var (propertyName, propertyTypeNode) in propertiesObjectNode)
+						{
+							if (propertyName != "$type")
+							{
+								if (propertyTypeNode is not null && propertyTypeNode.TryParseSchemaType(logger, types, typesToResolve, out var type))
+								{
+									properties.Add(new SchemaProperty()
+									{
+										Index = index++,
+										Name = propertyName,
+										Type = type,
+									});
+								}
+								else
+								{
+									typesToResolve.Enqueue(typeName, typeObjectNode);
+									if (propertyTypeNode is JsonObject propertyTypeObjectNode)
+									{
+										typesToResolve.Enqueue(propertyName, propertyTypeObjectNode);
+									}
+								}
+							}
+						}
 					}
 				}
 			}
@@ -161,14 +187,14 @@ namespace CG.Test.Editor.FrontEnd
 				return false;
 			}
 
-			public IEnumerable<SchemaProperty?> EnumerateProperties(ILogger<SchemaParsingMessage> logger, IReadOnlyDictionary<string, SchemaTypeBase> registeredTypes)
+			public IEnumerable<SchemaProperty> EnumerateProperties(ILogger<SchemaParsingMessage> logger, IReadOnlyDictionary<string, SchemaTypeBase> registeredTypes, DictionaryQueue<string, JsonObject> typesToResolve)
 			{
 				var index = 0;
 				foreach (var pair in objectNode)
 				{
 					if (pair.Key != "$type")
 					{
-						if (pair.Value is not null && pair.Value.TryParseSchemaType(logger, registeredTypes, out var type))
+						if (pair.Value is not null && pair.Value.TryParseSchemaType(logger, registeredTypes, typesToResolve, out var type))
 						{
 							yield return new SchemaProperty()
 							{
@@ -177,14 +203,9 @@ namespace CG.Test.Editor.FrontEnd
 								Index = index++,
 							};
 						}
-						else
-						{
-							yield return null;
-						}
 					}
 				}
 			}
-
 
 			public bool TryParseSchemaIntegerType(ILogger<SchemaParsingMessage> logger, [NotNullWhen(true)] out SchemaTypeBase? type)
 			{
@@ -246,7 +267,7 @@ namespace CG.Test.Editor.FrontEnd
 				return true;
 			}
 
-			public bool TryParseSchemaObjectType(ILogger<SchemaParsingMessage> logger, IReadOnlyDictionary<string, SchemaTypeBase> registeredTypes, [NotNullWhen(true)] out SchemaTypeBase? type)
+			public bool TryParseSchemaObjectType(ILogger<SchemaParsingMessage> logger, IReadOnlyDictionary<string, SchemaTypeBase> registeredTypes, DictionaryQueue<string, JsonObject> typesToResolve, [NotNullWhen(true)] out SchemaTypeBase? type)
 			{
 				if (objectNode.TryGetPropertyValue("properties", out var propertiesNode))
 				{
@@ -255,17 +276,17 @@ namespace CG.Test.Editor.FrontEnd
 						if (propertiesObjectNode.TryGetPropertyValue("$type", out var typeNode) &&
 							typeNode is JsonObject typeObjectNode && typeObjectNode.TryGetValue<string>("const", logger, out var typeName))
 						{
-							var properties = propertiesObjectNode.EnumerateProperties(logger, registeredTypes);
-							foreach (var property in properties)
+							var beforeFailCount = typesToResolve.Count;
+							var properties = propertiesObjectNode.EnumerateProperties(logger, registeredTypes, typesToResolve);							
+							type = new SchemaObjectType(typeName, properties);
+							var afterFailCount = typesToResolve.Count;
+
+							if (afterFailCount > beforeFailCount)
 							{
-								if (property is null)
-								{
-									type = null;
-									return false;
-								}
+								type = null;
+								return false;
 							}
 
-							type = new SchemaObjectType(typeName, properties.Select(property => (SchemaProperty)property!));
 							return true;
 						}
 						else
@@ -282,7 +303,16 @@ namespace CG.Test.Editor.FrontEnd
 				{
 					if (oneOfNode is JsonArray arrayNode)
 					{
-						type = new SchemaVariantType(arrayNode.EnumerateVariantTypes(logger, registeredTypes));
+						var beforeFailCount = typesToResolve.Count;
+						type = new SchemaVariantType(arrayNode.EnumerateVariantTypes(logger, registeredTypes, typesToResolve));
+						var afterFailCount = typesToResolve.Count;
+						
+						if (afterFailCount > beforeFailCount)
+						{
+							type = null;
+							return false;
+						}
+
 						return true;
 					}
 					else
@@ -298,11 +328,11 @@ namespace CG.Test.Editor.FrontEnd
 				return false;
 			}
 
-			public bool TryParseSchemaArrayType(ILogger<SchemaParsingMessage> logger, IReadOnlyDictionary<string, SchemaTypeBase> registeredTypes, [NotNullWhen(true)] out SchemaTypeBase? type)
+			public bool TryParseSchemaArrayType(ILogger<SchemaParsingMessage> logger, IReadOnlyDictionary<string, SchemaTypeBase> registeredTypes, DictionaryQueue<string, JsonObject> typesToResolve, [NotNullWhen(true)] out SchemaTypeBase? type)
 			{
 				if (objectNode.TryGetPropertyValue("items", out var itemsNode) && itemsNode is not null)
 				{
-					if (itemsNode.TryParseSchemaType(logger, registeredTypes, out var elementType))
+					if (itemsNode.TryParseSchemaType(logger, registeredTypes, typesToResolve, out var elementType))
 					{
 						type = new SchemaArrayType(elementType);
 						return true;
@@ -316,12 +346,17 @@ namespace CG.Test.Editor.FrontEnd
 				return false;
 			}
 
-			public bool TryParseSchemaReferenceType(ILogger<SchemaParsingMessage> logger, IReadOnlyDictionary<string, SchemaTypeBase> registeredTypes, [NotNullWhen(true)] out SchemaTypeBase? type)
+			public bool TryParseSchemaReferenceType(ILogger<SchemaParsingMessage> logger, IReadOnlyDictionary<string, SchemaTypeBase> registeredTypes, DictionaryQueue<string, JsonObject> typesToResolve, [NotNullWhen(true)] out SchemaTypeBase? type)
 			{
-				if (objectNode.TryGetPropertyValue("target", out var targetNode) && targetNode is not null && targetNode.TryParseSchemaType(logger, registeredTypes, out var elementType))
+				if (objectNode.TryGetPropertyValue("target", out var targetNode) && targetNode is not null)
 				{
-					type = new SchemaReferenceType(elementType);
-					return true;
+					if (targetNode.TryParseSchemaType(logger, registeredTypes, typesToResolve, out var elementType))
+					{
+						type = new SchemaReferenceType(elementType);
+						return true;
+					}
+
+					logger.Log(new SchemaParsingMessage($"Target type of 'reference' node is not available: '{targetNode["$ref"]?.GetValue<string>()}'", objectNode));
 				}
 				else
 				{
@@ -334,7 +369,7 @@ namespace CG.Test.Editor.FrontEnd
 
 		extension(JsonNode node)
 		{
-			public bool TryParseSchemaType(ILogger<SchemaParsingMessage> logger, IReadOnlyDictionary<string, SchemaTypeBase> typeDefinitions, [NotNullWhen(true)] out SchemaTypeBase? type)
+			public bool TryParseSchemaType(ILogger<SchemaParsingMessage> logger, IReadOnlyDictionary<string, SchemaTypeBase> typeDefinitions, DictionaryQueue<string, JsonObject> typesToResolve, [NotNullWhen(true)] out SchemaTypeBase? type)
 			{
 				if (node is JsonObject objectNode)
 				{
@@ -366,11 +401,11 @@ namespace CG.Test.Editor.FrontEnd
 								case "string":								     
 									return objectNode.TryParseSchemaStringType   (logger, out type);
 								case "object":								     
-									return objectNode.TryParseSchemaObjectType   (logger, typeDefinitions, out type);
+									return objectNode.TryParseSchemaObjectType   (logger, typeDefinitions, typesToResolve, out type);
 								case "array":								     
-									return objectNode.TryParseSchemaArrayType    (logger, typeDefinitions, out type);
+									return objectNode.TryParseSchemaArrayType    (logger, typeDefinitions, typesToResolve, out type);
 								case "reference":
-									return objectNode.TryParseSchemaReferenceType(logger, typeDefinitions, out type);
+									return objectNode.TryParseSchemaReferenceType(logger, typeDefinitions, typesToResolve, out type);
 							}
 						}
 						else

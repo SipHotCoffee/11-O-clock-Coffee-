@@ -1,4 +1,4 @@
-﻿using CG.Test.Editor.FrontEnd.Models;
+﻿using CG.Test.Editor.FrontEnd.Models.Types;
 using CommunityToolkit.Mvvm.ComponentModel;
 using System.Text.Json;
 

@@ -1,4 +1,4 @@
-﻿using CG.Test.Editor.FrontEnd.Models;
+﻿using CG.Test.Editor.FrontEnd.Models.Types;
 using CG.Test.Editor.FrontEnd.ViewModels;
 using CG.Test.Editor.FrontEnd.ViewModels.Nodes;
 using System.Text.Json.Nodes;

@@ -1,4 +1,4 @@
-﻿using CG.Test.Editor.FrontEnd.Models;
+﻿using CG.Test.Editor.FrontEnd.Models.Types;
 using CG.Test.Editor.FrontEnd.ViewModels.Nodes;
 using CG.Test.Editor.FrontEnd.Views.Dialogs;
 using CG.Test.Editor.FrontEnd.Visitors;
@@ -6,9 +6,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.Win32;
 using System.Collections.ObjectModel;
-using System.Drawing.Drawing2D;
 using System.IO;
-using System.Linq.Expressions;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Windows;
@@ -114,7 +112,7 @@ namespace CG.Test.Editor.FrontEnd.ViewModels
                     {
                         var types = new Dictionary<string, SchemaTypeBase>();
 						defsObjectNode.ParseDefinitions(logger, types);
-                        if (objectNode.TryParseSchemaType(logger, types, out var type))
+                        if (objectNode.TryParseSchemaType(logger, types, new DictionaryQueue<string, JsonObject>(), out var type))
                         {
 							return type;
 						}
