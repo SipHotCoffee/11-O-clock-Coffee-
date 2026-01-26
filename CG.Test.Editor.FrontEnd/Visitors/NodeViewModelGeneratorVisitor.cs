@@ -1,5 +1,6 @@
 ﻿using CG.Test.Editor.FrontEnd;
-using CG.Test.Editor.FrontEnd.Models.Types;
+using CG.Test.Editor.FrontEnd.Models;
+using CG.Test.Editor.FrontEnd.Models.LinkedTypes;
 using CG.Test.Editor.FrontEnd.ViewModels;
 using CG.Test.Editor.FrontEnd.ViewModels.Nodes;
 using CG.Test.Editor.FrontEnd.Views.Dialogs;
@@ -7,15 +8,17 @@ using System.Collections.ObjectModel;
 
 namespace CG.Test.Editor.FrontEnd.Visitors
 {
-    public class NodeViewModelGeneratorVisitor(FileInstanceViewModel editor, NodeViewModelBase? parent) : Visitor<NodeViewModelGeneratorVisitor, SchemaTypeBase, NodeViewModelBase>
+    public class NodeViewModelGeneratorVisitor(FileInstanceViewModel editor, NodeViewModelBase? parent) : Visitor<NodeViewModelGeneratorVisitor, LinkedSchemaTypeBase, NodeViewModelBase>
     {
         private readonly FileInstanceViewModel _editor = editor;
 
         private readonly NodeViewModelBase? _parent = parent;
 
-        public ArrayNodeViewModel Visit(SchemaArrayType arrayType) => new(_editor, _parent, arrayType);
+		public NodeViewModelBase Visit(LinkedSchemaSymbolType symbolType) => Invoke(symbolType.LinkedType);
 
-        public ObjectNodeViewModel Visit(SchemaObjectType objectType)
+		public ArrayNodeViewModel Visit(LinkedSchemaArrayType arrayType) => new(_editor, _parent, arrayType);
+
+        public ObjectNodeViewModel Visit(LinkedSchemaObjectType objectType)
         {
 			var result = new ObjectNodeViewModel(_editor, _parent, objectType);
 
@@ -27,12 +30,12 @@ namespace CG.Test.Editor.FrontEnd.Visitors
             return result;
         }
 
-        public NodeViewModelBase Visit(SchemaVariantType variantType)
+        public NodeViewModelBase Visit(LinkedSchemaVariantType variantType)
         {
-			var possibleTypes = new ObservableCollection<SchemaObjectType>(variantType.PossibleTypes.OfType<SchemaObjectType>());
+			var possibleTypes = new ObservableCollection<LinkedSchemaObjectType>(variantType.EnumerateObjectTypes());
             if (possibleTypes.Count == 0)
             {
-                return new ObjectNodeViewModel(_editor, _parent, new SchemaObjectType(string.Empty, []));
+                return new ObjectNodeViewModel(_editor, _parent, new LinkedSchemaObjectType(string.Empty, []));
             }
             else if (possibleTypes.Count == 1)
             {
@@ -49,16 +52,16 @@ namespace CG.Test.Editor.FrontEnd.Visitors
             return dialog.SelectedType.Visit(this);
         }
 
-        public EnumNodeViewModel Visit(SchemaEnumType enumType) => new(_editor, _parent, enumType, 0);
+        public EnumNodeViewModel Visit(LinkedSchemaEnumType enumType) => new(_editor, _parent, enumType, 0);
 
-		public NumberNodeViewModel Visit(SchemaNumberType numberType) => new(_editor, _parent, numberType, Math.Min(Math.Max(numberType.Minimum, 0), numberType.Maximum));
+		public NumberNodeViewModel Visit(LinkedSchemaNumberType numberType) => new(_editor, _parent, numberType, Math.Min(Math.Max(numberType.Minimum, 0), numberType.Maximum));
 
-        public IntegerNodeViewModel Visit(SchemaIntegerType integerType) => new(_editor, _parent, integerType, Math.Min(Math.Max(integerType.Minimum, 0), integerType.Maximum));
+        public IntegerNodeViewModel Visit(LinkedSchemaIntegerType integerType) => new(_editor, _parent, integerType, Math.Min(Math.Max(integerType.Minimum, 0), integerType.Maximum));
 
-        public StringNodeViewModel Visit(SchemaStringType stringType) => new(_editor, _parent, stringType, string.Empty);
+        public StringNodeViewModel Visit(LinkedSchemaStringType stringType) => new(_editor, _parent, stringType, string.Empty);
 
-		public BooleanNodeViewModel Visit(SchemaBooleanType booleanType) => new(_editor, _parent, booleanType, false);
+		public BooleanNodeViewModel Visit(LinkedSchemaBooleanType booleanType) => new(_editor, _parent, booleanType, false);
 
-        public ReferenceNodeViewModel Visit(SchemaReferenceType referenceType) => new(_editor, _parent, referenceType, null);
+        public ReferenceNodeViewModel Visit(LinkedSchemaReferenceType referenceType) => new(_editor, _parent, referenceType, null);
 	}
 }

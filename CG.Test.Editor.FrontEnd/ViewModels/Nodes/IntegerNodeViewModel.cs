@@ -1,11 +1,11 @@
-﻿using CG.Test.Editor.FrontEnd.Models.Types;
+﻿using CG.Test.Editor.FrontEnd.Models.LinkedTypes;
 using System.Text.Json;
 
 namespace CG.Test.Editor.FrontEnd.ViewModels.Nodes
 {
-    public partial class IntegerNodeViewModel(FileInstanceViewModel editor, NodeViewModelBase? parent, SchemaIntegerType type, long value) : ValueNodeViewModelBase<long>(editor, parent, value)
+    public partial class IntegerNodeViewModel(FileInstanceViewModel editor, NodeViewModelBase? parent, LinkedSchemaIntegerType type, long value) : ValueNodeViewModelBase<long>(editor, parent, value)
     {
-        public override SchemaIntegerType Type { get; } = type;
+        public override LinkedSchemaIntegerType Type { get; } = type;
 
         public override IntegerNodeViewModel Clone(NodeViewModelBase? parent) => new(Editor, parent, Type, Value);
 

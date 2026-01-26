@@ -1,4 +1,4 @@
-﻿using CG.Test.Editor.FrontEnd.Models.Types;
+﻿using CG.Test.Editor.FrontEnd.Models.LinkedTypes;
 using DependencyPropertyToolkit;
 using System.Collections.ObjectModel;
 using System.Windows;
@@ -16,10 +16,10 @@ namespace CG.Test.Editor.FrontEnd.Views.Dialogs
         }
 
         [DependencyProperty]
-		public partial ObservableCollection<SchemaObjectType> PossibleTypes { get; set; }
+		public partial ObservableCollection<LinkedSchemaObjectType> PossibleTypes { get; set; }
 
 		[DependencyProperty]
-		public partial SchemaObjectType SelectedType { get; set; }
+		public partial LinkedSchemaObjectType SelectedType { get; set; }
 
 		private void Ok_Button_Click(object sender, RoutedEventArgs e)
         {

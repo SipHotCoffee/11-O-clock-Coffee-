@@ -1,16 +1,13 @@
-﻿using CG.Test.Editor.FrontEnd.Models.Types;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
-using System;
+﻿using CG.Test.Editor.FrontEnd.Models.LinkedTypes;
+using CG.Test.Editor.FrontEnd.Models.Types;
 using System.Collections;
+using System.Collections.Frozen;
 using System.ComponentModel.DataAnnotations;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Numerics;
 using System.Reflection;
-using System.Reflection.Metadata;
-using System.Text.Json;
 using System.Text.Json.Nodes;
-using System.Xml.Linq;
 
 namespace CG.Test.Editor.FrontEnd
 {
@@ -18,37 +15,37 @@ namespace CG.Test.Editor.FrontEnd
     {
 		extension<TInteger>(TInteger) where TInteger : IBinaryInteger<TInteger>, IMinMaxValue<TInteger>
 		{
-            public static SchemaIntegerType GetIntegerSchema(ParameterInfo? parameter)
+            public static LinkedSchemaIntegerType GetIntegerSchema(ParameterInfo? parameter)
             {
 				var rangeAttribute = parameter?.GetCustomAttribute<RangeAttribute>();
 
 				if (rangeAttribute is not null)
 				{
-					return new SchemaIntegerType((int)rangeAttribute.Minimum, (int)rangeAttribute.Maximum);
+					return new LinkedSchemaIntegerType((int)rangeAttribute.Minimum, (int)rangeAttribute.Maximum);
 				}
 
-                return new SchemaIntegerType(long.CreateTruncating(TInteger.MinValue), long.CreateTruncating(TInteger.MaxValue));
+                return new LinkedSchemaIntegerType(long.CreateTruncating(TInteger.MinValue), long.CreateTruncating(TInteger.MaxValue));
             }
         }
 
 		extension<TFloat>(TFloat) where TFloat : IFloatingPoint<TFloat>, IMinMaxValue<TFloat>
 		{
-            public static SchemaNumberType GetFloatSchema(ParameterInfo? parameter)
+            public static LinkedSchemaNumberType GetFloatSchema(ParameterInfo? parameter)
             {
 				var rangeAttribute = parameter?.GetCustomAttribute<RangeAttribute>();
 
 				if (rangeAttribute is not null)
 				{
-					return new SchemaNumberType(((IConvertible)rangeAttribute.Minimum).ToDouble(CultureInfo.CurrentCulture), ((IConvertible)rangeAttribute.Maximum).ToDouble(CultureInfo.CurrentCulture));
+					return new LinkedSchemaNumberType(((IConvertible)rangeAttribute.Minimum).ToDouble(CultureInfo.CurrentCulture), ((IConvertible)rangeAttribute.Maximum).ToDouble(CultureInfo.CurrentCulture));
 				}
 
-				return new SchemaNumberType(double.CreateTruncating(TFloat.MinValue), double.CreateTruncating(TFloat.MaxValue));
+				return new LinkedSchemaNumberType(double.CreateTruncating(TFloat.MinValue), double.CreateTruncating(TFloat.MaxValue));
             }
         }
 
 		extension(Type type)
 		{
-			public SchemaTypeBase GetSchemaFromType(ParameterInfo? parameter)
+			public LinkedSchemaTypeBase GetSchemaFromType(ParameterInfo? parameter)
 			{
 				     if (type == typeof(byte))    { return    byte.GetIntegerSchema(parameter); }
 				else if (type == typeof(ushort))  { return  ushort.GetIntegerSchema(parameter); }
@@ -63,33 +60,33 @@ namespace CG.Test.Editor.FrontEnd
 				else if (type == typeof(decimal)) { return decimal.GetFloatSchema(parameter);   }
 				else if (type == typeof(bool))
 				{
-					return new SchemaBooleanType();
+					return new LinkedSchemaBooleanType();
 				}
 				else if (type == typeof(string))
 				{
-					return new SchemaStringType(int.MaxValue);
+					return new LinkedSchemaStringType(int.MaxValue);
 				}
 				else if (type.IsArray)
 				{
-					return new SchemaArrayType((type.GetElementType() ?? typeof(object)).GetSchemaFromType(null));
+					return new LinkedSchemaArrayType((type.GetElementType() ?? typeof(object)).GetSchemaFromType(null));
 				}
 				else if (type.IsAssignableTo(typeof(IEnumerable)))
 				{
 					if (type.GenericTypeArguments.Length > 0)
 					{
-						return new SchemaArrayType(type.GenericTypeArguments[0].GetSchemaFromType(null));
+						return new LinkedSchemaArrayType(type.GenericTypeArguments[0].GetSchemaFromType(null));
 					}
 					else
 					{
-						return new SchemaArrayType(typeof(object).GetSchemaFromType(null));
+						return new LinkedSchemaArrayType(typeof(object).GetSchemaFromType(null));
 					}
 				}
 				else
 				{
 					var constructor = type.GetConstructors(BindingFlags.Public | BindingFlags.Instance).First();
-					var properties = new Dictionary<string, SchemaProperty>();
+					var properties = new Dictionary<string, LinkedSchemaProperty>();
                     var parameters = constructor.GetParameters();
-					return new SchemaObjectType(type.Name, parameters.Select((parameter, index) => new SchemaProperty()
+					return new LinkedSchemaObjectType(type.Name, parameters.Select((parameter, index) => new LinkedSchemaProperty()
 					{ 
 						Index = index,
 						Name = parameter.Name ?? string.Empty,
@@ -99,16 +96,30 @@ namespace CG.Test.Editor.FrontEnd
 			}
 		}
 
-		extension(JsonArray arrayNode)
+		extension(LinkedSchemaTypeBase type)
 		{
 
-			public IEnumerable<SchemaTypeBase> EnumerateVariantTypes(ILogger<SchemaParsingMessage> logger, IReadOnlyDictionary<string, SchemaTypeBase> registeredTypes, DictionaryQueue<string, JsonObject> typesToResolve)
+			public IEnumerable<LinkedSchemaObjectType> EnumerateObjectTypes()
 			{
-				foreach (var node in arrayNode)
+				if (type is LinkedSchemaObjectType objectType)
 				{
-					if (node is not null && node.TryParseSchemaType(logger, registeredTypes, typesToResolve, out var type))
+					yield return objectType;
+				}
+				else if (type is LinkedSchemaVariantType variantType)
+				{
+					foreach (var possibleType in variantType.PossibleTypes)
 					{
-						yield return type;
+						foreach (var possibleObjectType in possibleType.EnumerateObjectTypes())
+						{
+							yield return possibleObjectType;
+						}
+					}
+				}
+				else if (type is LinkedSchemaSymbolType symbolType)
+				{
+					foreach (var possibleObjectType in symbolType.LinkedType.EnumerateObjectTypes())
+					{
+						yield return possibleObjectType;
 					}
 				}
 			}
@@ -116,59 +127,111 @@ namespace CG.Test.Editor.FrontEnd
 
 		extension(JsonObject objectNode)
 		{
-
-			public void ParseDefinitions(ILogger<SchemaParsingMessage> logger, Dictionary<string, SchemaTypeBase> types)
+			public bool TryParseSchemaDefinitions(ILogger<SchemaParsingMessage> logger, Dictionary<string, LinkedSchemaTypeBase> namedTypes)
 			{
-				var typesToResolve = new DictionaryQueue<string, JsonObject>();
-
 				foreach (var (typeName, typeNode) in objectNode)
 				{
-					if (typeNode is JsonObject childObjectNode)
+					if (typeNode is null)
 					{
-						typesToResolve.Enqueue(typeName, childObjectNode);
+						continue;
+					}
+
+					if (typeNode.TryParseLinkedSchemaType(logger, namedTypes, out var type))
+					{
+						namedTypes.Add(typeName, type);
+					}
+					else
+					{
+						return false;
 					}
 				}
-
-				while (typesToResolve.TryDequeue(out var typeName, out var typeObjectNode))
-				{
-					if (typeObjectNode.TryGetPropertyValue("oneOf", out var oneOfNode) && oneOfNode is JsonArray oneOfArrayNode)
-					{
-						foreach (var possibleTypeNode in oneOfArrayNode)
-						{
-							
-						}
-					}
-					else if (typeObjectNode.TryGetPropertyValue("properties", out var propertiesNode) && propertiesNode is JsonObject propertiesObjectNode)
-					{
-						var properties = new List<SchemaProperty>();
-
-						var index = 0;
-						foreach (var (propertyName, propertyTypeNode) in propertiesObjectNode)
-						{
-							if (propertyName != "$type")
-							{
-								if (propertyTypeNode is not null && propertyTypeNode.TryParseSchemaType(logger, types, typesToResolve, out var type))
-								{
-									properties.Add(new SchemaProperty()
-									{
-										Index = index++,
-										Name = propertyName,
-										Type = type,
-									});
-								}
-								else
-								{
-									typesToResolve.Enqueue(typeName, typeObjectNode);
-									if (propertyTypeNode is JsonObject propertyTypeObjectNode)
-									{
-										typesToResolve.Enqueue(propertyName, propertyTypeObjectNode);
-									}
-								}
-							}
-						}
-					}
-				}
+				return true;
 			}
+
+			//public bool TryParseSchemaNode(SchemaNodeBase? parent, string name, ILogger<SchemaParsingMessage> logger, [NotNullWhen(true)] out SchemaNodeBase? outputNode)
+			//{
+			//	var typeCode = objectNode["type"]?.GetValue<string>() ?? string.Empty;
+
+			//	if (objectNode.TryGetValue<string>("$ref", logger, out var path))
+			//	{
+			//		var pathTokens = path.Split('/');
+			//		var typeName = pathTokens[^1];
+			//		outputNode = new SchemaTypeReferenceNode(parent, typeName);
+			//		return true;
+			//	}
+
+			//	if (objectNode.TryGetPropertyValue("oneOf", out var oneOfNode) && oneOfNode is JsonArray arrayNode)
+			//	{
+			//		var variantNode = new SchemaVariantNode(parent, name);
+
+			//		foreach (var elementNode in arrayNode)
+			//		{
+			//			if (elementNode is JsonObject elementObjectNode && elementObjectNode.TryParseSchemaNode(variantNode, name, logger, out var elementSchemaNode))
+			//			{
+			//				variantNode.PossibleTypeNodes.Add(elementSchemaNode);
+			//			}
+			//			else
+			//			{
+			//				outputNode = null;
+			//				return false;
+			//			}
+			//		}
+
+			//		outputNode = variantNode;
+			//		return true;
+			//	}
+
+			//	if (objectNode.TryGetPropertyValue("properties", out var propertiesNode) && propertiesNode is JsonObject propertiesObjectNode)
+			//	{
+			//		var schemaObjectNode = new SchemaObjectNode(parent, name);
+
+			//		foreach (var (propertyName, propertyNode) in propertiesObjectNode)
+			//		{
+			//			if (propertyName == "$type")
+			//			{
+			//				continue;
+			//			}
+
+			//			if (propertyNode is JsonObject propertyObjectNode && propertyObjectNode.TryParseSchemaNode(schemaObjectNode, propertyName, logger, out var propertySchemaNode))
+			//			{
+			//				schemaObjectNode.PropertyNodes.Add(propertyName, propertySchemaNode);
+			//			}
+			//			else
+			//			{
+			//				outputNode = null;
+			//				return false;
+			//			}
+			//		}
+
+			//		outputNode = schemaObjectNode;
+			//		return true;
+			//	}
+
+			//	if (typeCode == "array" && objectNode.TryGetPropertyValue("items", out var itemsNode) && 
+			//		itemsNode is JsonObject itemsObjectNode && 
+			//		itemsObjectNode.TryParseSchemaNode(parent, string.Empty, logger, out var itemsSchemaNode))
+			//	{
+			//		outputNode = new SchemaArrayNode(parent, itemsSchemaNode);
+			//		return true;
+			//	}
+
+			//	if (typeCode == "reference" && objectNode.TryGetPropertyValue("target", out var targetNode) &&
+			//		targetNode is JsonObject targetObjectNode &&
+			//		targetObjectNode.TryParseSchemaNode(parent, string.Empty, logger, out var targetSchemaNode))
+			//	{
+			//		outputNode = new SchemaReferenceNode(parent, targetSchemaNode);
+			//		return true;
+			//	}
+
+			//	if (objectNode.TryParseLinkedSchemaType(logger, FrozenDictionary<string, LinkedSchemaTypeBase>.Empty, out var type))
+			//	{
+			//		outputNode = new SchemaDefinedNode(parent, type);
+			//		return true;
+			//	}
+
+			//	outputNode = null;
+			//	return false;
+			//}
 
 			private bool TryGetValue<TValue>(string propertyName, ILogger<SchemaParsingMessage> logger, [MaybeNullWhen(false)] out TValue value)
 			{
@@ -187,27 +250,7 @@ namespace CG.Test.Editor.FrontEnd
 				return false;
 			}
 
-			public IEnumerable<SchemaProperty> EnumerateProperties(ILogger<SchemaParsingMessage> logger, IReadOnlyDictionary<string, SchemaTypeBase> registeredTypes, DictionaryQueue<string, JsonObject> typesToResolve)
-			{
-				var index = 0;
-				foreach (var pair in objectNode)
-				{
-					if (pair.Key != "$type")
-					{
-						if (pair.Value is not null && pair.Value.TryParseSchemaType(logger, registeredTypes, typesToResolve, out var type))
-						{
-							yield return new SchemaProperty()
-							{
-								Name = pair.Key,
-								Type = type,
-								Index = index++,
-							};
-						}
-					}
-				}
-			}
-
-			public bool TryParseSchemaIntegerType(ILogger<SchemaParsingMessage> logger, [NotNullWhen(true)] out SchemaTypeBase? type)
+			private bool TryParseSchemaIntegerType(ILogger<SchemaParsingMessage> logger, [NotNullWhen(true)] out LinkedSchemaTypeBase? type)
 			{
 				if (!objectNode.TryGetValue<long>("minimum", logger, out var minimum))
 				{
@@ -219,11 +262,11 @@ namespace CG.Test.Editor.FrontEnd
 					maximum = long.MaxValue;
 				}
 
-				type = new SchemaIntegerType(minimum, maximum);
+				type = new LinkedSchemaIntegerType(minimum, maximum);
 				return true;
 			}
 
-			public bool TryParseSchemaNumberType(ILogger<SchemaParsingMessage> logger, [NotNullWhen(true)] out SchemaTypeBase? type)
+			private bool TryParseSchemaNumberType(ILogger<SchemaParsingMessage> logger, [NotNullWhen(true)] out LinkedSchemaTypeBase? type)
 			{
 				if (!objectNode.TryGetValue<double>("minimum", logger, out var minimum))
 				{
@@ -234,16 +277,16 @@ namespace CG.Test.Editor.FrontEnd
 				{
 					maximum = double.MaxValue;
 				}
-				type = new SchemaNumberType(minimum, maximum);
+				type = new LinkedSchemaNumberType(minimum, maximum);
 				return true;
 			}
 
-			public bool TryParseSchemaStringType(ILogger<SchemaParsingMessage> logger, [NotNullWhen(true)] out SchemaTypeBase? type)
+			private bool TryParseSchemaStringType(ILogger<SchemaParsingMessage> logger, [NotNullWhen(true)] out LinkedSchemaTypeBase? type)
 			{
 				if (objectNode.TryGetPropertyValue("enum", out var node) && node is JsonArray arrayNode)
 				{
 					var successful = true;
-					type = new SchemaEnumType(arrayNode.OfType<JsonValue>().Select((valueNode) =>
+					type = new LinkedSchemaEnumType(arrayNode.OfType<JsonValue>().Select((valueNode) =>
 					{
 						if (valueNode.TryGetValue<string>(out var elementName))
 						{
@@ -263,11 +306,11 @@ namespace CG.Test.Editor.FrontEnd
 				{
 					maxLength = int.MaxValue;
 				}
-				type = new SchemaStringType(maxLength);
+				type = new LinkedSchemaStringType(maxLength);
 				return true;
 			}
 
-			public bool TryParseSchemaObjectType(ILogger<SchemaParsingMessage> logger, IReadOnlyDictionary<string, SchemaTypeBase> registeredTypes, DictionaryQueue<string, JsonObject> typesToResolve, [NotNullWhen(true)] out SchemaTypeBase? type)
+			private bool TryParseSchemaObjectType(ILogger<SchemaParsingMessage> logger, IReadOnlyDictionary<string, LinkedSchemaTypeBase> registeredTypes, [NotNullWhen(true)] out LinkedSchemaTypeBase? type)
 			{
 				if (objectNode.TryGetPropertyValue("properties", out var propertiesNode))
 				{
@@ -276,16 +319,32 @@ namespace CG.Test.Editor.FrontEnd
 						if (propertiesObjectNode.TryGetPropertyValue("$type", out var typeNode) &&
 							typeNode is JsonObject typeObjectNode && typeObjectNode.TryGetValue<string>("const", logger, out var typeName))
 						{
-							var beforeFailCount = typesToResolve.Count;
-							var properties = propertiesObjectNode.EnumerateProperties(logger, registeredTypes, typesToResolve);							
-							type = new SchemaObjectType(typeName, properties);
-							var afterFailCount = typesToResolve.Count;
-
-							if (afterFailCount > beforeFailCount)
+							var properties = new List<LinkedSchemaProperty>();
+							var index = 0;
+							foreach (var (propertyName, propertyNode) in propertiesObjectNode)
 							{
-								type = null;
-								return false;
+								if (propertyName == "$type")
+								{
+									continue;
+								}
+
+								if (propertyNode is not null && propertyNode.TryParseLinkedSchemaType(logger, registeredTypes, out var propertyType))
+								{
+									properties.Add(new LinkedSchemaProperty()
+									{
+										Name  = propertyName,
+										Type  = propertyType,
+										Index = index++,
+									});
+								}
+								else
+								{
+									type = null;
+									return false;
+								}
 							}
+					
+							type = new LinkedSchemaObjectType(typeName, properties);
 
 							return true;
 						}
@@ -303,16 +362,22 @@ namespace CG.Test.Editor.FrontEnd
 				{
 					if (oneOfNode is JsonArray arrayNode)
 					{
-						var beforeFailCount = typesToResolve.Count;
-						type = new SchemaVariantType(arrayNode.EnumerateVariantTypes(logger, registeredTypes, typesToResolve));
-						var afterFailCount = typesToResolve.Count;
-						
-						if (afterFailCount > beforeFailCount)
+						var possibleTypes = new List<LinkedSchemaTypeBase>();
+
+						foreach (var node in arrayNode)
 						{
-							type = null;
-							return false;
+							if (node is not null && node.TryParseLinkedSchemaType(logger, registeredTypes, out var possibleType))
+							{
+								possibleTypes.Add(possibleType);
+							}
+							else
+							{
+								type = null;
+								return false;
+							}
 						}
 
+						type = new LinkedSchemaVariantType(string.Empty, possibleTypes);
 						return true;
 					}
 					else
@@ -322,19 +387,20 @@ namespace CG.Test.Editor.FrontEnd
 				}
 				else
 				{
-					logger.Log(new SchemaParsingMessage($"Node of type 'object' must contain a 'properties' object or a 'oneOf' array.", objectNode));
+					logger.Log(new SchemaParsingMessage($"Node of type 'object' must contain a 'properties' property, or a 'oneOf' array.", objectNode));
 				}
 				type = null;
 				return false;
 			}
 
-			public bool TryParseSchemaArrayType(ILogger<SchemaParsingMessage> logger, IReadOnlyDictionary<string, SchemaTypeBase> registeredTypes, DictionaryQueue<string, JsonObject> typesToResolve, [NotNullWhen(true)] out SchemaTypeBase? type)
+
+			private bool TryParseSchemaArrayType(ILogger<SchemaParsingMessage> logger, IReadOnlyDictionary<string, LinkedSchemaTypeBase> registeredTypes, [NotNullWhen(true)] out LinkedSchemaTypeBase? type)
 			{
 				if (objectNode.TryGetPropertyValue("items", out var itemsNode) && itemsNode is not null)
 				{
-					if (itemsNode.TryParseSchemaType(logger, registeredTypes, typesToResolve, out var elementType))
+					if (itemsNode.TryParseLinkedSchemaType(logger, registeredTypes, out var elementType))
 					{
-						type = new SchemaArrayType(elementType);
+						type = new LinkedSchemaArrayType(elementType);
 						return true;
 					}
 				}
@@ -346,13 +412,13 @@ namespace CG.Test.Editor.FrontEnd
 				return false;
 			}
 
-			public bool TryParseSchemaReferenceType(ILogger<SchemaParsingMessage> logger, IReadOnlyDictionary<string, SchemaTypeBase> registeredTypes, DictionaryQueue<string, JsonObject> typesToResolve, [NotNullWhen(true)] out SchemaTypeBase? type)
+			private bool TryParseSchemaReferenceType(ILogger<SchemaParsingMessage> logger, IReadOnlyDictionary<string, LinkedSchemaTypeBase> registeredTypes, [NotNullWhen(true)] out LinkedSchemaTypeBase? type)
 			{
 				if (objectNode.TryGetPropertyValue("target", out var targetNode) && targetNode is not null)
 				{
-					if (targetNode.TryParseSchemaType(logger, registeredTypes, typesToResolve, out var elementType))
+					if (targetNode.TryParseLinkedSchemaType(logger, registeredTypes, out var elementType))
 					{
-						type = new SchemaReferenceType(elementType);
+						type = new LinkedSchemaReferenceType(elementType);
 						return true;
 					}
 
@@ -369,7 +435,8 @@ namespace CG.Test.Editor.FrontEnd
 
 		extension(JsonNode node)
 		{
-			public bool TryParseSchemaType(ILogger<SchemaParsingMessage> logger, IReadOnlyDictionary<string, SchemaTypeBase> typeDefinitions, DictionaryQueue<string, JsonObject> typesToResolve, [NotNullWhen(true)] out SchemaTypeBase? type)
+
+			public bool TryParseLinkedSchemaType(ILogger<SchemaParsingMessage> logger, IReadOnlyDictionary<string, LinkedSchemaTypeBase> typeDefinitions, [NotNullWhen(true)] out LinkedSchemaTypeBase? type)
 			{
 				if (node is JsonObject objectNode)
 				{
@@ -383,7 +450,8 @@ namespace CG.Test.Editor.FrontEnd
 						}
 
 						var typeName = pathTokens[^1];
-						return typeDefinitions.TryGetValue(typeName, out type);
+						type = new LinkedSchemaSymbolType(typeName, typeDefinitions);
+						return true;
 					}
 					else if (objectNode.TryGetPropertyValue("type", out var childNode) && childNode is not null)
 					{
@@ -392,7 +460,7 @@ namespace CG.Test.Editor.FrontEnd
 							switch (typeName)
 							{
 								case "boolean":
-									type = new SchemaBooleanType();
+									type = new LinkedSchemaBooleanType();
 									return true;
 								case "integer":
 									return objectNode.TryParseSchemaIntegerType  (logger, out type);
@@ -401,11 +469,11 @@ namespace CG.Test.Editor.FrontEnd
 								case "string":								     
 									return objectNode.TryParseSchemaStringType   (logger, out type);
 								case "object":								     
-									return objectNode.TryParseSchemaObjectType   (logger, typeDefinitions, typesToResolve, out type);
+									return objectNode.TryParseSchemaObjectType   (logger, typeDefinitions, out type);
 								case "array":								     
-									return objectNode.TryParseSchemaArrayType    (logger, typeDefinitions, typesToResolve, out type);
+									return objectNode.TryParseSchemaArrayType    (logger, typeDefinitions, out type);
 								case "reference":
-									return objectNode.TryParseSchemaReferenceType(logger, typeDefinitions, typesToResolve, out type);
+									return objectNode.TryParseSchemaReferenceType(logger, typeDefinitions, out type);
 							}
 						}
 						else

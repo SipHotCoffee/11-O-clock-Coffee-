@@ -1,4 +1,4 @@
-﻿using CG.Test.Editor.FrontEnd.Models.Types;
+﻿using CG.Test.Editor.FrontEnd.Models.LinkedTypes;
 using CommunityToolkit.Mvvm.ComponentModel;
 using System.Text.Json;
 
@@ -12,7 +12,7 @@ namespace CG.Test.Editor.FrontEnd.ViewModels.Nodes
 		[ObservableProperty]
 		private NodePath? _path;
 
-        public ReferenceNodeViewModel(FileInstanceViewModel editor, NodeViewModelBase? parent, SchemaReferenceType type, NodeViewModelBase? node) : base(editor, parent)
+        public ReferenceNodeViewModel(FileInstanceViewModel editor, NodeViewModelBase? parent, LinkedSchemaReferenceType type, NodeViewModelBase? node) : base(editor, parent)
         {
             Type = type;
 			Node = node;
@@ -36,7 +36,7 @@ namespace CG.Test.Editor.FrontEnd.ViewModels.Nodes
 			}
         }
 
-        public override SchemaReferenceType Type { get; }
+        public override LinkedSchemaReferenceType Type { get; }
 
 		public override ReferenceNodeViewModel Clone(NodeViewModelBase? parent) => new(Editor, parent, Type, Node);
 

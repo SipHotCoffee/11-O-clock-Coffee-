@@ -1,4 +1,4 @@
-﻿using CG.Test.Editor.FrontEnd.Models.Types;
+﻿using CG.Test.Editor.FrontEnd.Models.LinkedTypes;
 using CG.Test.Editor.FrontEnd.ViewModels;
 using CG.Test.Editor.FrontEnd.ViewModels.Nodes;
 using CG.Test.Editor.FrontEnd.Visitors;
@@ -14,7 +14,7 @@ namespace CG.Test.Editor.FrontEnd.Views.Dialogs
     {
         public object? Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-			return ((IEnumerable<SchemaProperty>)value)?.Where((property) => property.Type.IsValueType);
+			return ((IEnumerable<LinkedSchemaProperty>)value)?.Where((property) => property.Type.IsValueType);
         }
 
         public object? ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
@@ -39,16 +39,16 @@ namespace CG.Test.Editor.FrontEnd.Views.Dialogs
         }
 
 		[DependencyProperty]
-		public partial ObservableCollection<SchemaObjectType> AvailableTypes { get; set; }
+		public partial ObservableCollection<LinkedSchemaObjectType> AvailableTypes { get; set; }
 
         [DependencyProperty]
-        public partial SchemaObjectType SelectedType { get; set; }
+        public partial LinkedSchemaObjectType SelectedType { get; set; }
 
         [DependencyProperty]
-        public partial IEnumerable<SchemaProperty> Properties { get; set; }
+        public partial IEnumerable<LinkedSchemaProperty> Properties { get; set; }
 
         [DependencyProperty]
-        public partial SchemaProperty SelectedProperty { get; set; }
+        public partial LinkedSchemaProperty SelectedProperty { get; set; }
 
         [DependencyProperty]
         public partial bool IsFilterEnabled { get; set; }
@@ -59,7 +59,7 @@ namespace CG.Test.Editor.FrontEnd.Views.Dialogs
 		[DependencyProperty]
 		public partial NodeViewModelBase NewValue { get; set; }
 
-        partial void OnSelectedPropertyChanged(SchemaProperty oldValue, SchemaProperty newValue)
+        partial void OnSelectedPropertyChanged(LinkedSchemaProperty oldValue, LinkedSchemaProperty newValue)
         {
             var visitor = new NodeViewModelGeneratorVisitor(_instanceViewModel, _parent);
 

@@ -5,7 +5,7 @@
                        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
                        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
                        xmlns:local="clr-namespace:CG.Test.Editor.FrontEnd.Views.Dialogs"
-					   xmlns:types="clr-namespace:CG.Test.Editor.FrontEnd.Models.Types" 
+					   xmlns:types="clr-namespace:CG.Test.Editor.FrontEnd.Models.LinkedTypes" 
 					   xmlns:viewmodelnodes="clr-namespace:CG.Test.Editor.FrontEnd.ViewModels.Nodes" 
 					   xmlns:viewmodels="clr-namespace:CG.Test.Editor.FrontEnd.ViewModels" 
 					   xmlns:converters="clr-namespace:CG.Test.Editor.FrontEnd.Converters"
@@ -81,16 +81,16 @@
 							<GridViewColumn.CellTemplate>
 								<DataTemplate>
 									<DataTemplate.Resources>
-										<DataTemplate DataType="{x:Type types:SchemaBooleanType}">
+										<DataTemplate DataType="{x:Type types:LinkedSchemaBooleanType}">
 											<TextBlock FontFamily="Cascadia Mono" VerticalAlignment="Center" Text="Boolean"/>
 										</DataTemplate>
-										<DataTemplate DataType="{x:Type types:SchemaStringType}">
+										<DataTemplate DataType="{x:Type types:LinkedSchemaStringType}">
 											<TextBlock FontFamily="Cascadia Mono" VerticalAlignment="Center" Text="String"/>
 										</DataTemplate>
-										<DataTemplate DataType="{x:Type types:SchemaNumberType}">
+										<DataTemplate DataType="{x:Type types:LinkedSchemaNumberType}">
 											<TextBlock FontFamily="Cascadia Mono" VerticalAlignment="Center" Text="Number"/>
 										</DataTemplate>
-										<DataTemplate DataType="{x:Type types:SchemaIntegerType}">
+										<DataTemplate DataType="{x:Type types:LinkedSchemaIntegerType}">
 											<TextBlock FontFamily="Cascadia Mono" VerticalAlignment="Center" Text="Integer"/>
 										</DataTemplate>
 									</DataTemplate.Resources>

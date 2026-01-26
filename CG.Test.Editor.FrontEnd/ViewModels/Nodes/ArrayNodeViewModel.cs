@@ -1,4 +1,4 @@
-﻿using CG.Test.Editor.FrontEnd.Models.Types;
+﻿using CG.Test.Editor.FrontEnd.Models.LinkedTypes;
 using CG.Test.Editor.FrontEnd.Views.Dialogs;
 using CG.Test.Editor.FrontEnd.Visitors;
 using CommunityToolkit.Mvvm.Input;
@@ -13,7 +13,7 @@ namespace CG.Test.Editor.FrontEnd.ViewModels.Nodes
 {
     public partial class ArrayNodeViewModel : NodeViewModelBase
     {
-        public ArrayNodeViewModel(FileInstanceViewModel editor, NodeViewModelBase? parent, SchemaArrayType type) : base(editor, parent)
+        public ArrayNodeViewModel(FileInstanceViewModel editor, NodeViewModelBase? parent, LinkedSchemaArrayType type) : base(editor, parent)
         {
             Type = type;
 
@@ -28,7 +28,7 @@ namespace CG.Test.Editor.FrontEnd.ViewModels.Nodes
 
 		public ObservableCollection<int> Indices { get; }
 
-		public override SchemaArrayType Type { get; }
+		public override LinkedSchemaArrayType Type { get; }
 
 		private void Elements_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
         {

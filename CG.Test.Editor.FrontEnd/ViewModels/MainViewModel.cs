@@ -1,4 +1,4 @@
-﻿using CG.Test.Editor.FrontEnd.Models.Types;
+﻿using CG.Test.Editor.FrontEnd.Models.LinkedTypes;
 using CG.Test.Editor.FrontEnd.ViewModels.Nodes;
 using CG.Test.Editor.FrontEnd.Views.Dialogs;
 using CG.Test.Editor.FrontEnd.Visitors;
@@ -92,7 +92,7 @@ namespace CG.Test.Editor.FrontEnd.ViewModels
 			}
         }
 
-        private static async Task<SchemaTypeBase?> LoadSchema(Window window)
+        private static async Task<LinkedSchemaTypeBase?> LoadSchema(Window window)
         {
 			ArgumentNullException.ThrowIfNull(window, nameof(window));
 
@@ -110,9 +110,9 @@ namespace CG.Test.Editor.FrontEnd.ViewModels
 
                     if (node is JsonObject objectNode && objectNode.TryGetPropertyValue("$defs", out var defsNode) && defsNode is JsonObject defsObjectNode)
                     {
-                        var types = new Dictionary<string, SchemaTypeBase>();
-						defsObjectNode.ParseDefinitions(logger, types);
-                        if (objectNode.TryParseSchemaType(logger, types, new DictionaryQueue<string, JsonObject>(), out var type))
+                        var types = new Dictionary<string, LinkedSchemaTypeBase>();
+						defsObjectNode.TryParseSchemaDefinitions(logger, types);
+                        if (objectNode.TryParseLinkedSchemaType(logger, types, out var type))
                         {
 							return type;
 						}

@@ -1,4 +1,4 @@
-﻿using CG.Test.Editor.FrontEnd.Models.Types;
+﻿using CG.Test.Editor.FrontEnd.Models.LinkedTypes;
 using CG.Test.Editor.FrontEnd.ViewModels;
 using CG.Test.Editor.FrontEnd.ViewModels.Nodes;
 using DependencyPropertyToolkit;
@@ -6,7 +6,7 @@ using System.Windows;
 
 namespace CG.Test.Editor.FrontEnd.Views.Dialogs
 {
-    public class TreeNodeViewModel(SchemaTypeBase typeFilter, NodeViewModelBase node)
+    public class TreeNodeViewModel(LinkedSchemaTypeBase typeFilter, NodeViewModelBase node)
     {
         public string Name { get; } = node.Name;
 

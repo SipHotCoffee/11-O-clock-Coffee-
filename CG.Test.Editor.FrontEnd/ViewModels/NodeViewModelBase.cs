@@ -1,4 +1,4 @@
-﻿using CG.Test.Editor.FrontEnd.Models.Types;
+﻿using CG.Test.Editor.FrontEnd.Models.LinkedTypes;
 using CG.Test.Editor.FrontEnd.ViewModels.Nodes;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -60,7 +60,7 @@ namespace CG.Test.Editor.FrontEnd.ViewModels
 
         public string Name => Parent?.GetName(this) ?? "(Root)";
 
-        public abstract SchemaTypeBase Type { get; }
+        public abstract LinkedSchemaTypeBase Type { get; }
 
         public virtual IEnumerable<NodeViewModelBase> Children { get; } = [];
 

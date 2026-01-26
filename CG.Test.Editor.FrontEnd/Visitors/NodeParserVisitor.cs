@@ -1,4 +1,4 @@
-﻿using CG.Test.Editor.FrontEnd.Models.Types;
+﻿using CG.Test.Editor.FrontEnd.Models.LinkedTypes;
 using CG.Test.Editor.FrontEnd.ViewModels;
 using CG.Test.Editor.FrontEnd.ViewModels.Nodes;
 using System.Text.Json.Nodes;
@@ -12,7 +12,7 @@ namespace CG.Test.Editor.FrontEnd.Visitors
 		public NodePath Path { get; } = path;
 	}
 
-    public class NodeParserVisitor(FileInstanceViewModel editor, NodePath currentPath, Dictionary<ulong, List<ReferenceNodeViewModel>> referenceNodesToAssign, NodeViewModelBase? parent, ILogger<NodeParsingMessage> logger, JsonNode? sourceNode) : Visitor<NodeParserVisitor, SchemaTypeBase, NodeViewModelBase?>
+    public class NodeParserVisitor(FileInstanceViewModel editor, NodePath currentPath, Dictionary<ulong, List<ReferenceNodeViewModel>> referenceNodesToAssign, NodeViewModelBase? parent, ILogger<NodeParsingMessage> logger, JsonNode? sourceNode) : Visitor<NodeParserVisitor, LinkedSchemaTypeBase, NodeViewModelBase?>
     {
         private readonly FileInstanceViewModel _editor = editor;
 
@@ -31,7 +31,9 @@ namespace CG.Test.Editor.FrontEnd.Visitors
 			_logger.Log(new NodeParsingMessage(message, CurrentPath));
 		}
 
-        public NumberNodeViewModel? Visit(SchemaNumberType numberType)
+        public NodeViewModelBase? Visit(LinkedSchemaSymbolType symbolType) => Invoke(symbolType.LinkedType);
+
+        public NumberNodeViewModel? Visit(LinkedSchemaNumberType numberType)
         {
 			if (SourceNode is JsonValue valueNode)
 			{
@@ -58,7 +60,7 @@ namespace CG.Test.Editor.FrontEnd.Visitors
             return null;
 		}
 
-		public IntegerNodeViewModel? Visit(SchemaIntegerType integerType)
+		public IntegerNodeViewModel? Visit(LinkedSchemaIntegerType integerType)
 		{
 			if (SourceNode is JsonValue valueNode)
 			{
@@ -78,7 +80,7 @@ namespace CG.Test.Editor.FrontEnd.Visitors
 			return null;
 		}
 
-		public EnumNodeViewModel? Visit(SchemaEnumType enumType)
+		public EnumNodeViewModel? Visit(LinkedSchemaEnumType enumType)
 		{
 			if (SourceNode is JsonValue valueNode)
 			{
@@ -105,7 +107,7 @@ namespace CG.Test.Editor.FrontEnd.Visitors
 			return null;
 		}
 
-		public BooleanNodeViewModel? Visit(SchemaBooleanType booleanType)
+		public BooleanNodeViewModel? Visit(LinkedSchemaBooleanType booleanType)
 		{
 			if (SourceNode is JsonValue valueNode)
 			{
@@ -125,7 +127,7 @@ namespace CG.Test.Editor.FrontEnd.Visitors
 			return null;
 		}
 
-		public StringNodeViewModel? Visit(SchemaStringType stringType)
+		public StringNodeViewModel? Visit(LinkedSchemaStringType stringType)
 		{
 			if (SourceNode is JsonValue valueNode)
 			{
@@ -145,7 +147,7 @@ namespace CG.Test.Editor.FrontEnd.Visitors
 			return null;
 		}
 
-		public ReferenceNodeViewModel? Visit(SchemaReferenceType referenceType)
+		public ReferenceNodeViewModel? Visit(LinkedSchemaReferenceType referenceType)
 		{
 			if (SourceNode is JsonValue valueNode)
 			{
@@ -172,7 +174,7 @@ namespace CG.Test.Editor.FrontEnd.Visitors
 			return null;
 		}
 
-		public ArrayNodeViewModel? Visit(SchemaArrayType arrayType)
+		public ArrayNodeViewModel? Visit(LinkedSchemaArrayType arrayType)
         {
 			if (SourceNode is JsonArray arrayNode)
 			{
@@ -199,7 +201,7 @@ namespace CG.Test.Editor.FrontEnd.Visitors
 			return null;
 		}
 
-		public ObjectNodeViewModel? Visit(SchemaObjectType objectType)
+		public ObjectNodeViewModel? Visit(LinkedSchemaObjectType objectType)
 		{
 			if (SourceNode is JsonObject objectNode)
 			{
@@ -231,7 +233,7 @@ namespace CG.Test.Editor.FrontEnd.Visitors
 			return null;
 		}
 
-		public NodeViewModelBase? Visit(SchemaVariantType variantType)
+		public NodeViewModelBase? Visit(LinkedSchemaVariantType variantType)
 		{
 			var messages = new List<NodeParsingMessage>();
 			var logger = new CollectionLogger<NodeParsingMessage>(messages);

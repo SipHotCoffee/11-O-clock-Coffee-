@@ -1,4 +1,4 @@
-﻿using CG.Test.Editor.FrontEnd.Models.Types;
+﻿using CG.Test.Editor.FrontEnd.Models.LinkedTypes;
 using CommunityToolkit.Mvvm.ComponentModel;
 using System.Text.Json;
 
@@ -6,7 +6,7 @@ namespace CG.Test.Editor.FrontEnd.ViewModels.Nodes
 {
     public partial class EnumNodeViewModel : NodeViewModelBase
     {
-        public override SchemaEnumType Type { get; }
+        public override LinkedSchemaEnumType Type { get; }
 
         [ObservableProperty]
         private int _selectedIndex;
@@ -14,7 +14,7 @@ namespace CG.Test.Editor.FrontEnd.ViewModels.Nodes
         [ObservableProperty]
         private string _selectedItem;
 
-        public EnumNodeViewModel(FileInstanceViewModel editor, NodeViewModelBase? parent, SchemaEnumType type, int selectedIndex) : base(editor, parent)
+        public EnumNodeViewModel(FileInstanceViewModel editor, NodeViewModelBase? parent, LinkedSchemaEnumType type, int selectedIndex) : base(editor, parent)
         {
             Type = type;
 
