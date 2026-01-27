@@ -106,7 +106,7 @@
 								<ItemsControl.ItemTemplate>
 									<DataTemplate>
 										<Button Content="{Binding Name}" Margin="2.5, 5, 2.5, 5" 
-												Command="{Binding  Path=NavigateCommand}" 
+												Command="{Binding Path=NavigateCommand}" 
 												CommandParameter="{Binding Node}"/>
 									</DataTemplate>
 								</ItemsControl.ItemTemplate>

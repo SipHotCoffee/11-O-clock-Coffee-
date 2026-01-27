@@ -46,7 +46,7 @@ namespace CG.Test.Editor.FrontEnd.ViewModels
 
 			_history = [];
 
-            _historyIndex = 0;
+            HistoryIndex = 0;
 
             File = file;
 

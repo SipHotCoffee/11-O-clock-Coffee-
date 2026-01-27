@@ -29,7 +29,6 @@ namespace CG.Test.Editor.FrontEnd.Models.LinkedTypes
         string Name { get; }
     }
 
-
     public class LinkedSchemaVariantType(string name, IEnumerable<LinkedSchemaTypeBase> possibleTypes) : LinkedSchemaTypeBase, INamedObject
 	{
         public IReadOnlySet<LinkedSchemaTypeBase> PossibleTypes { get; } = possibleTypes.ToImmutableSortedSet(new SchemaTypeComparer());

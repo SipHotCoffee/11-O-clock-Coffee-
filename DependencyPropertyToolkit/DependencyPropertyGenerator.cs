@@ -52,6 +52,19 @@ namespace DependencyPropertyToolkit
 			return false;
 		}
 
+		public static string NormalizeType(ITypeSymbol type)
+		{
+			var nonAnnotated = type.WithNullableAnnotation(NullableAnnotation.None);
+
+			var format = SymbolDisplayFormat.FullyQualifiedFormat.WithMiscellaneousOptions(
+				SymbolDisplayMiscellaneousOptions.EscapeKeywordIdentifiers |
+				SymbolDisplayMiscellaneousOptions.UseSpecialTypes
+			);
+
+			return nonAnnotated.ToDisplayString(format);
+		}
+
+
 		private static string GetNamespace(ClassDeclarationSyntax classDeclaration)
 		{
 			// Walk up the syntax tree until we find a namespace declaration
@@ -112,7 +125,7 @@ namespace DependencyPropertyToolkit
 
 			var triggerFunctionName = $"Trigger{property.Name}Changed";
 
-			var dependencyPropertyCode = $@"public static readonly System.Windows.DependencyProperty {property.Name}Property = System.Windows.DependencyProperty.Register(""{property.Name}"", typeof({property.Type}), typeof({classInfo.ClassName}), new System.Windows.PropertyMetadata({triggerFunctionName}));";
+			var dependencyPropertyCode = $@"public static readonly System.Windows.DependencyProperty {property.Name}Property = System.Windows.DependencyProperty.Register(""{property.Name}"", typeof({NormalizeType(property.Type)}), typeof({classInfo.ClassName}), new System.Windows.PropertyMetadata({triggerFunctionName}));";
 
 			var defaultValueArgument = foundAttribute.ConstructorArguments[0];
 			if (defaultValueArgument.Value != null)
@@ -123,7 +136,7 @@ namespace DependencyPropertyToolkit
 				}
 				else
 				{
-					dependencyPropertyCode = $@"public static readonly System.Windows.DependencyProperty {property.Name}Property = System.Windows.DependencyProperty.Register(""{property.Name}"", typeof({property.Type}), typeof({classInfo.ClassName}), new System.Windows.PropertyMetadata({ConvertToLiteral(defaultValueArgument.Value)}, {triggerFunctionName}));";
+					dependencyPropertyCode = $@"public static readonly System.Windows.DependencyProperty {property.Name}Property = System.Windows.DependencyProperty.Register(""{property.Name}"", typeof({NormalizeType(property.Type)}), typeof({classInfo.ClassName}), new System.Windows.PropertyMetadata({ConvertToLiteral(defaultValueArgument.Value)}, {triggerFunctionName}));";
 				}
 			}
 

@@ -101,7 +101,7 @@ namespace CG.Test.Editor.FrontEnd
             AllowsTransparency = true;
         }
 
-		[DependencyProperty]
+        [DependencyProperty]
 		public partial bool IsMicaBackgroundEnabled { get; set; }
 
         [DependencyProperty]

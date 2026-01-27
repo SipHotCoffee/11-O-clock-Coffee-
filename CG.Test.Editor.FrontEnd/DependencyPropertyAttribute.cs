@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Windows;
-
-namespace DependencyPropertyToolkit
+﻿namespace DependencyPropertyToolkit
 {
     [AttributeUsage(AttributeTargets.Property)]
     public class DependencyPropertyAttribute(object? defaultValue = default) : Attribute

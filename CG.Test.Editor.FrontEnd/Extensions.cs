@@ -1,7 +1,5 @@
 ﻿using CG.Test.Editor.FrontEnd.Models.LinkedTypes;
-using CG.Test.Editor.FrontEnd.Models.Types;
 using System.Collections;
-using System.Collections.Frozen;
 using System.ComponentModel.DataAnnotations;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
@@ -148,92 +146,7 @@ namespace CG.Test.Editor.FrontEnd
 				return true;
 			}
 
-			//public bool TryParseSchemaNode(SchemaNodeBase? parent, string name, ILogger<SchemaParsingMessage> logger, [NotNullWhen(true)] out SchemaNodeBase? outputNode)
-			//{
-			//	var typeCode = objectNode["type"]?.GetValue<string>() ?? string.Empty;
-
-			//	if (objectNode.TryGetValue<string>("$ref", logger, out var path))
-			//	{
-			//		var pathTokens = path.Split('/');
-			//		var typeName = pathTokens[^1];
-			//		outputNode = new SchemaTypeReferenceNode(parent, typeName);
-			//		return true;
-			//	}
-
-			//	if (objectNode.TryGetPropertyValue("oneOf", out var oneOfNode) && oneOfNode is JsonArray arrayNode)
-			//	{
-			//		var variantNode = new SchemaVariantNode(parent, name);
-
-			//		foreach (var elementNode in arrayNode)
-			//		{
-			//			if (elementNode is JsonObject elementObjectNode && elementObjectNode.TryParseSchemaNode(variantNode, name, logger, out var elementSchemaNode))
-			//			{
-			//				variantNode.PossibleTypeNodes.Add(elementSchemaNode);
-			//			}
-			//			else
-			//			{
-			//				outputNode = null;
-			//				return false;
-			//			}
-			//		}
-
-			//		outputNode = variantNode;
-			//		return true;
-			//	}
-
-			//	if (objectNode.TryGetPropertyValue("properties", out var propertiesNode) && propertiesNode is JsonObject propertiesObjectNode)
-			//	{
-			//		var schemaObjectNode = new SchemaObjectNode(parent, name);
-
-			//		foreach (var (propertyName, propertyNode) in propertiesObjectNode)
-			//		{
-			//			if (propertyName == "$type")
-			//			{
-			//				continue;
-			//			}
-
-			//			if (propertyNode is JsonObject propertyObjectNode && propertyObjectNode.TryParseSchemaNode(schemaObjectNode, propertyName, logger, out var propertySchemaNode))
-			//			{
-			//				schemaObjectNode.PropertyNodes.Add(propertyName, propertySchemaNode);
-			//			}
-			//			else
-			//			{
-			//				outputNode = null;
-			//				return false;
-			//			}
-			//		}
-
-			//		outputNode = schemaObjectNode;
-			//		return true;
-			//	}
-
-			//	if (typeCode == "array" && objectNode.TryGetPropertyValue("items", out var itemsNode) && 
-			//		itemsNode is JsonObject itemsObjectNode && 
-			//		itemsObjectNode.TryParseSchemaNode(parent, string.Empty, logger, out var itemsSchemaNode))
-			//	{
-			//		outputNode = new SchemaArrayNode(parent, itemsSchemaNode);
-			//		return true;
-			//	}
-
-			//	if (typeCode == "reference" && objectNode.TryGetPropertyValue("target", out var targetNode) &&
-			//		targetNode is JsonObject targetObjectNode &&
-			//		targetObjectNode.TryParseSchemaNode(parent, string.Empty, logger, out var targetSchemaNode))
-			//	{
-			//		outputNode = new SchemaReferenceNode(parent, targetSchemaNode);
-			//		return true;
-			//	}
-
-			//	if (objectNode.TryParseLinkedSchemaType(logger, FrozenDictionary<string, LinkedSchemaTypeBase>.Empty, out var type))
-			//	{
-			//		outputNode = new SchemaDefinedNode(parent, type);
-			//		return true;
-			//	}
-
-			//	outputNode = null;
-			//	return false;
-			//}
-
-			private bool TryGetValue<TValue>(string propertyName, ILogger<SchemaParsingMessage> logger, [MaybeNullWhen(false)] out TValue value)
+			public bool TryGetValue<TValue>(string propertyName, ILogger<SchemaParsingMessage> logger, [MaybeNullWhen(false)] out TValue value)
 			{
 				if (objectNode.TryGetPropertyValue(propertyName, out var childNode))
 				{
