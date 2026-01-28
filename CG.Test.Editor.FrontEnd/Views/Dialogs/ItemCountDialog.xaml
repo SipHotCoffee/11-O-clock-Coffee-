@@ -23,7 +23,7 @@
 			<RowDefinition Height="auto"/>
 		</Grid.RowDefinitions>
 
-		<controls:SpinButton Grid.Column="1" Margin="2.5, 5, 5, 5" MinWidth="50" IsIntegral="True" Minimum="1" Value="{Binding ItemCount, Mode=TwoWay}"/>
+		<controls:SpinButton Grid.Column="1" Margin="5, 5, 5, 2.5" MinWidth="50" IsIntegral="True" Minimum="1" Value="{Binding ItemCount, Mode=TwoWay}"/>
 
 		<Grid Grid.Row="1">
 			<Grid.ColumnDefinitions>
@@ -31,8 +31,8 @@
 				<ColumnDefinition Width="*"/>
 			</Grid.ColumnDefinitions>
 
-			<Button x:Name="_okButton"     Grid.Column="0" Content="OK"     Padding="8" Margin="6, 6, 3, 6" IsDefault="True" Click="OkButton_Click"/>
-			<Button x:Name="_cancelButton" Grid.Column="1" Content="Cancel" Padding="8" Margin="3, 6, 6, 6" IsCancel="True"/>
+			<Button x:Name="_okButton"     Grid.Column="0" Content="OK"     Padding="8" Margin="5, 2.5, 2.5, 5" IsDefault="True" Click="OkButton_Click"/>
+			<Button x:Name="_cancelButton" Grid.Column="1" Content="Cancel" Padding="8" Margin="2.5, 2.5, 5, 5" IsCancel="True"/>
 		</Grid>
 	</Grid>
 </frontend:CustomWindow>
