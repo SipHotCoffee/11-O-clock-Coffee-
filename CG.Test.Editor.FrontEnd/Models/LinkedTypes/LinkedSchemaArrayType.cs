@@ -6,5 +6,7 @@
 
         public override bool IsConvertibleFrom(LinkedSchemaTypeBase sourceType) 
             => sourceType is LinkedSchemaArrayType sourceArrayType && ElementType.IsConvertibleFrom(sourceArrayType.ElementType);
+
+        public override string ToString() => $"{ElementType}[]";
     }
 }

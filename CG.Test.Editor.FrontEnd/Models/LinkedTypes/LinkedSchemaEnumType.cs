@@ -11,5 +11,7 @@
 		public override bool IsValueType => true;
 
 		public override bool IsConvertibleFrom(LinkedSchemaTypeBase sourceType) => sourceType == this;
-	}
+
+        public override string ToString() => "Enum";
+    }
 }

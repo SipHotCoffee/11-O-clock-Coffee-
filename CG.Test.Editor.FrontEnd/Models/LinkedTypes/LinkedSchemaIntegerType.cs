@@ -8,5 +8,7 @@
 		public override bool IsValueType => true;
 
 		public override bool IsConvertibleFrom(LinkedSchemaTypeBase sourceType) => sourceType is LinkedSchemaIntegerType;
-    }
+
+		public override string ToString() => "Integer";
+	}
 }

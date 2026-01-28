@@ -37,7 +37,9 @@ namespace CG.Test.Editor.FrontEnd.Models.LinkedTypes
 
         public override bool IsConvertibleFrom(LinkedSchemaTypeBase sourceType) 
             => PossibleTypes.Contains(sourceType) || sourceType is LinkedSchemaSymbolType symbolType && PossibleTypes.Contains(symbolType.LinkedType);
-	}
+
+        public override string ToString() => Name;
+    }
 
     public class LinkedSchemaObjectType : LinkedSchemaTypeBase, INamedObject
 	{
@@ -72,5 +74,7 @@ namespace CG.Test.Editor.FrontEnd.Models.LinkedTypes
 
         public override bool IsConvertibleFrom(LinkedSchemaTypeBase sourceType) 
             => sourceType == this || sourceType is LinkedSchemaSymbolType symbolType && IsConvertibleFrom(symbolType.LinkedType);
+
+        public override string ToString() => Name;
     }
 }

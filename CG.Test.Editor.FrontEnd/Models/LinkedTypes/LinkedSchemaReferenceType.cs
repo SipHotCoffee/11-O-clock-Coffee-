@@ -1,10 +1,12 @@
 ﻿namespace CG.Test.Editor.FrontEnd.Models.LinkedTypes
 {
-    public class LinkedSchemaReferenceType(LinkedSchemaTypeBase elementType) : LinkedSchemaTypeBase
+    public class LinkedSchemaReferenceType(LinkedSchemaTypeBase targetType) : LinkedSchemaTypeBase
 	{
-		public LinkedSchemaTypeBase ElementType { get; } = elementType;
+		public LinkedSchemaTypeBase TargetType { get; } = targetType;
 
 		public override bool IsConvertibleFrom(LinkedSchemaTypeBase sourceType) 
-			=> sourceType is LinkedSchemaReferenceType sourceReferenceType && ElementType.IsConvertibleFrom(sourceReferenceType.ElementType);
-	}
+			=> sourceType is LinkedSchemaReferenceType sourceReferenceType && TargetType.IsConvertibleFrom(sourceReferenceType.TargetType);
+
+        public override string ToString() => $"{TargetType}&";
+    }
 }

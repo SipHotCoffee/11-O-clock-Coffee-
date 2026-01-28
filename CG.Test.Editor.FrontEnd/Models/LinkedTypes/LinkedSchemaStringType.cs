@@ -7,5 +7,7 @@
         public override bool IsValueType => true;
 
         public override bool IsConvertibleFrom(LinkedSchemaTypeBase sourceType) => sourceType is LinkedSchemaStringType;
-	}
+
+        public override string ToString() => "String";
+    }
 }

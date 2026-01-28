@@ -27,9 +27,32 @@ namespace CG.Test.Editor.FrontEnd.Views.Dialogs
 	{
 		public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
 		{
-			var node = (NodeViewModelBase)values[0];
-			var type = (LinkedSchemaTypeBase)values[1];
+			var node = (NodeViewModelBase?)values[0];
+			var type = (LinkedSchemaTypeBase?)values[1];
+
+			if(node is null || type is null)
+			{
+				return false;
+			}
+
 			return type.IsConvertibleFrom(node.Type) || node.AllChildren.Any((child) => type.IsConvertibleFrom(child.Type));
+		}
+
+		public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)
+		{
+			throw new NotImplementedException();
+		}
+	}
+
+	public class SelectedNodeHasMatchingType : IMultiValueConverter
+	{
+		public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
+		{
+			if (values[0] is NodeViewModelBase node && values[1] is LinkedSchemaTypeBase type)
+			{
+				return type.IsConvertibleFrom(node.Type);
+			}
+			return false;
 		}
 
 		public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)
@@ -69,17 +92,20 @@ namespace CG.Test.Editor.FrontEnd.Views.Dialogs
         public partial TreeNodeViewModel Root { get; set; }
 
         [DependencyProperty]
-        public partial NodeViewModelBase Current { get; set; }
+        public partial NodeViewModelBase? CurrentNode { get; set; }
+
+		[DependencyProperty]
+		public partial NodeViewModelBase? SelectedNode { get; set; }
 
 		[DependencyProperty]
 		public partial ObservableCollection<NodeViewModelBase> AddressItems { get; set; }
 
 		partial void OnRootChanged(TreeNodeViewModel oldValue, TreeNodeViewModel newValue)
         {
-            Current = newValue.Node;
+            CurrentNode = newValue.Node;
         }
 
-		partial void OnCurrentChanged(NodeViewModelBase oldValue, NodeViewModelBase newValue)
+		partial void OnCurrentNodeChanged(NodeViewModelBase? oldValue, NodeViewModelBase? newValue)
 		{
 			AddressItems.Clear();
 			for (var current = newValue; current is not null; current = current.Parent)
@@ -118,42 +144,76 @@ namespace CG.Test.Editor.FrontEnd.Views.Dialogs
 		{
 			if (target.AllChildren.Any((child) => FilterType.IsConvertibleFrom(child.Type)))
 			{
-				Current = target;
+				CurrentNode = target;
 				AddPage();
 			}
 		}
 
 		private void AddPage()
 		{
+			if (CurrentNode is null)
+			{
+				return;
+			}
+
 			var nextIndex = HistoryIndex + 1;
 			if (nextIndex < _history.Count)
 			{
 				_history.RemoveRange(nextIndex, _history.Count - nextIndex);
 			}
-			_history.Add(Current);
+			_history.Add(CurrentNode);
 			HistoryIndex = _history.Count - 1;
 		}
 
 		private void MoveForwardButton_Click(object sender, RoutedEventArgs e)
         {
-			Current = _history[++HistoryIndex];
+			CurrentNode = _history[++HistoryIndex];
 		}
 
         private void MoveBackButton_Click(object sender, RoutedEventArgs e)
         {
-			Current = _history[--HistoryIndex];
+			CurrentNode = _history[--HistoryIndex];
 		}
 
         private void MoveUpButton_Click(object sender, RoutedEventArgs e)
         {
-			Current = Current.Parent ?? throw new NullReferenceException();
+			CurrentNode = CurrentNode?.Parent ?? throw new NullReferenceException();
 			AddPage();
 		}
+
         private void AddressItemButton_Click(object sender, RoutedEventArgs e)
         {
 			var control = (FrameworkElement)sender;
 			var node = (NodeViewModelBase)control.Tag;
 			Navigate(node);
 		}
-    }
+
+		private void ArrayListView_SelectionChanged(object sender, SelectionChangedEventArgs e)
+		{
+			var listView = (ListView)sender;
+
+			if (listView.SelectedItem is NodeViewModelBase node)
+			{
+				SelectedNode = node;
+			}
+			else
+			{
+				SelectedNode = null;
+			}
+		}
+
+		private void ObjectListView_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+			var listView = (ListView)sender;
+
+			if (listView.SelectedItem is KeyValuePair<string, NodeViewModelBase> pair)
+			{
+				SelectedNode = pair.Value;
+			}
+			else
+			{
+				SelectedNode = null;
+			}
+		}
+	}
 }

@@ -11,5 +11,7 @@
 		public override bool IsConvertibleFrom(LinkedSchemaTypeBase sourceType) => LinkedType.IsConvertibleFrom(sourceType);
 
         string INamedObject.Name => TypeName;
+
+        public override string ToString() => LinkedType.ToString();
     }
 }

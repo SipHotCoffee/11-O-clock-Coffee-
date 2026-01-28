@@ -90,12 +90,19 @@ namespace CG.Test.Editor.FrontEnd.Visitors
 
         public void Visit(ReferenceNodeViewModel referenceNode)
         {
-            var referenceDialog = new ReferencePickerDialog()
+            if (referenceNode.Root.AllChildren.Any((node) => referenceNode.Type.TargetType.IsConvertibleFrom(node.Type)))
             {
-                FilterType = referenceNode.Type.ElementType,
-                Root = new TreeNodeViewModel(referenceNode.Type.ElementType, referenceNode.Root)
-            };
-            referenceDialog.ShowDialog();
+				var referenceDialog = new ReferencePickerDialog()
+				{
+					FilterType = referenceNode.Type.TargetType,
+					Root = new TreeNodeViewModel(referenceNode.Type.TargetType, referenceNode.Root)
+				};
+				referenceDialog.ShowDialog();
+            }
+            else
+            {
+				_editor.OwnerWindow.ShowMessage($"No node of type '{referenceNode.Type.TargetType}' can be referenced.");
+			}
         }
 	}
 }

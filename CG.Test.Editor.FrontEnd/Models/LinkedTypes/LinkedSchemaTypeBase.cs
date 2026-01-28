@@ -5,5 +5,7 @@
         public virtual bool IsValueType => false;
 
         public abstract bool IsConvertibleFrom(LinkedSchemaTypeBase sourceType);
+
+        public abstract override string ToString();
     }
 }
