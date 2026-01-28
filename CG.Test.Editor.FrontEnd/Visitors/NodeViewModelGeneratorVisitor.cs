@@ -5,6 +5,7 @@ using CG.Test.Editor.FrontEnd.ViewModels;
 using CG.Test.Editor.FrontEnd.ViewModels.Nodes;
 using CG.Test.Editor.FrontEnd.Views.Dialogs;
 using System.Collections.ObjectModel;
+using System.Windows.Data;
 
 namespace CG.Test.Editor.FrontEnd.Visitors
 {
@@ -42,11 +43,11 @@ namespace CG.Test.Editor.FrontEnd.Visitors
                 return possibleTypes[0].Visit(this);
             }
 
-			var dialog = new VariantTypeSelectorDialog
+            var dialog = new VariantTypeSelectorDialog
             {
                 Owner = _editor.OwnerWindow,
-                PossibleTypes = possibleTypes
-			};
+                PossibleTypes = CollectionViewSource.GetDefaultView(possibleTypes)
+            };
 
             dialog.ShowDialog();
             return dialog.SelectedType.Visit(this);

@@ -17,6 +17,8 @@
 
 		<local:NodeContainsMatchingType x:Key="NodeContainsMatchingType"/>
 		<local:SelectedNodeHasMatchingType x:Key="SelectedNodeHasMatchingType"/>
+
+		<local:NodeFromPairConverter x:Key="NodeFromPairConverter"/>
 	</Window.Resources>
 	<Grid>
 		<Grid.RowDefinitions>
@@ -57,7 +59,7 @@
 					<Separator/>
 
 					<Button x:Name="_moveUpButton" Margin="2.5, 5, 2.5, 5" Content="&#xe74a;" FontFamily="{StaticResource SymbolFont}" Click="MoveUpButton_Click" 
-							IsEnabled="{Binding Current.Parent, Converter={StaticResource IsNotNullConverter}}"/>
+							IsEnabled="{Binding CurrentNode.Parent, Converter={StaticResource IsNotNullConverter}}"/>
 
 					<Separator/>
 
@@ -111,7 +113,7 @@
 										</ListView>
 										<ListView x:Name="_listView" Grid.Column="1" Margin="2.5, 5, 5, 5" SelectionMode="Single"
 												  Resources="{StaticResource NodeCompactDataTemplates}" ItemsSource="{Binding Elements}" 
-												  SelectionChanged="ArrayListView_SelectionChanged">
+												  SelectedItem="{Binding Mode=TwoWay, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type local:ReferencePickerDialog}}, Path=SelectedNode}">
 											<ListView.ItemContainerStyle>
 												<Style TargetType="{x:Type ListViewItem}" BasedOn="{StaticResource {x:Type ListViewItem}}">
 													<Setter Property="IsEnabled">
@@ -138,7 +140,7 @@
 						</DataTemplate>
 						<DataTemplate DataType="{x:Type viewmodelnodes:ObjectNodeViewModel}">
 							<ListView ItemsSource="{Binding Nodes}" SelectionMode="Single" 
-									  SelectionChanged="ObjectListView_SelectionChanged">
+									  SelectedItem="{Binding Converter={StaticResource NodeFromPairConverter}, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type local:ReferencePickerDialog}}, Path=SelectedNode}">
 								<ListView.ItemContainerStyle>
 									<Style TargetType="{x:Type ListViewItem}" BasedOn="{StaticResource {x:Static GridView.GridViewItemContainerStyleKey}}">
 										<Setter Property="IsEnabled">

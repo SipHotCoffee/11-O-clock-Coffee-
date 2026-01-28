@@ -61,6 +61,31 @@ namespace CG.Test.Editor.FrontEnd.Views.Dialogs
 		}
 	}
 
+	public class NodeFromPairConverter : IValueConverter
+	{
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+			if (value is null)
+			{
+				return default(KeyValuePair<string, NodeViewModelBase>);
+			}
+
+			var node = (NodeViewModelBase)value;
+			return new KeyValuePair<string, NodeViewModelBase>(node.Name, node);
+		}
+
+		public object? ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+		{
+			if (value is null)
+			{
+				return null;
+			}
+
+			var (_, node) = (KeyValuePair<string, NodeViewModelBase>)value;
+			return node;
+		}
+    }
+
 	public partial class ReferencePickerDialog : CustomWindow
     {
 		private readonly List<NodeViewModelBase> _history;
@@ -138,7 +163,6 @@ namespace CG.Test.Editor.FrontEnd.Views.Dialogs
 			var item = (ListViewItem)sender;
 			var node = (NodeViewModelBase)item.Content;
 			Navigate(node);
-			
 		}
 
         private void ObjectViewItem_MouseDoubleClick(object sender, System.Windows.Input.MouseButtonEventArgs e)

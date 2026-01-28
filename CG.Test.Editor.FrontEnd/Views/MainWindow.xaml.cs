@@ -5,9 +5,6 @@ using System.Windows.Input;
 
 namespace CG.Test.Editor.FrontEnd.Views
 {
-    /// <summary>
-    /// Interaction logic for MainWindow.xaml
-    /// </summary>
     public partial class MainWindow : CustomWindow
     {
         public MainWindow()
