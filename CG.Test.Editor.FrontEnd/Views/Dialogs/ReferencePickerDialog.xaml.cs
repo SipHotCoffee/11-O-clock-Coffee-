@@ -3,12 +3,16 @@ using CG.Test.Editor.FrontEnd.ViewModels;
 using CG.Test.Editor.FrontEnd.ViewModels.Nodes;
 using DependencyPropertyToolkit;
 using System.Collections.ObjectModel;
+using System.Globalization;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Data;
+using System.Windows.Media;
+using System.Xml.Linq;
 
 namespace CG.Test.Editor.FrontEnd.Views.Dialogs
 {
-    public class TreeNodeViewModel(LinkedSchemaTypeBase typeFilter, NodeViewModelBase node)
+	public class TreeNodeViewModel(LinkedSchemaTypeBase typeFilter, NodeViewModelBase node)
     {
         public NodeViewModelBase Node { get; } = node;
 
@@ -19,7 +23,22 @@ namespace CG.Test.Editor.FrontEnd.Views.Dialogs
                                                                             .Select((node) => new TreeNodeViewModel(typeFilter, node)) ];
     }
 
-    public partial class ReferencePickerDialog : CustomWindow
+	public class NodeContainsMatchingType : IMultiValueConverter
+	{
+		public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
+		{
+			var node = (NodeViewModelBase)values[0];
+			var type = (LinkedSchemaTypeBase)values[1];
+			return type.IsConvertibleFrom(node.Type) || node.AllChildren.Any((child) => type.IsConvertibleFrom(child.Type));
+		}
+
+		public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)
+		{
+			throw new NotImplementedException();
+		}
+	}
+
+	public partial class ReferencePickerDialog : CustomWindow
     {
 		private readonly List<NodeViewModelBase> _history;
 
@@ -33,6 +52,9 @@ namespace CG.Test.Editor.FrontEnd.Views.Dialogs
 
 			HistoryIndex = 0;
 		}
+
+		[DependencyProperty]
+		public partial LinkedSchemaTypeBase FilterType { get; set; }
 
 		[DependencyProperty]
 		public partial int HistoryIndex { get; set; }
@@ -94,8 +116,11 @@ namespace CG.Test.Editor.FrontEnd.Views.Dialogs
 
 		private void Navigate(NodeViewModelBase target)
 		{
-			Current = target;
-			AddPage();
+			if (target.AllChildren.Any((child) => FilterType.IsConvertibleFrom(child.Type)))
+			{
+				Current = target;
+				AddPage();
+			}
 		}
 
 		private void AddPage()
@@ -124,5 +149,11 @@ namespace CG.Test.Editor.FrontEnd.Views.Dialogs
 			Current = Current.Parent ?? throw new NullReferenceException();
 			AddPage();
 		}
-	}
+        private void AddressItemButton_Click(object sender, RoutedEventArgs e)
+        {
+			var control = (FrameworkElement)sender;
+			var node = (NodeViewModelBase)control.Tag;
+			Navigate(node);
+		}
+    }
 }

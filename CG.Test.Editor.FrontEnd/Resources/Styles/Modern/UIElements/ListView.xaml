@@ -123,10 +123,10 @@
             </ScrollViewer>
         </Border>
         <ControlTemplate.Triggers>
-            <Trigger Property="IsEnabled" Value="false">
+            <!--<Trigger Property="IsEnabled" Value="false">
                 <Setter Property="Background"  TargetName="Border" Value="{StaticResource ListView.Inactive.Background}"/>
                 <Setter Property="BorderBrush" TargetName="Border" Value="{StaticResource ListView.Inactive.Border}"/>
-            </Trigger>
+            </Trigger>-->
             <MultiTrigger>
                 <MultiTrigger.Conditions>
                     <Condition Property="IsGrouping" Value="true"/>

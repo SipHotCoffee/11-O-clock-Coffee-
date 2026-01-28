@@ -150,6 +150,11 @@ namespace CG.Test.Editor.FrontEnd.ViewModels
 			var instance = new FileInstanceViewModel(this, null, window);
 			var schemaType = await LoadSchema(window);
 
+            if (schemaType is null)
+            {
+                return;
+            }
+
 			var openFileDialog = new OpenFileDialog()
 			{
 				Filter = "Json files (*.json)|*.json"

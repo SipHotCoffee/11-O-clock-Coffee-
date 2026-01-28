@@ -14,10 +14,12 @@
 					   DataContext="{Binding RelativeSource={RelativeSource Mode=Self}}">
 	<Window.Resources>
 		<converters:IsNotNullConverter x:Key="IsNotNullConverter"/>
+
+		<local:NodeContainsMatchingType x:Key="NodeContainsMatchingType"/>
 	</Window.Resources>
 	<Grid>
 		<Grid.ColumnDefinitions>
-			<ColumnDefinition Width="0.5*"/>
+			<ColumnDefinition Width="0.3*"/>
 			<ColumnDefinition Width="*"/>
 		</Grid.ColumnDefinitions>
 
@@ -29,22 +31,27 @@
 			</TreeView.ItemTemplate>
 		</TreeView>
 		<Grid Grid.Column="1">
+			<Grid.ColumnDefinitions>
+				<ColumnDefinition Width="129*"/>
+				<ColumnDefinition Width="856*"/>
+			</Grid.ColumnDefinitions>
 			<Grid.RowDefinitions>
 				<RowDefinition Height="auto"/>
 				<RowDefinition Height="*"/>
 			</Grid.RowDefinitions>
 
-			<ToolBar Grid.Row="0">
-				<Button x:Name="_moveBackButton" Margin="5, 5, 2.5, 5"   Content="&#xe72b;" FontFamily="{StaticResource SymbolFont}"
+			<ToolBar Grid.Row="0" Grid.ColumnSpan="2">
+				<Button x:Name="_moveBackButton" Margin="5, 5, 2.5, 5" Content="&#xe72b;" FontFamily="{StaticResource SymbolFont}"
 						IsEnabled="{Binding IsBackButtonEnabled}" Click="MoveBackButton_Click"/>
+
 				<Button x:Name="_moveForwardButton" Margin="2.5, 5, 2.5, 5" Content="&#xe72a;" FontFamily="{StaticResource SymbolFont}" 
 						IsEnabled="{Binding IsForwardButtonEnabled}" Click="MoveForwardButton_Click"/>
-				
+
 				<Separator/>
-				
+
 				<Button x:Name="_moveUpButton" Margin="2.5, 5, 2.5, 5" Content="&#xe74a;" FontFamily="{StaticResource SymbolFont}" Click="MoveUpButton_Click" 
 						IsEnabled="{Binding Current.Parent, Converter={StaticResource IsNotNullConverter}}"/>
-				
+
 				<Separator/>
 
 				<ItemsControl ItemsSource="{Binding AddressItems}">
@@ -55,13 +62,13 @@
 					</ItemsControl.ItemsPanel>
 					<ItemsControl.ItemTemplate>
 						<DataTemplate>
-							<Button Content="{Binding Name}" Margin="2.5, 5, 2.5, 5"/>
+							<Button x:Name="_addressItemButton" Content="{Binding Name}" Margin="2.5, 5, 2.5, 5" Tag="{Binding}" Click="AddressItemButton_Click"/>
 						</DataTemplate>
 					</ItemsControl.ItemTemplate>
 				</ItemsControl>
 			</ToolBar>
 
-			<ContentControl Grid.Row="1" Content="{Binding Current}">
+			<ContentControl Grid.Row="1" Content="{Binding Current}" Grid.ColumnSpan="2">
 				<ContentControl.Resources>
 					<DataTemplate DataType="{x:Type viewmodelnodes:ArrayNodeViewModel}">
 						<Grid>
@@ -77,10 +84,9 @@
 									</Grid.ColumnDefinitions>
 
 									<ListView Grid.Column="0" Margin="2.5, 5, 5, 5" IsEnabled="False" 
-														  ItemsSource="{Binding Indices}" 
-														  Background="Transparent" 
-														  BorderBrush="Transparent" 
-														  SelectionMode="Multiple">
+											  ItemsSource="{Binding Indices}" 
+											  Background="Transparent" 
+											  BorderBrush="Transparent">
 										<ListView.ItemTemplate>
 											<DataTemplate>
 												<Grid>
@@ -97,9 +103,21 @@
 										</ListView.ItemTemplate>
 									</ListView>
 									<ListView x:Name="_listView" Grid.Column="1" Margin="2.5, 5, 5, 5" SelectionMode="Single"
-											  ItemsSource="{Binding Elements}" Resources="{StaticResource NodeCompactDataTemplates}">
+											  Resources="{StaticResource NodeCompactDataTemplates}" ItemsSource="{Binding Elements}">
 										<ListView.ItemContainerStyle>
 											<Style TargetType="{x:Type ListViewItem}" BasedOn="{StaticResource {x:Type ListViewItem}}">
+												<Setter Property="IsEnabled">
+													<Setter.Value>
+														<MultiBinding Converter="{StaticResource NodeContainsMatchingType}">
+															<MultiBinding.Bindings>
+																<Binding Mode="OneWay" Path="."/>
+																<Binding Mode="OneWay" 
+																		 RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type local:ReferencePickerDialog}}"
+																		 Path="FilterType"/>
+															</MultiBinding.Bindings>
+														</MultiBinding>
+													</Setter.Value>
+												</Setter>
 												<Setter Property="VerticalContentAlignment" Value="Center"/>
 												<Setter Property="VerticalAlignment" Value="Center"/>
 												<EventSetter Event="MouseDoubleClick" Handler="ArrayViewItem_MouseDoubleClick"/>
@@ -114,6 +132,18 @@
 						<ListView ItemsSource="{Binding Nodes}" SelectionMode="Single">
 							<ListView.ItemContainerStyle>
 								<Style TargetType="{x:Type ListViewItem}" BasedOn="{StaticResource {x:Static GridView.GridViewItemContainerStyleKey}}">
+									<Setter Property="IsEnabled">
+										<Setter.Value>
+											<MultiBinding Converter="{StaticResource NodeContainsMatchingType}">
+												<MultiBinding.Bindings>
+													<Binding Mode="OneWay" Path="Value"/>
+													<Binding Mode="OneWay" 
+															 RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type local:ReferencePickerDialog}}"
+															 Path="FilterType"/>
+												</MultiBinding.Bindings>
+											</MultiBinding>
+										</Setter.Value>
+									</Setter>
 									<Setter Property="VerticalContentAlignment" Value="Center"/>
 									<Setter Property="VerticalAlignment" Value="Center"/>
 									<EventSetter Event="MouseDoubleClick" Handler="ObjectViewItem_MouseDoubleClick"/>
@@ -137,8 +167,7 @@
 										<GridViewColumn Header="Value">
 											<GridViewColumn.CellTemplate>
 												<DataTemplate>
-													<ContentControl VerticalAlignment="Center" Content="{Binding Value}" 
-																				Resources="{StaticResource NodeCompactDataTemplates}"/>
+													<ContentControl VerticalAlignment="Center" Content="{Binding Value}" Resources="{StaticResource NodeCompactDataTemplates}"/>
 												</DataTemplate>
 											</GridViewColumn.CellTemplate>
 										</GridViewColumn>
