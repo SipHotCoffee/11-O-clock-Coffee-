@@ -94,7 +94,6 @@
 
 	<Style x:Key="SpinButtonTextBox" TargetType="{x:Type TextBox}">
 		<!--<Setter Property="Validation.ErrorTemplate"         Value="{StaticResource TextBoxErrorTemplate}"/>-->
-		<Setter Property="MaxWidth"                         Value="100"/>
 		<Setter Property="Background"                       Value="{StaticResource TextBox.Normal.Background}"/>
 		<Setter Property="BorderBrush"                      Value="{StaticResource TextBox.Normal.Border}"/>
 		<Setter Property="Foreground"                       Value="{StaticResource Window.Active.Foreground}"/>

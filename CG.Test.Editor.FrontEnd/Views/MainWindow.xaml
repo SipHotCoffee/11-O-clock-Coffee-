@@ -164,11 +164,31 @@
 													</Style.Triggers>
 												</Style>
 											</ToolBar.Resources>
-											
+
 											<Button FontFamily="{StaticResource SymbolFont}" 
 													FontSize="18" 
-													Content="&#xe948;" 
-													Command="{Binding InsertCommand}"/>
+													Command="{Binding InsertCommand}">
+												<Button.InputBindings>
+													<KeyBinding Key="LeftAlt" Modifiers="Alt" Command="{Binding InsertMultipleCommand}"/>
+												</Button.InputBindings>
+												<Button.Style>
+													<Style TargetType="{x:Type Button}" BasedOn="{StaticResource {x:Static ToolBar.ButtonStyleKey}}">
+														<Setter Property="Content" Value="&#xe948;"/>
+														<Style.Triggers>
+															<DataTrigger Binding="{Binding Source={x:Static Keyboard.Modifiers}}" Value="Alt">
+																<Setter Property="Content">
+																	<Setter.Value>
+																		<StackPanel Orientation="Horizontal">
+																			<TextBlock Text="&#xe948;"/>
+																			<TextBlock Text="*"/>
+																		</StackPanel>
+																	</Setter.Value>
+																</Setter>
+															</DataTrigger>
+														</Style.Triggers>
+													</Style>
+												</Button.Style>
+											</Button>
 
 											<Button Command="{Binding InsertAboveCommand}" 
 													CommandParameter="{Binding ElementName=_listView, Path=SelectedIndex}"

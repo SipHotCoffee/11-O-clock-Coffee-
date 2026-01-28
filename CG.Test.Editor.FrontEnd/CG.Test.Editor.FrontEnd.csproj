@@ -29,4 +29,10 @@
     <Resource Include="Resources\Fonts\Segoe Fluent Icons.ttf" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Compile Update="Views\Dialogs\ItemCountDialog.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
+  </ItemGroup>
+
 </Project>

@@ -75,6 +75,21 @@ namespace CG.Test.Editor.FrontEnd.ViewModels.Nodes
         }
 
 		[RelayCommand]
+		void InsertMultiple()
+		{
+            var itemDialog = new ItemCountDialog(); 
+            if (itemDialog.ShowDialog() == true)
+            {
+                var baseNode = Type.ElementType.Visit(new NodeViewModelGeneratorVisitor(Editor, this));
+
+				for (var i = 0; i < itemDialog.ItemCount; i++)
+				{
+					Elements.Add(baseNode.Clone(this));
+				}
+			}
+		}
+
+		[RelayCommand]
 		void InsertAbove(int selectedIndex)
 		{
 			Elements.Insert(selectedIndex, Type.ElementType.Visit(new NodeViewModelGeneratorVisitor(Editor, this)));
