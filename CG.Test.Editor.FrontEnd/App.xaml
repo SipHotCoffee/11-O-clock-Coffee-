@@ -91,9 +91,9 @@
 				</DataTemplate>
 				<DataTemplate DataType="{x:Type viewmodelnodes:ObjectNodeViewModel}">
 					<StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-						<TextBlock FontFamily="Cascadia Mono" Text="{Binding Type.Name}"/>
-						<TextBlock FontFamily="Cascadia Mono" Text="{} { "/>
-						<ItemsControl Resources="{StaticResource NodeVeryCompactDataTemplates}" ItemsSource="{Binding Nodes}">
+						<TextBlock VerticalAlignment="Center" FontFamily="Cascadia Mono" Text="{Binding Type.Name}"/>
+						<TextBlock VerticalAlignment="Center" FontFamily="Cascadia Mono" Text="{} { "/>
+						<ItemsControl VerticalAlignment="Center" Resources="{StaticResource NodeVeryCompactDataTemplates}" ItemsSource="{Binding Nodes}">
 							<ItemsControl.ItemsPanel>
 								<ItemsPanelTemplate>
 									<StackPanel Orientation="Horizontal"/>
@@ -101,8 +101,8 @@
 							</ItemsControl.ItemsPanel>
 							<ItemsControl.ItemTemplate>
 								<DataTemplate>
-									<StackPanel Orientation="Horizontal">
-										<TextBlock FontFamily="Cascadia Mono" x:Name="commaTextBlock" Text=", "/>
+									<StackPanel VerticalAlignment="Center" Orientation="Horizontal">
+										<TextBlock VerticalAlignment="Center" FontFamily="Cascadia Mono" x:Name="commaTextBlock" Text=", "/>
 										<ContentPresenter Content="{Binding Value}"/>
 									</StackPanel>
 									<DataTemplate.Triggers>
@@ -113,27 +113,37 @@
 								</DataTemplate>
 							</ItemsControl.ItemTemplate>
 						</ItemsControl>
-						<TextBlock FontFamily="Cascadia Mono" Text="{} }"/>
+						<TextBlock VerticalAlignment="Center" FontFamily="Cascadia Mono" Text="{} }"/>
 					</StackPanel>
 				</DataTemplate>
 				<DataTemplate DataType="{x:Type viewmodelnodes:IntegerNodeViewModel}">
-					<TextBlock FontFamily="Cascadia Mono" Text="{Binding Value}"/>
+					<TextBlock VerticalAlignment="Center" FontFamily="Cascadia Mono" Text="{Binding Value}"/>
 				</DataTemplate>
 				<DataTemplate DataType="{x:Type viewmodelnodes:NumberNodeViewModel}">
-					<TextBlock FontFamily="Cascadia Mono" Text="{Binding Value}"/>
+					<TextBlock VerticalAlignment="Center" FontFamily="Cascadia Mono" Text="{Binding Value}"/>
 				</DataTemplate>
 				<DataTemplate DataType="{x:Type viewmodelnodes:BooleanNodeViewModel}">
-					<TextBlock FontFamily="Cascadia Mono" Text="{Binding Value}"/>
+					<TextBlock VerticalAlignment="Center" FontFamily="Cascadia Mono" Text="{Binding Value}"/>
 				</DataTemplate>
 				<DataTemplate DataType="{x:Type viewmodelnodes:StringNodeViewModel}">
 					<StackPanel Orientation="Horizontal">
-						<TextBlock FontFamily="Cascadia Mono" Text="&quot;"/>
-						<TextBlock FontFamily="Cascadia Mono" Text="{Binding Value}"/>
-						<TextBlock FontFamily="Cascadia Mono" Text="&quot;"/>
+						<TextBlock VerticalAlignment="Center" FontFamily="Cascadia Mono" Text="&quot;"/>
+						<TextBlock VerticalAlignment="Center" FontFamily="Cascadia Mono" Text="{Binding Value}"/>
+						<TextBlock VerticalAlignment="Center" FontFamily="Cascadia Mono" Text="&quot;"/>
 					</StackPanel>
 				</DataTemplate>
 				<DataTemplate DataType="{x:Type viewmodelnodes:EnumNodeViewModel}">
-					<TextBlock FontFamily="Cascadia Mono" Text="{Binding SelectedItem}"/>
+					<TextBlock VerticalAlignment="Center" FontFamily="Cascadia Mono" Text="{Binding SelectedItem}"/>
+				</DataTemplate>
+
+				<DataTemplate DataType="{x:Type viewmodelnodes:ReferenceNodeViewModel}">
+					<StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+						<TextBlock VerticalAlignment="Center" FontFamily="Cascadia Mono" Text="{Binding Type.TargetType}"/>
+						<TextBlock VerticalAlignment="Center" FontFamily="Cascadia Mono" Text=" -> "/>
+						<TextBlock VerticalAlignment="Center" FontFamily="Cascadia Mono" Text="("/>
+						<ContentControl Margin="0" Padding="0" VerticalContentAlignment="Center" VerticalAlignment="Center" FontFamily="Cascadia Mono" Content="{Binding Node}"/>
+						<TextBlock VerticalAlignment="Center" FontFamily="Cascadia Mono" Text=")"/>
+					</StackPanel>
 				</DataTemplate>
 			</ResourceDictionary>
 		</ResourceDictionary>

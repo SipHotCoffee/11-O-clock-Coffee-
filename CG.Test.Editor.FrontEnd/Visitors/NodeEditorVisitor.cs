@@ -95,9 +95,18 @@ namespace CG.Test.Editor.FrontEnd.Visitors
 				var referenceDialog = new ReferencePickerDialog()
 				{
 					FilterType = referenceNode.Type.TargetType,
-					Root = new TreeNodeViewModel(referenceNode.Type.TargetType, referenceNode.Root)
+					Root = new TreeNodeViewModel(referenceNode.Type.TargetType, referenceNode.Root),
+                    SelectedNode = referenceNode.Node,
 				};
-				referenceDialog.ShowDialog();
+
+				if (referenceDialog.ShowDialog() == true)
+                {
+                    referenceNode.Node = referenceDialog.SelectedNode;
+                }
+                else
+                {
+                    referenceNode.Node = null;
+                }
             }
             else
             {

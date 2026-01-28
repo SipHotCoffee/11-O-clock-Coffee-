@@ -198,8 +198,8 @@
 				<ColumnDefinition Width="*"/>
 			</Grid.ColumnDefinitions>
 
-			<Button Grid.Column="0" Margin="0, 0, 5, 0"     Content="None"/>
-			<Button Grid.Column="1" Margin="2.5, 0, 2.5, 0" Content="Selected">
+			<Button Grid.Column="0" Margin="0, 0, 5, 0"     Content="None" IsCancel="True"/>
+			<Button Grid.Column="1" Margin="2.5, 0, 2.5, 0" Content="Selected" IsDefault="True" Click="SelectedButton_Click">
 				<Button.IsEnabled>
 					<MultiBinding Converter="{StaticResource SelectedNodeHasMatchingType}">
 						<MultiBinding.Bindings>

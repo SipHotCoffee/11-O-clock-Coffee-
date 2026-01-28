@@ -94,7 +94,7 @@ namespace CG.Test.Editor.FrontEnd.Views.Dialogs
         [DependencyProperty]
         public partial NodeViewModelBase? CurrentNode { get; set; }
 
-		[DependencyProperty]
+		[DependencyProperty(null)]
 		public partial NodeViewModelBase? SelectedNode { get; set; }
 
 		[DependencyProperty]
@@ -103,6 +103,14 @@ namespace CG.Test.Editor.FrontEnd.Views.Dialogs
 		partial void OnRootChanged(TreeNodeViewModel oldValue, TreeNodeViewModel newValue)
         {
             CurrentNode = newValue.Node;
+        }
+
+        partial void OnSelectedNodeChanged(NodeViewModelBase? oldValue, NodeViewModelBase? newValue)
+        {
+            if (newValue is not null)
+			{
+				CurrentNode = newValue.Parent;
+			}
         }
 
 		partial void OnCurrentNodeChanged(NodeViewModelBase? oldValue, NodeViewModelBase? newValue)
@@ -214,6 +222,12 @@ namespace CG.Test.Editor.FrontEnd.Views.Dialogs
 			{
 				SelectedNode = null;
 			}
+		}
+
+        private void SelectedButton_Click(object sender, RoutedEventArgs e)
+        {
+			DialogResult = true;
+			Close();
 		}
 	}
 }
