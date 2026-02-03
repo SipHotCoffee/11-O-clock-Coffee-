@@ -20,7 +20,13 @@
 		<ListView Grid.Row="0" SelectionMode="Single" Margin="5, 5, 5, 2.5" ItemsSource="{Binding RecentSchemas}" SelectedItem="{Binding SelectedSchema}">
 			<ListView.ItemTemplate>
 				<DataTemplate>
-					<TextBlock Text="{Binding}"/>
+					<TextBlock Text="{Binding FileName}">
+						<TextBlock.ContextMenu>
+							<ContextMenu>
+								<MenuItem Header="Remove from recent" Command="{Binding DeleteCommand}"/>
+							</ContextMenu>
+						</TextBlock.ContextMenu>
+					</TextBlock>
 				</DataTemplate>
 			</ListView.ItemTemplate>
 		</ListView>

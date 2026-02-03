@@ -8,6 +8,7 @@ namespace CG.Test.Editor.FrontEnd.Views.Dialogs
 		public StringValueDialog()
         {
             InitializeComponent();
+			_textBox.Focus();
         }
 
 		[DependencyProperty]

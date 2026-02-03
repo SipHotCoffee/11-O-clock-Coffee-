@@ -13,9 +13,8 @@
 		<viewmodels:MainViewModel/>
 	</Window.DataContext>
 	<Window.Resources>
-		<ResourceDictionary>
-			<converters:IsNotNullConverter x:Key="IsNotNullConverter"/>
-		</ResourceDictionary>
+		<converters:IsNotNullConverter x:Key="IsNotNullConverter"/>
+		<BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
 	</Window.Resources>
     <Grid>
 		<Grid.RowDefinitions>
@@ -165,29 +164,15 @@
 												</Style>
 											</ToolBar.Resources>
 
-											<Button FontFamily="{StaticResource SymbolFont}" 
-													FontSize="18" 
+											<Button FontSize="18" 
 													Command="{Binding InsertCommand}">
-												<Button.InputBindings>
-													<KeyBinding Key="LeftAlt" Modifiers="Alt" Command="{Binding InsertMultipleCommand}"/>
-												</Button.InputBindings>
-												<Button.Style>
-													<Style TargetType="{x:Type Button}" BasedOn="{StaticResource {x:Static ToolBar.ButtonStyleKey}}">
-														<Setter Property="Content" Value="&#xe948;"/>
-														<Style.Triggers>
-															<DataTrigger Binding="{Binding Source={x:Static Keyboard.Modifiers}}" Value="Alt">
-																<Setter Property="Content">
-																	<Setter.Value>
-																		<StackPanel Orientation="Horizontal">
-																			<TextBlock Text="&#xe948;"/>
-																			<TextBlock Text="*"/>
-																		</StackPanel>
-																	</Setter.Value>
-																</Setter>
-															</DataTrigger>
-														</Style.Triggers>
-													</Style>
-												</Button.Style>
+												<Button.Content>
+													<StackPanel Orientation="Horizontal">
+														<TextBlock FontFamily="{StaticResource SymbolFont}" Text="&#xe948;"/>
+														<TextBlock Text=" *" 
+																   Visibility="{Binding Editor.MainViewModel.IsAltDown, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+													</StackPanel>
+												</Button.Content>
 											</Button>
 
 											<Button Command="{Binding InsertAboveCommand}" 
@@ -222,11 +207,19 @@
 													Command="{Binding CopyElementsCommand}"
 													CommandParameter="{Binding ElementName=_listView, Path=SelectedItems}"
 													Style="{StaticResource MultipleSelectionButton}"/>
-											
-											<Button FontFamily="{StaticResource SymbolFont}" 
-													FontSize="18" Content="&#xe77f;" 
+
+											<Button
+													FontSize="18"
 													Command="{Binding PasteElementsCommand}"
-													Style="{StaticResource ClipboardHasItemsButton}"/>
+													Style="{StaticResource ClipboardHasItemsButton}">
+												<Button.Content>
+													<StackPanel Orientation="Horizontal">
+														<TextBlock FontFamily="{StaticResource SymbolFont}" Text="&#xe77f;"/>
+														<TextBlock Text=" *" 
+													   Visibility="{Binding Editor.MainViewModel.IsAltDown, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+													</StackPanel>
+												</Button.Content>
+											</Button>
 
 											<Button Command="{Binding PasteAboveElementsCommand}" 
 													CommandParameter="{Binding ElementName=_listView, Path=SelectedIndex}"

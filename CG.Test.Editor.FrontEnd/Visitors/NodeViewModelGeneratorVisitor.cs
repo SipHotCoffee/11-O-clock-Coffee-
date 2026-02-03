@@ -1,6 +1,4 @@
-﻿using CG.Test.Editor.FrontEnd;
-using CG.Test.Editor.FrontEnd.Models;
-using CG.Test.Editor.FrontEnd.Models.LinkedTypes;
+﻿using CG.Test.Editor.FrontEnd.Models.LinkedTypes;
 using CG.Test.Editor.FrontEnd.ViewModels;
 using CG.Test.Editor.FrontEnd.ViewModels.Nodes;
 using CG.Test.Editor.FrontEnd.Views.Dialogs;
@@ -9,11 +7,13 @@ using System.Windows.Data;
 
 namespace CG.Test.Editor.FrontEnd.Visitors
 {
-    public class NodeViewModelGeneratorVisitor(FileInstanceViewModel editor, NodeViewModelBase? parent) : Visitor<NodeViewModelGeneratorVisitor, LinkedSchemaTypeBase, NodeViewModelBase>
+    public class NodeViewModelGeneratorVisitor(FileInstanceViewModel editor, NodeViewModelBase? parent, string? propertyName) : Visitor<NodeViewModelGeneratorVisitor, LinkedSchemaTypeBase, NodeViewModelBase>
     {
         private readonly FileInstanceViewModel _editor = editor;
 
         private readonly NodeViewModelBase? _parent = parent;
+
+        private readonly string? _propertyName = propertyName;
 
 		public NodeViewModelBase Visit(LinkedSchemaSymbolType symbolType) => Invoke(symbolType.LinkedType);
 
@@ -25,7 +25,7 @@ namespace CG.Test.Editor.FrontEnd.Visitors
 
 			foreach (var property in objectType.Properties)
 			{
-				result.Nodes.Add(new KeyValuePair<string, NodeViewModelBase>(property.Name, property.Type.Visit(new NodeViewModelGeneratorVisitor(_editor, result))));
+				result.Nodes.Add(new KeyValuePair<string, NodeViewModelBase>(property.Name, property.Type.Visit(new NodeViewModelGeneratorVisitor(_editor, result, property.Name))));
 			}
             
             return result;
@@ -49,7 +49,12 @@ namespace CG.Test.Editor.FrontEnd.Visitors
                 PossibleTypes = CollectionViewSource.GetDefaultView(possibleTypes)
             };
 
-            dialog.ShowDialog();
+			if (_propertyName is not null)
+			{
+                dialog.Title = $"Select variant type for property: '{_propertyName}'";
+			}
+
+			dialog.ShowDialog();
             return dialog.SelectedType.Visit(this);
         }
 

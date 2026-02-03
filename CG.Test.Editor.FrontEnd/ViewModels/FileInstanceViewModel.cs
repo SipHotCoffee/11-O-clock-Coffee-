@@ -12,11 +12,12 @@ namespace CG.Test.Editor.FrontEnd.ViewModels
     {
         private static int _lastId = 1;
 
-        private readonly MainViewModel _mainViewModel;
-
         private readonly List<NodeViewModelBase> _history;
 
-        [ObservableProperty]
+		[ObservableProperty]
+		private MainViewModel _mainViewModel;
+
+		[ObservableProperty]
         private int _historyIndex;
 
         [ObservableProperty]
@@ -42,11 +43,11 @@ namespace CG.Test.Editor.FrontEnd.ViewModels
 
 		public FileInstanceViewModel(MainViewModel mainViewModel, FileInfo? file, Window ownerWindow)
         {
-            _mainViewModel = mainViewModel;
-
 			_history = [];
+            
+            MainViewModel = mainViewModel;
 
-            HistoryIndex = 0;
+			HistoryIndex = 0;
 
             File = file;
 
@@ -137,7 +138,7 @@ namespace CG.Test.Editor.FrontEnd.ViewModels
 		[RelayCommand]
 		void Close()
 		{
-            _mainViewModel.OpenFiles.Remove(this);
+            MainViewModel.OpenFiles.Remove(this);
 		}
 
         [RelayCommand]

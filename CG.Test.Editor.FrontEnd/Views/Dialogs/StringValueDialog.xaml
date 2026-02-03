@@ -21,7 +21,8 @@
 			<RowDefinition Height="auto"/>
 		</Grid.RowDefinitions>
 
-		<TextBox Margin="5, 5, 5, 2.5"
+		<TextBox x:Name="_textBox"
+				 Margin="5, 5, 5, 2.5"
 				 MaxLength="{Binding MaximumLength}"
 				 Text="{Binding Text}"/>
 

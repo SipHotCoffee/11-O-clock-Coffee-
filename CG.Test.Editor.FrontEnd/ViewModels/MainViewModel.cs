@@ -10,6 +10,7 @@ using System.IO;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Windows;
+using System.Windows.Input;
 
 namespace CG.Test.Editor.FrontEnd.ViewModels
 {
@@ -41,7 +42,15 @@ namespace CG.Test.Editor.FrontEnd.ViewModels
         [ObservableProperty]
         private FileInstanceViewModel? _selectedFile;
 
+        [ObservableProperty]
+        private bool _isAltDown;
+
         public ObservableCollection<FileInstanceViewModel> OpenFiles { get; } = [];
+
+        public MainViewModel()
+        {
+			InputManager.Current.PreProcessInput += (sender, e) => IsAltDown = Keyboard.Modifiers.HasFlag(ModifierKeys.Alt);
+		}
 
         private async Task SaveFileAsync(Stream stream)
         {
@@ -102,7 +111,7 @@ namespace CG.Test.Editor.FrontEnd.ViewModels
 			{
 				try
 				{
-					await using var stream = File.OpenRead(recentSchemasDialog.SelectedSchema);
+					await using var stream = File.OpenRead(recentSchemasDialog.SelectedSchema.FileName);
 					var node = await JsonNode.ParseAsync(stream);
 
 					var messages = new HashSet<SchemaParsingMessage>(10, new SchemaParsingMessageComparer());
@@ -138,7 +147,7 @@ namespace CG.Test.Editor.FrontEnd.ViewModels
             var schemaType = await LoadSchema(window);
             if (schemaType is not null)
             {
-                instance.Root = schemaType.Visit(new NodeViewModelGeneratorVisitor(instance, null));
+                instance.Root = schemaType.Visit(new NodeViewModelGeneratorVisitor(instance, null, null));
                 OpenFiles.Add(instance);
                 SelectedFile = instance;
             }

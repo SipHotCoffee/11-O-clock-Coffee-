@@ -61,7 +61,7 @@ namespace CG.Test.Editor.FrontEnd.Views.Dialogs
 
         partial void OnSelectedPropertyChanged(LinkedSchemaProperty oldValue, LinkedSchemaProperty newValue)
         {
-            var visitor = new NodeViewModelGeneratorVisitor(_instanceViewModel, _parent);
+            var visitor = new NodeViewModelGeneratorVisitor(_instanceViewModel, _parent, null);
 
 			OldValue = newValue.Type.Visit(visitor);
 			NewValue = newValue.Type.Visit(visitor);

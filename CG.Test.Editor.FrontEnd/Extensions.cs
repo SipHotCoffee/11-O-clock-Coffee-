@@ -96,7 +96,6 @@ namespace CG.Test.Editor.FrontEnd
 
 		extension(LinkedSchemaTypeBase type)
 		{
-
 			public IEnumerable<LinkedSchemaObjectType> EnumerateObjectTypes()
 			{
 				if (type is LinkedSchemaObjectType objectType)

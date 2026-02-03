@@ -1,11 +1,34 @@
-﻿using DependencyPropertyToolkit;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
+using DependencyPropertyToolkit;
 using Microsoft.Win32;
+using System.Collections.ObjectModel;
 using System.IO;
 using System.Text.Json;
 using System.Windows;
 
 namespace CG.Test.Editor.FrontEnd.Views.Dialogs
 {
+	public partial class RecentSchemaViewModel(RecentSchemasDialog dialog, string name) : ObservableObject, IEquatable<RecentSchemaViewModel>
+	{
+		private readonly RecentSchemasDialog _dialog = dialog;
+
+		public string FileName { get; } = name;
+
+		[RelayCommand]
+		async Task Delete()
+		{
+			_dialog.RecentSchemas.Remove(this);
+			await _dialog.SaveRecentSchemas();
+		}
+
+        public bool Equals(RecentSchemaViewModel? other) => FileName == other?.FileName;
+
+        public override bool Equals(object? obj) => Equals(obj as RecentSchemaViewModel);
+
+		public override int GetHashCode() => FileName.GetHashCode();
+    }
+
     public partial class RecentSchemasDialog : CustomWindow
     {
         private const string SAVE_FILE_NAME = "save.json";
@@ -28,14 +51,23 @@ namespace CG.Test.Editor.FrontEnd.Views.Dialogs
 
             await using var stream = File.OpenRead(SAVE_FILE_NAME);
 			var saveInfo = await JsonSerializer.DeserializeAsync<SaveInfo>(stream);
-            RecentSchemas = [.. saveInfo!.RecentSchemas.Where(File.Exists)];
+            RecentSchemas = [..saveInfo!.RecentSchemas.Where(File.Exists).Select((name) => new RecentSchemaViewModel(this, name)).ToHashSet()];
 		}
 
 		[DependencyProperty]
-		public partial HashSet<string> RecentSchemas { get; set; }
+		public partial ObservableCollection<RecentSchemaViewModel> RecentSchemas { get; set; }
 
         [DependencyProperty]
-        public partial string SelectedSchema { get; set; }
+        public partial RecentSchemaViewModel SelectedSchema { get; set; }
+
+		public async Task SaveRecentSchemas()
+		{
+			await using var stream = File.Create(SAVE_FILE_NAME);
+			await JsonSerializer.SerializeAsync(stream, new SaveInfo()
+			{
+				RecentSchemas = RecentSchemas.Select((viewModel) => viewModel.FileName)
+			});
+		}
 
 		private async void BrowseButton_Click(object sender, RoutedEventArgs e)
         {
@@ -48,14 +80,11 @@ namespace CG.Test.Editor.FrontEnd.Views.Dialogs
 
 			if (openFileDialog.ShowDialog() == true)
 			{
-				RecentSchemas.Add(openFileDialog.FileName);
-                SelectedSchema = openFileDialog.FileName;
+				var recentSchema = new RecentSchemaViewModel(this, openFileDialog.FileName);
+				RecentSchemas.Add(recentSchema);
+                SelectedSchema = recentSchema;
 
-                await using var stream = File.Create(SAVE_FILE_NAME);
-				await JsonSerializer.SerializeAsync(stream, new SaveInfo()
-                {
-                    RecentSchemas = RecentSchemas
-                });
+				await SaveRecentSchemas();
 
 				DialogResult = true;
 				Close();

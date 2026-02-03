@@ -8,6 +8,7 @@ using System.Collections.Specialized;
 using System.Text.Json;
 using System.Windows.Controls;
 using System.Windows.Data;
+using System.Windows.Input;
 
 namespace CG.Test.Editor.FrontEnd.ViewModels.Nodes
 {
@@ -24,7 +25,7 @@ namespace CG.Test.Editor.FrontEnd.ViewModels.Nodes
             Elements.CollectionChanged += Elements_CollectionChanged;
 		}
 
-		public ObservableCollection<NodeViewModelBase> Elements { get; }
+        public ObservableCollection<NodeViewModelBase> Elements { get; }
 
 		public ObservableCollection<int> Indices { get; }
 
@@ -71,34 +72,35 @@ namespace CG.Test.Editor.FrontEnd.ViewModels.Nodes
         [RelayCommand]
         void Insert()
         {
-            Elements.Add(Type.ElementType.Visit(new NodeViewModelGeneratorVisitor(Editor, this)));
-        }
-
-		[RelayCommand]
-		async Task InsertMultiple()
-		{
-            var itemDialog = new ItemCountDialog(); 
-            if (itemDialog.ShowDialog() == true)
+            if (Keyboard.Modifiers.HasFlag(ModifierKeys.Alt))
             {
-                var baseNode = Type.ElementType.Visit(new NodeViewModelGeneratorVisitor(Editor, this));
-
-                for (var i = 0; i < itemDialog.ItemCount; i++)
+                var itemDialog = new ItemCountDialog();
+                if (itemDialog.ShowDialog() == true)
                 {
-                    Elements.Add(baseNode.Clone(this));
+                    var baseNode = Type.ElementType.Visit(new NodeViewModelGeneratorVisitor(Editor, this, null));
+
+                    for (var i = 0; i < itemDialog.ItemCount; i++)
+                    {
+                        Elements.Add(baseNode.Clone(this));
+                    }
                 }
-			}
-		}
+            }
+            else
+            {
+                Elements.Add(Type.ElementType.Visit(new NodeViewModelGeneratorVisitor(Editor, this, null)));
+            }
+        }
 
 		[RelayCommand]
 		void InsertAbove(int selectedIndex)
 		{
-			Elements.Insert(selectedIndex, Type.ElementType.Visit(new NodeViewModelGeneratorVisitor(Editor, this)));
+            Elements.Insert(selectedIndex, Type.ElementType.Visit(new NodeViewModelGeneratorVisitor(Editor, this, null)));   
 		}
 
 		[RelayCommand]
 		void InsertBelow(int selectedIndex)
 		{
-			Elements.Insert(selectedIndex + 1, Type.ElementType.Visit(new NodeViewModelGeneratorVisitor(Editor, this)));
+            Elements.Insert(selectedIndex + 1, Type.ElementType.Visit(new NodeViewModelGeneratorVisitor(Editor, this, null)));
 		}
 
 		[RelayCommand]
@@ -121,9 +123,26 @@ namespace CG.Test.Editor.FrontEnd.ViewModels.Nodes
         [RelayCommand]
         void PasteElements()
         {
-            foreach (var node in Editor.ClipboardNodes!.Where((node) => Type.ElementType.IsConvertibleFrom(node.Type)))
+			if (Keyboard.Modifiers.HasFlag(ModifierKeys.Alt))
+			{
+				var itemDialog = new ItemCountDialog();
+				if (itemDialog.ShowDialog() == true)
+				{
+					for (var i = 0; i < itemDialog.ItemCount; i++)
+					{
+						foreach (var node in Editor.ClipboardNodes!.Where((node) => Type.ElementType.IsConvertibleFrom(node.Type)))
+						{
+							Elements.Add(node.Clone(this));
+						}
+					}
+				}
+			}
+			else
             {
-                Elements.Add(node.Clone(this));
+                foreach (var node in Editor.ClipboardNodes!.Where((node) => Type.ElementType.IsConvertibleFrom(node.Type)))
+                {
+                    Elements.Add(node.Clone(this));
+                }
             }
         }
 
@@ -131,22 +150,22 @@ namespace CG.Test.Editor.FrontEnd.ViewModels.Nodes
         void PasteAboveElements(int selectedIndex)
         {
             var index = selectedIndex;
-			foreach (var node in Editor.ClipboardNodes!.Where((node) => Type.ElementType.IsConvertibleFrom(node.Type)))
-			{
-				Elements.Insert(index, node.Clone(this));
+            foreach (var node in Editor.ClipboardNodes!.Where((node) => Type.ElementType.IsConvertibleFrom(node.Type)))
+            {
+                Elements.Insert(index, node.Clone(this));
                 ++index;
-			}
+            }   
 		}
 
 		[RelayCommand]
 		void PasteBelowElements(int selectedIndex)
 		{
-			var index = selectedIndex + 1;
-			foreach (var node in Editor.ClipboardNodes!.Where((node) => Type.ElementType.IsConvertibleFrom(node.Type)))
-			{
-				Elements.Insert(index, node.Clone(this));
-				++index;
-			}
+            var index = selectedIndex + 1;
+            foreach (var node in Editor.ClipboardNodes!.Where((node) => Type.ElementType.IsConvertibleFrom(node.Type)))
+            {
+                Elements.Insert(index, node.Clone(this));
+                ++index;
+            }   
 		}
 
         [RelayCommand]
