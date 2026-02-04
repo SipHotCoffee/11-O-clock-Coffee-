@@ -29,20 +29,16 @@ namespace CG.Test.Editor.FrontEnd.Visitors
                 return;
             }
 
-            var parameters = new MessageBoxParameters($"Change or edit variant node of type '{variantNode.Type.Name}'", "Edit variant node.", "Edit");
+            var parameters = new MessageBoxParameters($"Change or edit variant node of type '{variantNode.VariantType.Name}'", "Edit variant node.", "Edit");
             parameters.AddButton("Change Type");
-            var chosenButton = _editor.OwnerWindow.ShowMessage(parameters);
-			switch (chosenButton)
-            {
-                case 0:
-                    variantNode.SelectedObject.Visit(this);
-                    break;
-                case 1:
-                    var generatedVariantNode = (VariantNodeViewModel)variantNode.Type.Visit(new NodeViewModelGeneratorVisitor(_editor, variantNode.Parent, null));
-                    variantNode.SelectedObject = generatedVariantNode.SelectedObject;
-					break;
+            if (_editor.OwnerWindow.ShowMessage(parameters) == 1)
+            {   
+                var generatedVariantNode = (VariantNodeViewModel)variantNode.VariantType.Visit(new NodeViewModelGeneratorVisitor(_editor, variantNode.Parent, null));
+                variantNode.SelectedObject = generatedVariantNode.SelectedObject;
             }
-        }
+
+			variantNode.SelectedObject.Visit(this);
+		}
 
         public void Visit(NumberNodeViewModel numberNode)
         {

@@ -6,19 +6,23 @@ namespace CG.Test.Editor.FrontEnd.ViewModels.Nodes
 {
     public partial class VariantNodeViewModel : NodeViewModelBase
     {
-        public override LinkedSchemaVariantType Type { get; }
+		public LinkedSchemaVariantType VariantType { get; }
+
+        public override LinkedSchemaObjectType Type => SelectedObject.Type;
 
 		[ObservableProperty]
 		private ObjectNodeViewModel _selectedObject;
 
         public VariantNodeViewModel(FileInstanceViewModel editor, NodeViewModelBase? parent, LinkedSchemaVariantType type, ObjectNodeViewModel selectedObject) : base(editor, parent)
         {
-            Type = type;
+			VariantType = type;
 
 			SelectedObject = selectedObject;
         }
 
         public override void SerializeTo(Utf8JsonWriter writer) => SelectedObject.SerializeTo(writer);
+
+        public override IEnumerable<NodeViewModelBase> Children => SelectedObject.Children;
 
         protected override string GetName(NodeViewModelBase item)
         {
@@ -37,6 +41,6 @@ namespace CG.Test.Editor.FrontEnd.ViewModels.Nodes
 			return "Child not found!";
 		}
 
-        public override VariantNodeViewModel Clone(NodeViewModelBase? parent) => new(Editor, parent, Type, SelectedObject.Clone(parent));
+        public override VariantNodeViewModel Clone(NodeViewModelBase? parent) => new(Editor, parent, VariantType, SelectedObject.Clone(parent));
 	}
 }
