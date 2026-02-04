@@ -154,12 +154,16 @@ namespace CG.Test.Editor.FrontEnd.Visitors
 				if (valueNode.TryGetValue<ulong>(out var value))
 				{
 					var result = new ReferenceNodeViewModel(_editor, Parent, referenceType, null);
-					if(!_referenceNodesToAssign.TryGetValue(value, out var referenceNodes))
+
+					if (value != 0)
 					{
-						referenceNodes = [];
-						_referenceNodesToAssign.Add(value, referenceNodes);
+						if (!_referenceNodesToAssign.TryGetValue(value, out var referenceNodes))
+						{
+							referenceNodes = [];
+							_referenceNodesToAssign.Add(value, referenceNodes);
+						}
+						referenceNodes.Add(result);
 					}
-					referenceNodes.Add(result);
 					return result;
 				}
 				else

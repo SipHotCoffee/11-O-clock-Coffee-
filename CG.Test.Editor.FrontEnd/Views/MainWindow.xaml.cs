@@ -1,4 +1,5 @@
 ﻿using CG.Test.Editor.FrontEnd.ViewModels;
+using CG.Test.Editor.FrontEnd.ViewModels.Nodes;
 using CG.Test.Editor.FrontEnd.Visitors;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -31,5 +32,5 @@ namespace CG.Test.Editor.FrontEnd.Views
 				node.Visit(new NodeEditorVisitor(ViewModel.SelectedFile, false));
 			}
 		}
-    }
+	}
 }

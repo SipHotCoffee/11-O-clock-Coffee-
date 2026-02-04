@@ -5,6 +5,9 @@ using CommunityToolkit.Mvvm.Input;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Windows;
+using System.Windows.Data;
+using System.Windows.Threading;
+using System.Xml.Linq;
 
 namespace CG.Test.Editor.FrontEnd.ViewModels
 {
@@ -53,7 +56,7 @@ namespace CG.Test.Editor.FrontEnd.ViewModels
 
 			OwnerWindow = ownerWindow;
 
-            Name = $"Untitled {_lastId++}";
+            Name = file?.Name ?? $"Untitled {_lastId++}";
 
 			AddressItems = [];
 
@@ -62,7 +65,7 @@ namespace CG.Test.Editor.FrontEnd.ViewModels
             HasClipboardNodes = false;
 		}
 
-        public FileInfo? File { get; }
+        public FileInfo? File { get; set; }
 
 		public Window OwnerWindow { get; }
 

@@ -1,6 +1,7 @@
 ﻿using CG.Test.Editor.FrontEnd.Models.LinkedTypes;
 using CG.Test.Editor.FrontEnd.Views.Dialogs;
 using CG.Test.Editor.FrontEnd.Visitors;
+using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using System.Collections;
 using System.Collections.ObjectModel;

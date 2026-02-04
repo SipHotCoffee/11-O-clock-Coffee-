@@ -75,7 +75,8 @@ namespace CG.Test.Editor.FrontEnd.Views.Dialogs
 			
             var openFileDialog = new OpenFileDialog
 			{
-				Filter = "Json Schema files (*.json)|*.json"
+				Filter = "Json Schema files (*.json)|*.json",
+				InitialDirectory = @"C:\Database\Schemas"
 			};
 
 			if (openFileDialog.ShowDialog() == true)

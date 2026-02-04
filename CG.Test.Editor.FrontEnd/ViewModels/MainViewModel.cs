@@ -98,8 +98,9 @@ namespace CG.Test.Editor.FrontEnd.ViewModels
             {
                 await using var stream = saveFileDialog.OpenFile();
                 await SaveFileAsync(stream);
+				SelectedFile!.File = new FileInfo(saveFileDialog.FileName);
 			}
-        }
+		}
 
         private static async Task<LinkedSchemaTypeBase?> LoadSchema(Window window)
         {
@@ -156,7 +157,7 @@ namespace CG.Test.Editor.FrontEnd.ViewModels
 		[RelayCommand]
 		async Task OpenFile(Window window)
         {
-			var instance = new FileInstanceViewModel(this, null, window);
+			
 			var schemaType = await LoadSchema(window);
 
             if (schemaType is null)
@@ -164,9 +165,10 @@ namespace CG.Test.Editor.FrontEnd.ViewModels
                 return;
             }
 
-			var openFileDialog = new OpenFileDialog()
-			{
-				Filter = "Json files (*.json)|*.json"
+            var openFileDialog = new OpenFileDialog()
+            {
+                Filter = "Json files (*.json)|*.json",
+                InitialDirectory = @"C:\Database"
 			};
 
 			if (openFileDialog.ShowDialog() == true)
@@ -206,8 +208,9 @@ namespace CG.Test.Editor.FrontEnd.ViewModels
                         paths.Add(id, path);
                     }
 
+					var instance = new FileInstanceViewModel(this, new FileInfo(openFileDialog.FileName), window);
 
-                    var contentNode = fileObjectNode["content"];
+					var contentNode = fileObjectNode["content"];
                     
 					var messages = new List<NodeParsingMessage>();
 					var logger = new CollectionLogger<NodeParsingMessage>(messages);
@@ -237,6 +240,7 @@ namespace CG.Test.Editor.FrontEnd.ViewModels
                         }
                     }
 
+                    rootNodeViewModel?.HasChanges = false;
 					instance.Root = rootNodeViewModel;
 					OpenFiles.Add(instance);
 					SelectedFile = instance;

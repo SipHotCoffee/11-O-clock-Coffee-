@@ -11,7 +11,10 @@ namespace CG.Test.Editor.FrontEnd.ViewModels
         [ObservableProperty]
         private bool _hasChanges;
 
-        partial void OnHasChangesChanged(bool oldValue, bool newValue)
+		[ObservableProperty]
+		private NodeViewModelBase? _selectedNode;
+
+		partial void OnHasChangesChanged(bool oldValue, bool newValue)
         {
             Parent?.HasChanges = newValue;   
         }
