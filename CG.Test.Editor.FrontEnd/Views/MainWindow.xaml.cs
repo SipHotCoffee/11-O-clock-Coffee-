@@ -1,6 +1,7 @@
 ﻿using CG.Test.Editor.FrontEnd.ViewModels;
 using CG.Test.Editor.FrontEnd.ViewModels.Nodes;
 using CG.Test.Editor.FrontEnd.Visitors;
+using System.ComponentModel;
 using System.Windows.Controls;
 using System.Windows.Input;
 
@@ -31,6 +32,11 @@ namespace CG.Test.Editor.FrontEnd.Views
 			{
 				node.Visit(new NodeEditorVisitor(ViewModel.SelectedFile, false));
 			}
+		}
+
+        private async void Window_Closing(object sender, CancelEventArgs e)
+        {
+            e.Cancel = !await ViewModel.CloseAllAsync();
 		}
 	}
 }

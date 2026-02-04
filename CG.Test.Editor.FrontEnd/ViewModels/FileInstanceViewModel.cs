@@ -2,8 +2,10 @@
 using CG.Test.Editor.FrontEnd.Views.Dialogs;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Microsoft.Win32;
 using System.Collections.ObjectModel;
 using System.IO;
+using System.Text.Json;
 using System.Windows;
 using System.Windows.Data;
 using System.Windows.Threading;
@@ -103,6 +105,74 @@ namespace CG.Test.Editor.FrontEnd.ViewModels
             }
 		}
 
+		private async Task SaveFileAsync(Stream stream)
+		{
+			await using var writer = new Utf8JsonWriter(stream);
+			writer.WriteStartObject();
+			{
+				writer.WriteStartArray("referencePaths");
+				{
+					foreach (var (node, id) in CachedPaths)
+					{
+						writer.WriteStartObject();
+						{
+							writer.WriteNumber("id", id);
+							writer.WriteStartArray("path");
+							{
+								foreach (var element in node.Address)
+								{
+									element.SerializeTo(writer);
+								}
+							}
+							writer.WriteEndObject();
+						}
+						writer.WriteEndObject();
+					}
+				}
+				writer.WriteEndArray();
+
+				writer.WritePropertyName("content");
+				Root!.SerializeTo(writer);
+			}
+			writer.WriteEndObject();
+
+			await writer.FlushAsync();
+			Root.HasChanges = false;
+		}
+
+		private async Task SaveAsFileAsync()
+		{
+			var saveFileDialog = new SaveFileDialog()
+			{
+				Filter = "Json Schema files (*.json)|*.json"
+			};
+
+			if (saveFileDialog.ShowDialog() == true)
+			{
+				await using var stream = saveFileDialog.OpenFile();
+				await SaveFileAsync(stream);
+				File = new FileInfo(saveFileDialog.FileName);
+			}
+		}
+
+		public async Task Save()
+        {
+			if (File?.Exists != true)
+			{
+				await SaveAsFileAsync();
+			}
+			else if (Root!.HasChanges)
+			{
+				await using var stream = File.OpenWrite();
+				await SaveFileAsync(stream);
+			}
+		}
+
+        public async Task SaveAs()
+        {
+			await SaveAsFileAsync();
+		}
+
         private void AddPage()
         {
             if (Current is null)
@@ -138,10 +208,32 @@ namespace CG.Test.Editor.FrontEnd.ViewModels
 			Current = _history[++HistoryIndex];
 		}
 
-		[RelayCommand]
-		void Close()
+		public async Task<bool> CloseAsync()
 		{
-            MainViewModel.OpenFiles.Remove(this);
+			if (Root?.HasChanges == true)
+			{
+				var messageBoxParameters = new MessageBoxParameters($"Save changes to '{Name}'?", "CG Json Editor", "Yes");
+				messageBoxParameters.AddButton("No");
+				messageBoxParameters.AddButton("Cancel", true);
+
+				switch (OwnerWindow.ShowMessage(messageBoxParameters))
+				{
+					case 0:
+						await Save();
+						break;
+					case 2:
+						return false;
+				}
+			}
+
+			MainViewModel.OpenFiles.Remove(this);
+			return true;
+		}
+
+		[RelayCommand]
+		async Task Close()
+		{
+			await CloseAsync();
 		}
 
         [RelayCommand]

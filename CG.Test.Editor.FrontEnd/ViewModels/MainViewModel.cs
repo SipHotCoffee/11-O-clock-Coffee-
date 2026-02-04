@@ -9,6 +9,7 @@ using System.Collections.ObjectModel;
 using System.IO;
 using System.Text.Json;
 using System.Text.Json.Nodes;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 
@@ -52,56 +53,6 @@ namespace CG.Test.Editor.FrontEnd.ViewModels
 			InputManager.Current.PreProcessInput += (sender, e) => IsAltDown = Keyboard.Modifiers.HasFlag(ModifierKeys.Alt);
 		}
 
-        private async Task SaveFileAsync(Stream stream)
-        {
-			await using var writer = new Utf8JsonWriter(stream);
-            writer.WriteStartObject();
-            {
-                writer.WriteStartArray("referencePaths");
-                {
-                    foreach (var (node, id) in SelectedFile!.CachedPaths)
-                    {
-                        writer.WriteStartObject();
-                        {
-                            writer.WriteNumber("id", id);
-                            writer.WriteStartArray("path");
-                            {
-                                foreach (var element in node.Address)
-                                {
-                                    element.SerializeTo(writer);
-                                }
-                            }
-                            writer.WriteEndObject();
-                        }
-                        writer.WriteEndObject();
-                    }
-                }
-                writer.WriteEndArray();
-
-                writer.WritePropertyName("content");
-                SelectedFile!.Root!.SerializeTo(writer);
-            }
-            writer.WriteEndObject();
-
-			await writer.FlushAsync();
-            SelectedFile.Root.HasChanges = false;
-		}
-
-		private async Task SaveAsFileAsync()
-        {
-            var saveFileDialog = new SaveFileDialog()
-            {
-                Filter = "Json Schema files (*.json)|*.json"
-            };
-
-            if (saveFileDialog.ShowDialog() == true)
-            {
-                await using var stream = saveFileDialog.OpenFile();
-                await SaveFileAsync(stream);
-				SelectedFile!.File = new FileInfo(saveFileDialog.FileName);
-			}
-		}
-
         private static async Task<LinkedSchemaTypeBase?> LoadSchema(Window window)
         {
 			ArgumentNullException.ThrowIfNull(window, nameof(window));
@@ -140,6 +91,19 @@ namespace CG.Test.Editor.FrontEnd.ViewModels
 			}
             return null;
 		}
+
+        public async Task<bool> CloseAllAsync()
+        {
+			while (OpenFiles.Count > 0)
+			{
+				var file = OpenFiles[^1];
+				if (!await file.CloseAsync())
+				{
+					return false;
+				}
+			}
+            return true;
+        }
 
 		[RelayCommand]
         async Task NewFile(Window window)
@@ -256,24 +220,34 @@ namespace CG.Test.Editor.FrontEnd.ViewModels
         [RelayCommand]
         async Task SaveFile()
         {
-            if (SelectedFile!.File?.Exists != true)
+            if (SelectedFile is not null)
             {
-                await SaveAsFileAsync();
-            }
-            else if (SelectedFile!.Root!.HasChanges)
-            {
-                await using var stream = SelectedFile.File.OpenWrite();
-                await SaveFileAsync(stream);
+                await SelectedFile.Save();
             }
         }
 
         [RelayCommand]
         async Task SaveFileAs()
         {
-			await SaveAsFileAsync();
+            if (SelectedFile is not null)
+            {
+                await SelectedFile.SaveAs();
+            }
+        }
+
+
+		[RelayCommand]
+		async Task SaveAll()
+		{
+            var tasks = new List<Task>();
+			foreach (var file in OpenFiles)
+            {
+                tasks.Add(file.Save());
+            }
+            await Task.WhenAll(tasks);
 		}
 
-        [RelayCommand]
+		[RelayCommand]
         void Exit(Window window)
         {
             window.Close();

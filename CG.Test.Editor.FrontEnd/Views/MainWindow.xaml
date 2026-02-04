@@ -8,7 +8,13 @@
 					xmlns:viewmodelnodes="clr-namespace:CG.Test.Editor.FrontEnd.ViewModels.Nodes"
 					xmlns:converters="clr-namespace:CG.Test.Editor.FrontEnd.Converters"
 					mc:Ignorable="d"
-					Title="Json Editor" Height="450" Width="800" IsMicaBackgroundEnabled="True" WindowStartupLocation="CenterScreen" WindowState="Maximized">
+					Title="Json Editor" 
+					Height="450" 
+					Width="800" 
+					IsMicaBackgroundEnabled="True" 
+					WindowStartupLocation="CenterScreen" 
+					WindowState="Maximized" 
+					Closing="Window_Closing">
 	<Window.DataContext>
 		<viewmodels:MainViewModel/>
 	</Window.DataContext>
