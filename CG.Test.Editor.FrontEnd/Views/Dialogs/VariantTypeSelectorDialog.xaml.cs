@@ -35,6 +35,11 @@ namespace CG.Test.Editor.FrontEnd.Views.Dialogs
 				{
 					return type.Name.Contains(newValue, StringComparison.CurrentCultureIgnoreCase);
 				}
+
+				if (value is LinkedSchemaSymbolType symbolType)
+				{
+					return symbolType.TypeName.Contains(newValue, StringComparison.CurrentCultureIgnoreCase);
+				}
 				return false;
 			};
 		}

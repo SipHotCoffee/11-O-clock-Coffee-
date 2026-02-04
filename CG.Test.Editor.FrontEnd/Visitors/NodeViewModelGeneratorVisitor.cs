@@ -55,7 +55,7 @@ namespace CG.Test.Editor.FrontEnd.Visitors
 			}
 
 			dialog.ShowDialog();
-            return dialog.SelectedType.Visit(this);
+            return new VariantNodeViewModel(_editor, _parent, variantType, (ObjectNodeViewModel)dialog.SelectedType.Visit(this));
         }
 
         public EnumNodeViewModel Visit(LinkedSchemaEnumType enumType) => new(_editor, _parent, enumType, 0);

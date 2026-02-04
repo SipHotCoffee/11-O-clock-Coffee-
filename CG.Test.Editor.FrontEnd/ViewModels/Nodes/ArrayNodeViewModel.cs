@@ -216,7 +216,7 @@ namespace CG.Test.Editor.FrontEnd.ViewModels.Nodes
 
             if (dialog.ShowDialog() == true)
             {
-				dialog.SelectedNode.Visit(new NodeEditorVisitor(Editor));
+				dialog.SelectedNode.Visit(new NodeEditorVisitor(Editor, false));
 			}
         }
 

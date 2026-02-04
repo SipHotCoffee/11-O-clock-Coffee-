@@ -5,9 +5,11 @@ using System.Collections.ObjectModel;
 
 namespace CG.Test.Editor.FrontEnd.Visitors
 {
-    public class NodeEditorVisitor(FileInstanceViewModel editor) : Visitor<NodeEditorVisitor, NodeViewModelBase, Void>
+    public class NodeEditorVisitor(FileInstanceViewModel editor, bool askForChangingType) : Visitor<NodeEditorVisitor, NodeViewModelBase, Void>
     {
         private readonly FileInstanceViewModel _editor = editor;
+
+        private readonly bool _askForChangingType = askForChangingType;
 
 		public void Visit(ArrayNodeViewModel arrayNode)
         {
@@ -18,6 +20,29 @@ namespace CG.Test.Editor.FrontEnd.Visitors
 		{
 			_editor.Navigate(objectNode);
 		}
+
+        public void Visit(VariantNodeViewModel variantNode)
+        {
+            if (!_askForChangingType)
+            {
+                variantNode.SelectedObject.Visit(this);
+                return;
+            }
+
+            var parameters = new MessageBoxParameters($"Change or edit variant node of type '{variantNode.Type.Name}'", "Edit variant node.", "Edit");
+            parameters.AddButton("Change Type");
+            var chosenButton = _editor.OwnerWindow.ShowMessage(parameters);
+			switch (chosenButton)
+            {
+                case 0:
+                    variantNode.SelectedObject.Visit(this);
+                    break;
+                case 1:
+                    var generatedVariantNode = (VariantNodeViewModel)variantNode.Type.Visit(new NodeViewModelGeneratorVisitor(_editor, variantNode.Parent, null));
+                    variantNode.SelectedObject = generatedVariantNode.SelectedObject;
+					break;
+            }
+        }
 
         public void Visit(NumberNodeViewModel numberNode)
         {

@@ -2,9 +2,33 @@
 using System.Windows;
 using System.Runtime.InteropServices;
 using System.Windows.Interop;
+using System.Diagnostics.CodeAnalysis;
 
 namespace CG.Test.Editor.FrontEnd
 {
+    public class MessageBoxParameters(string message, string title = "", string firstButton = "OK")
+    {
+        private readonly List<string> _buttons = [ firstButton ];
+
+        public IReadOnlyList<string> Buttons => _buttons;
+
+        public int DefaultButtonIndex { get; private set; } = 0;
+
+        public string Message { get; } = message;
+
+        public string Title { get; } = title;
+
+        public void AddButton(string buttonLabel, bool isDefault = false)
+        {
+            if (isDefault)
+            {
+                DefaultButtonIndex = _buttons.Count;
+            }
+
+            _buttons.Add(buttonLabel);
+        }
+    }
+
     public static class UIExtensions
     {
         [StructLayout(LayoutKind.Sequential)]
@@ -55,11 +79,13 @@ namespace CG.Test.Editor.FrontEnd
 
         extension(Window ownerWindow)
         {
-            public int ShowMessage(string message, string title = "", int defaultButtonIndex = 0, string first = "OK", params IReadOnlyList<string> buttons)
-            {
-                if (_isOpen)
+            public int ShowMessage(string message) => ownerWindow.ShowMessage(new MessageBoxParameters(message));
+
+			public int ShowMessage(MessageBoxParameters parameters)
+			{
+				if (_isOpen)
                 {
-                    return defaultButtonIndex;
+                    return parameters.DefaultButtonIndex;
                 }
 
                 var grid = new Grid()
@@ -74,14 +100,14 @@ namespace CG.Test.Editor.FrontEnd
                 {
                     HorizontalAlignment = HorizontalAlignment.Center,
                     VerticalAlignment   = VerticalAlignment.Center,
-                    Text                = message,
+                    Text                = parameters.Message,
                     TextWrapping        = TextWrapping.Wrap,
                     Margin              = new Thickness(10),
                 };
 
                 var contextMenu = new ContextMenu();
                 var copyMenuItem = new MenuItem() { Header = "Copy" };
-                copyMenuItem.Click += (sender, e) => Clipboard.SetText(message);
+                copyMenuItem.Click += (sender, e) => Clipboard.SetText(parameters.Message);
 
                 contextMenu.Items.Add(copyMenuItem);
 
@@ -97,7 +123,7 @@ namespace CG.Test.Editor.FrontEnd
                 Grid.SetRow(scrollViewer, 0);
                 Grid.SetColumn(scrollViewer, 0);
 
-                Grid.SetColumnSpan(scrollViewer, buttons.Count + 1);
+                Grid.SetColumnSpan(scrollViewer, parameters.Buttons.Count);
 
                 grid.Children.Add(scrollViewer);
 
@@ -111,57 +137,59 @@ namespace CG.Test.Editor.FrontEnd
 
                 var window = new CustomWindow()
                 {
-                    Owner   = owner,
-                    Title   = title,
-                    Content = grid,
+                    Owner                 = owner,
+                    Title                 = parameters.Title,
+                    Content               = grid,
                     WindowStartupLocation = WindowStartupLocation.CenterScreen,
-                    ResizeMode = ResizeMode.CanResize,
-                    SizeToContent = SizeToContent.Height,
-                    Width = 400,
-                    MaxHeight = Math.Min(720, SystemParameters.FullPrimaryScreenHeight),
-                    ShowInTaskbar = false,
-                    Topmost = true
+                    ResizeMode            = ResizeMode.CanResize,
+                    SizeToContent         = SizeToContent.Height,
+                    Width                 = 400,
+                    MaxHeight             = Math.Min(720, SystemParameters.FullPrimaryScreenHeight),
+                    ShowInTaskbar         = false,
+                    Topmost               = true
                 };
 
                 window.SourceInitialized += Window_SourceInitialized;
 
-                var firstButton = new Button()
-                {
-                    IsDefault = defaultButtonIndex == 0,
-                    Content   = first,
-                    Margin    = new Thickness(2.5),
-                };
+                //var firstButton = new Button()
+                //{
+                //    IsDefault = defaultButtonIndex == 0,
+                //    Content   = firstButtonLabel,
+                //    Margin    = new Thickness(2.5),
+                //};
 
-                Grid.SetColumn(firstButton, 0);
-                Grid.SetRow(firstButton, 1);
+                //Grid.SetColumn(firstButton, 0);
+                //Grid.SetRow(firstButton, 1);
 
-                grid.ColumnDefinitions.Add(new ColumnDefinition() { Width = new GridLength(1.0, GridUnitType.Star) });
-                grid.Children.Add(firstButton);
+                //grid.ColumnDefinitions.Add(new ColumnDefinition() { Width = new GridLength(1.0, GridUnitType.Star) });
+                //grid.Children.Add(firstButton);
 
-                firstButton.Click += (sender, e) =>
-                {
-                    result = 0;
-                    window.DialogResult = true;
-                    window.Close();
-                };
+                //firstButton.Click += (sender, e) =>
+                //{
+                //    result = 0;
+                //    window.DialogResult = true;
+                //    window.Close();
+                //};
 
-                for (var i = 0; i < buttons.Count; i++)
+                for (var i = 0; i < parameters.Buttons.Count; i++)
                 {
                     var button = new Button()
                     {
-                        IsDefault = i + 1 == defaultButtonIndex,
-                        Content   = buttons[i],
+                        IsDefault = i == parameters.DefaultButtonIndex, //i + 1 == defaultButtonIndex,
+                        Content   = parameters.Buttons[i],
                         Margin    = new Thickness(2.5),
                     };
 
+                    var buttonIndex = i;
+
                     button.Click += (sender, e) =>
                     {
-                        result = i;
+                        result = buttonIndex;
                         window.DialogResult = true;
                         window.Close();
                     };
 
-                    Grid.SetColumn(button, i + 1);
+                    Grid.SetColumn(button, i);
                     Grid.SetRow(button, 1);
 
                     grid.ColumnDefinitions.Add(new ColumnDefinition() { Width = new GridLength(1.0, GridUnitType.Star) });

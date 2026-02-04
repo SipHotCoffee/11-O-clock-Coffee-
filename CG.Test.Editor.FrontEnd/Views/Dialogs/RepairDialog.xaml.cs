@@ -69,13 +69,13 @@ namespace CG.Test.Editor.FrontEnd.Views.Dialogs
 
         private void OldValueButton_Click(object sender, RoutedEventArgs e)
         {
-            var visitor = new NodeEditorVisitor(_instanceViewModel);
+            var visitor = new NodeEditorVisitor(_instanceViewModel, true);
             OldValue.Visit(visitor);
 		}
 
         private void NewValueButton_Click(object sender, RoutedEventArgs e)
         {
-			var visitor = new NodeEditorVisitor(_instanceViewModel);
+			var visitor = new NodeEditorVisitor(_instanceViewModel, true);
 			NewValue.Visit(visitor);
 		}
 

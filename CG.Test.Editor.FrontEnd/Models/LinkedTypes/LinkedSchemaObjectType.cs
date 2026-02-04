@@ -33,6 +33,8 @@ namespace CG.Test.Editor.FrontEnd.Models.LinkedTypes
 	{
         public IReadOnlySet<LinkedSchemaTypeBase> PossibleTypes { get; } = possibleTypes.ToImmutableSortedSet(new SchemaTypeComparer());
 
+        public IReadOnlyDictionary<string, LinkedSchemaObjectType> PossibleObjectTypes { get; } = possibleTypes.OfType<LinkedSchemaObjectType>().ToImmutableDictionary((type) => type.Name, (type) => type);
+
         public string Name { get; } = name;
 
         public override bool IsConvertibleFrom(LinkedSchemaTypeBase sourceType) 

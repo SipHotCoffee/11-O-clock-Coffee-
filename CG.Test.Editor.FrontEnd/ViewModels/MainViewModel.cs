@@ -228,7 +228,10 @@ namespace CG.Test.Editor.FrontEnd.ViewModels
 
 					foreach (var message in messages)
                     {
-                        if (window.ShowMessage($"Error: {message.Message} Error occured here: '{string.Join("/", message.Path)}'", string.Empty, 0, "Next", [ "Cancel" ]) == 1)
+                        var messageParameters = new MessageBoxParameters($"Error: {message.Message} Error occured here: '{string.Join("/", message.Path)}'", string.Empty, "Next");
+                        messageParameters.AddButton("Cancel");
+
+                        if (window.ShowMessage(messageParameters) == 1)
                         {
                             return;
                         }

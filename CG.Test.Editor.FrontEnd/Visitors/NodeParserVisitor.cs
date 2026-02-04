@@ -235,9 +235,19 @@ namespace CG.Test.Editor.FrontEnd.Visitors
 
 		public NodeViewModelBase? Visit(LinkedSchemaVariantType variantType)
 		{
+			if (SourceNode is JsonObject objectNode && 
+				objectNode.TryGetPropertyValue("$type", out var typeNode) && 
+				typeNode is JsonValue typeValueNode && 
+				typeValueNode.TryGetValue<string>(out var typeName) && 
+				variantType.PossibleObjectTypes.TryGetValue(typeName, out var objectType) &&
+				objectType.Visit(new NodeParserVisitor(_editor, CurrentPath, _referenceNodesToAssign, Parent, _logger, SourceNode)) is ObjectNodeViewModel objectNodeViewModel)
+			{
+				return new VariantNodeViewModel(_editor, Parent, variantType, objectNodeViewModel);
+			}
+			
 			var messages = new List<NodeParsingMessage>();
 			var logger = new CollectionLogger<NodeParsingMessage>(messages);
-			
+
 			foreach (var possibleType in variantType.PossibleTypes)
 			{
 				messages.Clear();

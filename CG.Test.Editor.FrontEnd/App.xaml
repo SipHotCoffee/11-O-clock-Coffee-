@@ -37,6 +37,9 @@
 						<TextBlock FontFamily="Cascadia Mono" Text="{} {...}"/>
 					</StackPanel>
 				</DataTemplate>
+				<DataTemplate DataType="{x:Type viewmodelnodes:VariantNodeViewModel}">
+					<ContentControl Padding="0" Content="{Binding SelectedObject}"/>
+				</DataTemplate>
 				<DataTemplate DataType="{x:Type viewmodelnodes:IntegerNodeViewModel}">
 					<TextBlock FontFamily="Cascadia Mono" Text="{Binding Value}"/>
 				</DataTemplate>
@@ -116,6 +119,9 @@
 						</ItemsControl>
 						<TextBlock VerticalAlignment="Center" FontFamily="Cascadia Mono" Text="{} }"/>
 					</StackPanel>
+				</DataTemplate>
+				<DataTemplate DataType="{x:Type viewmodelnodes:VariantNodeViewModel}">
+					<ContentControl Padding="0" Content="{Binding SelectedObject}"/>
 				</DataTemplate>
 				<DataTemplate DataType="{x:Type viewmodelnodes:IntegerNodeViewModel}">
 					<TextBlock VerticalAlignment="Center" FontFamily="Cascadia Mono" Text="{Binding Value}"/>

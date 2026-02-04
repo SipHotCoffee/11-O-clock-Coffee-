@@ -12,6 +12,6 @@
 
         string INamedObject.Name => TypeName;
 
-        public override string ToString() => LinkedType.ToString();
+        public override string ToString() => TypeName;
     }
 }
