@@ -4,23 +4,18 @@ using CG.Test.Editor.FrontEnd.ViewModels.Nodes;
 using CG.Test.Editor.FrontEnd.Visitors;
 using DependencyPropertyToolkit;
 using System.Collections.ObjectModel;
-using System.Globalization;
 using System.Windows;
-using System.Windows.Data;
 
 namespace CG.Test.Editor.FrontEnd.Views.Dialogs
 {
-    public class FieldValueFilterConverter : IValueConverter
+    public class FieldValueFilterConverter : ValueConverterBase<IEnumerable<LinkedSchemaProperty>, IEnumerable<LinkedSchemaProperty>>
     {
-        public object? Convert(object value, Type targetType, object parameter, CultureInfo culture)
-        {
-			return ((IEnumerable<LinkedSchemaProperty>)value)?.Where((property) => property.Type.IsValueType);
-        }
+        public override IEnumerable<LinkedSchemaProperty> Convert(IEnumerable<LinkedSchemaProperty> properties) => properties.Where((property) => property.Type.IsValueType);
 
-        public object? ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        public override IEnumerable<LinkedSchemaProperty> ConvertBack(IEnumerable<LinkedSchemaProperty> source)
         {
-			throw new NotImplementedException();
-		}
+            throw new NotImplementedException();
+        }
     }
 
     public partial class RepairDialog : CustomWindow

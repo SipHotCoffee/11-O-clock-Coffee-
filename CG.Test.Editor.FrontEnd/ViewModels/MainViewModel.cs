@@ -121,7 +121,6 @@ namespace CG.Test.Editor.FrontEnd.ViewModels
 		[RelayCommand]
 		async Task OpenFile(Window window)
         {
-			
 			var schemaType = await LoadSchema(window);
 
             if (schemaType is null)

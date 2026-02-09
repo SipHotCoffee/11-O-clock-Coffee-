@@ -1,7 +1,6 @@
 ﻿using CG.Test.Editor.FrontEnd.Models.LinkedTypes;
 using CG.Test.Editor.FrontEnd.Views.Dialogs;
 using CG.Test.Editor.FrontEnd.Visitors;
-using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using System.Collections;
 using System.Collections.ObjectModel;
@@ -13,15 +12,31 @@ using System.Windows.Input;
 
 namespace CG.Test.Editor.FrontEnd.ViewModels.Nodes
 {
-    public partial class ArrayNodeViewModel : NodeViewModelBase
+    public class IsInsertEnabledConverter : MultiValueConverterBase<bool>
     {
-        public ArrayNodeViewModel(FileInstanceViewModel editor, NodeViewModelBase? parent, LinkedSchemaArrayType type) : base(editor, parent)
+        public bool Convert(int count, LinkedSchemaArrayType type)
+        {
+            return count + 1 <= type.MaximumItemCount;
+        }
+    }
+
+	public class IsDeleteEnabledConverter : MultiValueConverterBase<bool>
+	{
+		public bool Convert(int elementCount, LinkedSchemaArrayType arrayType, int selectionCount)
+		{
+			return selectionCount > 0 && elementCount - selectionCount >= arrayType.MinimumItemCount;
+		}
+    }
+
+	public partial class ArrayNodeViewModel : NodeViewModelBase
+    {
+        public ArrayNodeViewModel(FileInstanceViewModel editor, NodeViewModelBase? parent, IEnumerable<NodeViewModelBase> nodes, LinkedSchemaArrayType type) : base(editor, parent)
         {
             Type = type;
 
-            Elements = [];
+            Elements = new(nodes);
 
-            Indices = [];
+			Indices = [];
 
             Elements.CollectionChanged += Elements_CollectionChanged;
 		}
@@ -49,7 +64,7 @@ namespace CG.Test.Editor.FrontEnd.ViewModels.Nodes
 
         public override ArrayNodeViewModel Clone(NodeViewModelBase? parent)
         {
-            var result = new ArrayNodeViewModel(Editor, parent, Type);
+            var result = new ArrayNodeViewModel(Editor, parent, [], Type);
             foreach (var element in Elements)
             {
                 result.Elements.Add(element.Clone(result));
@@ -75,7 +90,11 @@ namespace CG.Test.Editor.FrontEnd.ViewModels.Nodes
         {
             if (Keyboard.Modifiers.HasFlag(ModifierKeys.Alt))
             {
-                var itemDialog = new ItemCountDialog();
+                var itemDialog = new ItemCountDialog()
+                {
+                    MaximumItemCount = (uint)(Elements.Count - Type.MaximumItemCount)
+                };
+
                 if (itemDialog.ShowDialog() == true)
                 {
                     var baseNode = Type.ElementType.Visit(new NodeViewModelGeneratorVisitor(Editor, this, null));

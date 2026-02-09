@@ -1,19 +1,11 @@
-﻿using System.Globalization;
-using System.Windows;
-using System.Windows.Data;
+﻿using System.Windows;
 
 namespace CG.Test.Editor.FrontEnd.Converters
 {
-    public class FlippedBooleanToVisibilityConverter : IValueConverter
+    public class FlippedBooleanToVisibilityConverter : ValueConverterBase<bool, Visibility>
     {
-        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
-        {
-            return value is bool booleanValue && booleanValue ? Visibility.Collapsed : Visibility.Visible;
-        }
+        public override Visibility Convert(bool source) => source ? Visibility.Collapsed : Visibility.Visible;
 
-        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
-        {
-            return value is Visibility visibility && visibility == Visibility.Collapsed;
-        }
+		public override bool ConvertBack(Visibility visibility) => visibility == Visibility.Collapsed;
     }
 }

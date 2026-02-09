@@ -17,7 +17,8 @@ namespace CG.Test.Editor.FrontEnd.Visitors
 
 		public NodeViewModelBase Visit(LinkedSchemaSymbolType symbolType) => Invoke(symbolType.LinkedType);
 
-		public ArrayNodeViewModel Visit(LinkedSchemaArrayType arrayType) => new(_editor, _parent, arrayType);
+		public ArrayNodeViewModel Visit(LinkedSchemaArrayType arrayType) 
+            => new(_editor, _parent, Enumerable.Range(0, arrayType.MinimumItemCount).Select((index) => arrayType.ElementType.Visit(this)), arrayType);
 
         public ObjectNodeViewModel Visit(LinkedSchemaObjectType objectType)
         {

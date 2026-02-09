@@ -21,67 +21,32 @@ namespace CG.Test.Editor.FrontEnd.Views.Dialogs
                                                                             .Select((node) => new TreeNodeViewModel(typeFilter, node)) ];
     }
 
-	public class NodeContainsMatchingType : IMultiValueConverter
+	public class NodeContainsMatchingType : MultiValueConverterBase<bool>
 	{
-		public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
-		{
-			var node = (NodeViewModelBase?)values[0];
-			var type = (LinkedSchemaTypeBase?)values[1];
+        public bool Convert(NodeViewModelBase node, LinkedSchemaTypeBase type) 
+			=> type.IsConvertibleFrom(node.Type) || node.AllChildren.Any((child) => type.IsConvertibleFrom(child.Type));
 
-			if(node is null || type is null)
-			{
-				return false;
-			}
-
-			return type.IsConvertibleFrom(node.Type) || node.AllChildren.Any((child) => type.IsConvertibleFrom(child.Type));
-		}
-
-		public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)
-		{
-			throw new NotImplementedException();
-		}
-	}
-
-	public class SelectedNodeHasMatchingType : IMultiValueConverter
-	{
-		public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
-		{
-			if (values[0] is NodeViewModelBase node && values[1] is LinkedSchemaTypeBase type)
-			{
-				return type.IsConvertibleFrom(node.Type);
-			}
-			return false;
-		}
-
-		public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)
-		{
-			throw new NotImplementedException();
-		}
-	}
-
-	public class NodeFromPairConverter : IValueConverter
-	{
-        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        public void ConvertBack(bool source, out NodeViewModelBase node, out LinkedSchemaTypeBase type)
         {
-			if (value is null)
-			{
-				return default(KeyValuePair<string, NodeViewModelBase>);
-			}
+            throw new NotImplementedException();
+        }
+    }
 
-			var node = (NodeViewModelBase)value;
-			return new KeyValuePair<string, NodeViewModelBase>(node.Name, node);
-		}
+	public class SelectedNodeHasMatchingType : MultiValueConverterBase<bool>
+	{
+        public bool Convert(NodeViewModelBase node, LinkedSchemaTypeBase type) => type.IsConvertibleFrom(node.Type);
 
-		public object? ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
-		{
-			if (value is null)
-			{
-				return null;
-			}
+        public void ConvertBack(bool source, out NodeViewModelBase node, out LinkedSchemaTypeBase type)
+        {
+            throw new NotImplementedException();
+        }
+    }
 
-			var (_, node) = (KeyValuePair<string, NodeViewModelBase>)value;
-			return node;
-		}
+	public class NodeFromPairConverter : ValueConverterBase<NodeViewModelBase, KeyValuePair<string, NodeViewModelBase>>
+	{
+        public override KeyValuePair<string, NodeViewModelBase> Convert(NodeViewModelBase node) => KeyValuePair.Create(node.Name, node);
+
+        public override NodeViewModelBase ConvertBack(KeyValuePair<string, NodeViewModelBase> pair) => pair.Value;
     }
 
 	public partial class ReferencePickerDialog : CustomWindow

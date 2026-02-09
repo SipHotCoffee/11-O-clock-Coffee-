@@ -23,7 +23,13 @@
 			<RowDefinition Height="auto"/>
 		</Grid.RowDefinitions>
 
-		<controls:SpinButton Grid.Column="1" Margin="5, 5, 5, 2.5" MinWidth="50" IsIntegral="True" Minimum="1" Value="{Binding ItemCount, Mode=TwoWay}"/>
+		<controls:SpinButton Grid.Column="1" 
+							 Margin="5, 5, 5, 2.5" 
+							 MinWidth="50" 
+							 IsIntegral="True" 
+							 Minimum="1" 
+							 Maximum="{Binding MaximumItemCount}" 
+							 Value="{Binding ItemCount, Mode=TwoWay}"/>
 
 		<Grid Grid.Row="1">
 			<Grid.ColumnDefinitions>

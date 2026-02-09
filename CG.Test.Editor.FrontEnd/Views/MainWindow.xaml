@@ -127,6 +127,9 @@
 						</ToolBar>
 						<ContentControl Grid.Row="1" Content="{Binding Current}">
 							<ContentControl.Resources>
+								<viewmodelnodes:IsInsertEnabledConverter x:Key="IsInsertEnabledConverter"/>
+								<viewmodelnodes:IsDeleteEnabledConverter x:Key="IsDeleteEnabledConverter"/>
+								
 								<DataTemplate DataType="{x:Type viewmodelnodes:ArrayNodeViewModel}">
 									<Grid>
 										<Grid.RowDefinitions>
@@ -143,6 +146,24 @@
 														</DataTrigger>
 													</Style.Triggers>
 												</Style>
+												
+												<Style x:Key="DeleteMultipleSelectionButton" 
+													   TargetType="{x:Type Button}" BasedOn="{StaticResource {x:Static ToolBar.ButtonStyleKey}}">
+													<Setter Property="IsEnabled" Value="False"/>
+													<Style.Triggers>
+														<DataTrigger Value="True">
+															<DataTrigger.Binding>
+																<MultiBinding Converter="{StaticResource IsDeleteEnabledConverter}">
+																	<Binding Path="Elements.Count"/>
+																	<Binding Path="Type"/>
+																	<Binding ElementName="_listView" Path="SelectedItems.Count"/>
+																</MultiBinding>
+															</DataTrigger.Binding>
+															<Setter Property="IsEnabled" Value="True"/>
+														</DataTrigger>
+													</Style.Triggers>
+												</Style>
+
 												<Style x:Key="ClipboardHasItemsButton" 
 													   TargetType="{x:Type Button}" BasedOn="{StaticResource {x:Static ToolBar.ButtonStyleKey}}">
 													<Setter Property="IsEnabled" Value="False"/>
@@ -154,12 +175,35 @@
 												</Style>
 
 												<Style x:Key="SingleSelectionButton" 
-													   TargetType="{x:Type Button}" BasedOn="{StaticResource {x:Static ToolBar.ButtonStyleKey}}">
+													   TargetType="{x:Type Button}" 
+													   BasedOn="{StaticResource {x:Static ToolBar.ButtonStyleKey}}">
 													<Setter Property="IsEnabled" Value="False"/>
 													<Style.Triggers>
 														<DataTrigger Binding="{Binding ElementName=_listView, Path=SelectedItems.Count}" Value="1">
 															<Setter Property="IsEnabled" Value="True"/>
 														</DataTrigger>
+													</Style.Triggers>
+												</Style>
+
+												<Style x:Key="SingleInsertSelectionButton" 
+													   TargetType="{x:Type Button}" 
+													   BasedOn="{StaticResource {x:Static ToolBar.ButtonStyleKey}}">
+													<Setter Property="IsEnabled" Value="False"/>
+													<Style.Triggers>
+														<MultiDataTrigger>
+															<MultiDataTrigger.Conditions>
+																<Condition Binding="{Binding ElementName=_listView, Path=SelectedItems.Count}" Value="1"/>
+																<Condition Value="True">
+																	<Condition.Binding>
+																		<MultiBinding Converter="{StaticResource IsInsertEnabledConverter}">
+																			<Binding Path="Elements.Count"/>
+																			<Binding Path="Type"/>
+																		</MultiBinding>
+																	</Condition.Binding>
+																</Condition>
+															</MultiDataTrigger.Conditions>
+															<Setter Property="IsEnabled" Value="True"/>
+														</MultiDataTrigger>
 													</Style.Triggers>
 												</Style>
 
@@ -179,6 +223,12 @@
 											</ToolBar.Resources>
 
 											<Button Command="{Binding InsertCommand}">
+												<Button.IsEnabled>
+													<MultiBinding Converter="{StaticResource IsInsertEnabledConverter}">
+														<Binding Path="Elements.Count"/>
+														<Binding Path="Type"/>
+													</MultiBinding>
+												</Button.IsEnabled>
 												<Button.Content>
 													<StackPanel Orientation="Horizontal" Margin="0">
 														<TextBlock FontSize="18" FontFamily="{StaticResource SymbolFont}" Text="&#xe948;"/>
@@ -190,7 +240,7 @@
 
 											<Button Command="{Binding InsertAboveCommand}" 
 													CommandParameter="{Binding ElementName=_listView, Path=SelectedIndex}"
-													Style="{StaticResource SingleSelectionButton}">
+													Style="{StaticResource SingleInsertSelectionButton}">
 												<StackPanel Orientation="Vertical" HorizontalAlignment="Center">
 													<TextBlock HorizontalAlignment="Center" FontFamily="{StaticResource SymbolFont}" FontSize="12" Margin="2" Text="&#xe74a;"/>
 													<TextBlock HorizontalAlignment="Center" FontFamily="{StaticResource SymbolFont}" FontSize="18" Margin="2" Text="&#xe948;"/>
@@ -199,7 +249,7 @@
 
 											<Button Command="{Binding InsertBelowCommand}" 
 													CommandParameter="{Binding ElementName=_listView, Path=SelectedIndex}"
-													Style="{StaticResource SingleSelectionButton}">
+													Style="{StaticResource SingleInsertSelectionButton}">
 												<StackPanel Orientation="Vertical" HorizontalAlignment="Center">
 													<TextBlock HorizontalAlignment="Center" FontFamily="{StaticResource SymbolFont}" FontSize="18" Margin="2" Text="&#xe948;"/>
 													<TextBlock HorizontalAlignment="Center" FontFamily="{StaticResource SymbolFont}" FontSize="12" Margin="2" Text="&#xe74b;"/>
@@ -211,7 +261,7 @@
 													Content="&#xe8c6;"
 													Command="{Binding CutElementsCommand}"
 													CommandParameter="{Binding ElementName=_listView, Path=SelectedItems}"
-													Style="{StaticResource MultipleSelectionButton}">
+													Style="{StaticResource DeleteMultipleSelectionButton}">
 											</Button>
 											
 											<Button FontFamily="{StaticResource SymbolFont}" 
@@ -256,7 +306,7 @@
 													FontSize="18" Content="&#xe74d;" 
 													Command="{Binding DeleteElementsCommand}"
 													CommandParameter="{Binding ElementName=_listView, Path=SelectedItems}"
-													Style="{StaticResource MultipleSelectionButton}"/>
+													Style="{StaticResource DeleteMultipleSelectionButton}"/>
 
 											<Separator/>
 

@@ -1,18 +1,9 @@
-﻿using System.Globalization;
-using System.Windows.Data;
-
-namespace CG.Test.Editor.FrontEnd.Converters
+﻿namespace CG.Test.Editor.FrontEnd.Converters
 {
-    public class FlipBooleanConverter : IValueConverter
+    public class FlipBooleanConverter : ValueConverterBase<bool, bool>
     {
-        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
-        {
-            return !(bool)value;
-        }
+        public override bool Convert(bool source) => !source;
 
-        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
-        {
-            return !(bool)value;
-        }
+        public override bool ConvertBack(bool source) => !source;
     }
 }

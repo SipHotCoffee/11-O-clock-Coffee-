@@ -182,7 +182,7 @@ namespace CG.Test.Editor.FrontEnd.Visitors
         {
 			if (SourceNode is JsonArray arrayNode)
 			{
-				var result = new ArrayNodeViewModel(_editor, Parent, arrayType);
+				var result = new ArrayNodeViewModel(_editor, Parent, [], arrayType);
 				var elementVisitor = new NodeParserVisitor(_editor, CurrentPath, _referenceNodesToAssign, result, _logger, null);
                 for (var i = 0; i < arrayNode.Count; i++)
 				{

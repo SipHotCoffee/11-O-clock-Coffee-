@@ -66,17 +66,17 @@ namespace CG.Test.Editor.FrontEnd
 				}
 				else if (type.IsArray)
 				{
-					return new LinkedSchemaArrayType((type.GetElementType() ?? typeof(object)).GetSchemaFromType(null));
+					return new LinkedSchemaArrayType((type.GetElementType() ?? typeof(object)).GetSchemaFromType(null), int.MinValue, int.MaxValue);
 				}
 				else if (type.IsAssignableTo(typeof(IEnumerable)))
 				{
 					if (type.GenericTypeArguments.Length > 0)
 					{
-						return new LinkedSchemaArrayType(type.GenericTypeArguments[0].GetSchemaFromType(null));
+						return new LinkedSchemaArrayType(type.GenericTypeArguments[0].GetSchemaFromType(null), int.MinValue, int.MaxValue);
 					}
 					else
 					{
-						return new LinkedSchemaArrayType(typeof(object).GetSchemaFromType(null));
+						return new LinkedSchemaArrayType(typeof(object).GetSchemaFromType(null), int.MinValue, int.MaxValue);
 					}
 				}
 				else
@@ -312,7 +312,17 @@ namespace CG.Test.Editor.FrontEnd
 				{
 					if (itemsNode.TryParseLinkedSchemaType(logger, registeredTypes, out var elementType))
 					{
-						type = new LinkedSchemaArrayType(elementType);
+						if (!objectNode.TryGetValue<int>("minItems", logger, out var minimumItemCount))
+						{
+							minimumItemCount = 0;
+						}
+
+						if (!objectNode.TryGetValue<int>("maxItems", logger, out var maximumItemCount))
+						{
+							maximumItemCount = int.MaxValue;
+						}
+
+						type = new LinkedSchemaArrayType(elementType, minimumItemCount, maximumItemCount);
 						return true;
 					}
 				}

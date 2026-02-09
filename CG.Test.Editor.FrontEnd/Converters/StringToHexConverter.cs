@@ -1,31 +1,24 @@
 ﻿using System.Globalization;
-using System.Windows.Data;
 
 namespace CG.Test.Editor.FrontEnd.Converters
 {
-    public class StringToHexConverter : IValueConverter
+    public class StringToHexConverter : ValueConverterBase<byte, string>
     {
-        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        public override string Convert(byte source) => System.Convert.ToString(source, 16).ToUpper();
+
+        public override byte ConvertBack(string stringValue)
         {
-            var byteValue = (byte)value;
-            return System.Convert.ToString(byteValue, 16).ToUpper();
-        }
+			if (!int.TryParse(stringValue, NumberStyles.HexNumber, CultureInfo.InvariantCulture, out var intValue))
+			{
+				return 0;
+			}
 
-        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
-        {
-            var stringValue = (string)value;
+			if (intValue > byte.MaxValue)
+			{
+				return byte.Parse(stringValue.AsSpan(0, 2), NumberStyles.HexNumber);
+			}
 
-            if (!int.TryParse(stringValue, NumberStyles.HexNumber, CultureInfo.InvariantCulture, out var intValue))
-            {
-                return (byte)0;
-            }
-
-            if (intValue > byte.MaxValue)
-            {
-                return byte.Parse(stringValue.AsSpan(0, 2), NumberStyles.HexNumber);
-            }
-
-            return (byte)intValue;
-        }
+			return (byte)intValue;
+		}
     }
 }
