@@ -129,7 +129,8 @@
 							<ContentControl.Resources>
 								<viewmodelnodes:IsInsertEnabledConverter x:Key="IsInsertEnabledConverter"/>
 								<viewmodelnodes:IsDeleteEnabledConverter x:Key="IsDeleteEnabledConverter"/>
-								
+								<viewmodelnodes:IsPasteEnabledConverter  x:Key="IsPasteEnabledConverter"/>
+
 								<DataTemplate DataType="{x:Type viewmodelnodes:ArrayNodeViewModel}">
 									<Grid>
 										<Grid.RowDefinitions>
@@ -146,7 +147,7 @@
 														</DataTrigger>
 													</Style.Triggers>
 												</Style>
-												
+
 												<Style x:Key="DeleteMultipleSelectionButton" 
 													   TargetType="{x:Type Button}" BasedOn="{StaticResource {x:Static ToolBar.ButtonStyleKey}}">
 													<Setter Property="IsEnabled" Value="False"/>
@@ -169,6 +170,26 @@
 													<Setter Property="IsEnabled" Value="False"/>
 													<Style.Triggers>
 														<DataTrigger Binding="{Binding Path=Editor.HasClipboardNodes}" Value="True">
+															<Setter Property="IsEnabled" Value="True"/>
+														</DataTrigger>
+													</Style.Triggers>
+												</Style>
+
+
+												<Style x:Key="ClipboardItemCountInRange" 
+													   TargetType="{x:Type Button}" BasedOn="{StaticResource {x:Static ToolBar.ButtonStyleKey}}">
+													<Setter Property="IsEnabled" Value="False"/>
+													<Style.Triggers>
+														<DataTrigger Value="True">
+															<DataTrigger.Binding>
+																<MultiBinding Converter="{StaticResource IsPasteEnabledConverter}">
+																	<MultiBinding.Bindings>
+																		<Binding Path="Elements.Count"/>
+																		<Binding Path="Type"/>
+																		<Binding Path="Editor.ClipboardNodes.Count"/>
+																	</MultiBinding.Bindings>
+																</MultiBinding>
+															</DataTrigger.Binding>
 															<Setter Property="IsEnabled" Value="True"/>
 														</DataTrigger>
 													</Style.Triggers>
@@ -271,22 +292,21 @@
 													CommandParameter="{Binding ElementName=_listView, Path=SelectedItems}"
 													Style="{StaticResource MultipleSelectionButton}"/>
 
-											<Button
-													FontSize="18"
+											<Button FontSize="18"
 													Command="{Binding PasteElementsCommand}"
-													Style="{StaticResource ClipboardHasItemsButton}">
+													Style="{StaticResource ClipboardItemCountInRange}">
 												<Button.Content>
 													<StackPanel Orientation="Horizontal">
 														<TextBlock FontFamily="{StaticResource SymbolFont}" Text="&#xe77f;"/>
 														<TextBlock Text=" *" 
-													   Visibility="{Binding Editor.MainViewModel.IsAltDown, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+																   Visibility="{Binding Editor.MainViewModel.IsAltDown, Converter={StaticResource BooleanToVisibilityConverter}}"/>
 													</StackPanel>
 												</Button.Content>
 											</Button>
 
 											<Button Command="{Binding PasteAboveElementsCommand}" 
 													CommandParameter="{Binding ElementName=_listView, Path=SelectedIndex}"
-													Style="{StaticResource PasteSingleSelectionButton}">
+													Style="{StaticResource ClipboardItemCountInRange}">
 												<StackPanel Orientation="Vertical" HorizontalAlignment="Center">
 													<TextBlock HorizontalAlignment="Center" FontFamily="{StaticResource SymbolFont}" FontSize="12" Margin="2" Text="&#xe74a;"/>
 													<TextBlock HorizontalAlignment="Center" FontFamily="{StaticResource SymbolFont}" FontSize="18" Margin="2" Text="&#xe77f;"/>
@@ -295,7 +315,7 @@
 
 											<Button Command="{Binding PasteBelowElementsCommand}" 
 													CommandParameter="{Binding ElementName=_listView, Path=SelectedIndex}"
-													Style="{StaticResource PasteSingleSelectionButton}">
+													Style="{StaticResource ClipboardItemCountInRange}">
 												<StackPanel Orientation="Vertical" HorizontalAlignment="Center">
 													<TextBlock HorizontalAlignment="Center" FontFamily="{StaticResource SymbolFont}" FontSize="18" Margin="2" Text="&#xe77f;"/>
 													<TextBlock HorizontalAlignment="Center" FontFamily="{StaticResource SymbolFont}" FontSize="12" Margin="2" Text="&#xe74b;"/>

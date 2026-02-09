@@ -1,5 +1,6 @@
 ﻿using System.Globalization;
 using System.Reflection;
+using System.Windows;
 using System.Windows.Data;
 
 namespace CG.Test.Editor.FrontEnd
@@ -18,6 +19,11 @@ namespace CG.Test.Editor.FrontEnd
 	{
         object? IMultiValueConverter.Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
         {
+            if (values.Any((item) => item == DependencyProperty.UnsetValue))
+            {
+                return null;
+            }
+
             var method = GetType().GetMethod("Convert", BindingFlags.Instance | BindingFlags.Public);
             return method is not null ? method.Invoke(this, values) : throw new NotImplementedException();
         }

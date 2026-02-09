@@ -28,6 +28,14 @@ namespace CG.Test.Editor.FrontEnd.ViewModels.Nodes
 		}
     }
 
+	public class IsPasteEnabledConverter : MultiValueConverterBase<bool>
+	{
+		public bool Convert(int elementCount, LinkedSchemaArrayType arrayType, int clipboardCount)
+		{
+			return clipboardCount > 0 && elementCount + clipboardCount <= arrayType.MaximumItemCount;
+		}
+	}
+
 	public partial class ArrayNodeViewModel : NodeViewModelBase
     {
         public ArrayNodeViewModel(FileInstanceViewModel editor, NodeViewModelBase? parent, IEnumerable<NodeViewModelBase> nodes, LinkedSchemaArrayType type) : base(editor, parent)
