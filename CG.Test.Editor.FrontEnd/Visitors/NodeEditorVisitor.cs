@@ -33,7 +33,12 @@ namespace CG.Test.Editor.FrontEnd.Visitors
             parameters.AddButton("Change Type");
             if (_editor.OwnerWindow.ShowMessage(parameters) == 1)
             {   
-                var generatedVariantNode = (VariantNodeViewModel)variantNode.VariantType.Visit(new NodeViewModelGeneratorVisitor(_editor, variantNode.Parent, null));
+                var generatedVariantNode = (VariantNodeViewModel?)variantNode.VariantType.Visit(new NodeViewModelGeneratorVisitor(_editor, variantNode.Parent, null));
+                if (generatedVariantNode is null)
+                {
+                    return;
+                }
+
                 variantNode.SelectedObject = generatedVariantNode.SelectedObject;
             }
 

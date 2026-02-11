@@ -35,4 +35,8 @@
     </Compile>
   </ItemGroup>
 
+	<Target Name="RunPowerShellScript" AfterTargets="Publish">
+		<Exec WorkingDirectory="..\VersionControlEditor" Command="AssemblyVersionUpdate.bat"/>
+	</Target>
+
 </Project>

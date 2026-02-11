@@ -14,7 +14,7 @@ namespace CG.Test.Editor.FrontEnd.ViewModels.Nodes
 
 		partial void OnValueChanged(TValue? oldValue, TValue newValue)
 		{
-			HasChanges = true;
+			Editor.HasChanges = true;
 		}
 
 		public bool Equals(ValueNodeViewModelBase<TValue>? other) => other is not null && Value.Equals(other.Value);

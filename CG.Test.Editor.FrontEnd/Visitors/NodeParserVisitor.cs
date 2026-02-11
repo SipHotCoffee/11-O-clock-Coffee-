@@ -20,7 +20,7 @@ namespace CG.Test.Editor.FrontEnd.Visitors
 
 		private readonly Dictionary<ulong, List<ReferenceNodeViewModel>> _referenceNodesToAssign = referenceNodesToAssign;
 
-		public NodeViewModelBase? Parent { get; set; } = parent;
+		public NodeViewModelBase? Parent { get; } = parent;
 
 		public NodePath CurrentPath { get; set; } = currentPath;
 

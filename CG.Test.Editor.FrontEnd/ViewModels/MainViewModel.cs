@@ -203,7 +203,7 @@ namespace CG.Test.Editor.FrontEnd.ViewModels
                         }
                     }
 
-                    rootNodeViewModel?.HasChanges = false;
+                    instance.HasChanges = false;
 					instance.Root = rootNodeViewModel;
 					OpenFiles.Add(instance);
 					SelectedFile = instance;

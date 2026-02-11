@@ -1,50 +1,70 @@
 ﻿using CG.Test.Editor.FrontEnd.Models.LinkedTypes;
 using CommunityToolkit.Mvvm.ComponentModel;
 using System.Text.Json;
+using System.Xml.Linq;
 
 namespace CG.Test.Editor.FrontEnd.ViewModels.Nodes
 {
     public partial class ReferenceNodeViewModel : NodeViewModelBase
 	{
-		[ObservableProperty]
-		private NodeViewModelBase? _node;
+		private WeakReference<NodeViewModelBase>? _nodeReference;
 
 		[ObservableProperty]
 		private NodePath? _path;
 
         public ReferenceNodeViewModel(FileInstanceViewModel editor, NodeViewModelBase? parent, LinkedSchemaReferenceType type, NodeViewModelBase? node) : base(editor, parent)
         {
-            Type = type;
-			Node = node;
+			_nodeReference = node is not null ? new WeakReference<NodeViewModelBase>(node) : null;
 
-			if (node is not null)
-			{
-				editor.CachedPaths.AddReference(node);
-			}
+			Type = type;
         }
 
-		partial void OnNodeChanged(NodeViewModelBase? oldValue, NodeViewModelBase? newValue)
-        {
-            if (oldValue is not null)
+		public NodeViewModelBase? Node
+		{
+			get
 			{
-				Editor.CachedPaths.RemoveReference(oldValue);
+				if (_nodeReference is not null && _nodeReference.TryGetTarget(out var node))
+				{
+					return node;
+				}
+				return null;
 			}
+			set
+			{
+				if (value is not null)
+				{
+					OnPropertyChanging();
 
-			if (newValue is not null)
-			{
-				Editor.CachedPaths.AddReference(newValue);
+					if (_nodeReference is null)
+					{
+						_nodeReference = new WeakReference<NodeViewModelBase>(value);
+					}
+					else
+					{
+						_nodeReference.SetTarget(value);
+					}
+					
+					OnPropertyChanged();
+				}
 			}
-        }
+		}
 
         public override LinkedSchemaReferenceType Type { get; }
 
-		public override ReferenceNodeViewModel Clone(NodeViewModelBase? parent) => new(Editor, parent, Type, Node);
+        public override ReferenceNodeViewModel Clone(NodeViewModelBase? parent) => new(Editor, parent, Type, Node);
 
-		protected override string GetName(NodeViewModelBase item) => $"Reference -> ({(Node?.Name) ?? "null"})";
+        protected override string GetName(NodeViewModelBase item) => $"Reference -> ({(Node?.Name) ?? "null"})";
 
-		public override void SerializeTo(Utf8JsonWriter writer)
+        public override void SerializeTo(Utf8JsonWriter writer, IReadOnlyDictionary<NodeViewModelBase, ulong> referencedNodes)
 		{
-			writer.WriteNumberValue(Editor.CachedPaths.GetReferenceId(Node));
+			if (_nodeReference is not null && _nodeReference.TryGetTarget(out var node) && referencedNodes.TryGetValue(node, out var id))
+			{
+				writer.WriteNumberValue(id);
+			}
+			else
+			{
+				writer.WriteNumberValue(0);
+			}
 		}
 	}
 }

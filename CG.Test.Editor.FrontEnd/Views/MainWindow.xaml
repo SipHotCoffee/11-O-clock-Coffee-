@@ -23,7 +23,7 @@
 		<BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
 	</Window.Resources>
 	<Window.InputBindings>
-		<KeyBinding Modifiers="Ctrl" Key="N" Command="{Binding NewFileCommand}" CommandParameter="{Binding RelativeSource={RelativeSource AncestorType={x:Type Window}}}"/>
+		<KeyBinding Modifiers="Ctrl" Key="N" Command="{Binding NewFileCommand}"  CommandParameter="{Binding RelativeSource={RelativeSource AncestorType={x:Type Window}}}"/>
 		<KeyBinding Modifiers="Ctrl" Key="O" Command="{Binding OpenFileCommand}" CommandParameter="{Binding RelativeSource={RelativeSource AncestorType={x:Type Window}}}"/>
 		<KeyBinding Modifiers="Ctrl" Key="S" Command="{Binding SaveFileCommand}"/>
 	</Window.InputBindings>
@@ -47,7 +47,7 @@
 								<DataTrigger Binding="{Binding OpenFiles.Count}" Value="0">
 									<Setter Property="IsEnabled" Value="False"/>
 								</DataTrigger>
-								<DataTrigger Binding="{Binding SelectedFile.Root.HasChanges}" Value="False">
+								<DataTrigger Binding="{Binding SelectedFile.HasChanges}" Value="False">
 									<Setter Property="IsEnabled" Value="False"/>
 								</DataTrigger>
 							</Style.Triggers>
@@ -81,7 +81,7 @@
 						</Grid.ColumnDefinitions>
 						<TextBlock Grid.Column="0" TextAlignment="Center" Text="{Binding Name}" VerticalAlignment="Center"/>
 						<TextBlock Grid.Column="1" Text="*" 
-								   Visibility="{Binding Root.HasChanges, Converter={StaticResource BooleanToVisibilityConverter}}"
+								   Visibility="{Binding HasChanges, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}"
 								   VerticalAlignment="Center"/>
 						
 						<Button Grid.Column="2" Margin="5, 0, 5, 0" FontSize="10" FontFamily="{StaticResource SymbolFont}" 
@@ -174,7 +174,6 @@
 														</DataTrigger>
 													</Style.Triggers>
 												</Style>
-
 
 												<Style x:Key="ClipboardItemCountInRange" 
 													   TargetType="{x:Type Button}" BasedOn="{StaticResource {x:Static ToolBar.ButtonStyleKey}}">
@@ -403,7 +402,7 @@
 										<ListView.View>
 											<GridView>
 												<GridView.Columns>
-													<GridViewColumn Header="Property Name">
+													<GridViewColumn Width="auto" Header="Property Name">
 														<GridViewColumn.CellTemplate>
 															<DataTemplate>
 																<StackPanel Orientation="Horizontal" VerticalAlignment="Center">
@@ -415,7 +414,7 @@
 															</DataTemplate>
 														</GridViewColumn.CellTemplate>
 													</GridViewColumn>
-													<GridViewColumn Header="Value">
+													<GridViewColumn Width="auto" Header="Value">
 														<GridViewColumn.CellTemplate>
 															<DataTemplate>
 																<ContentControl VerticalAlignment="Center" Content="{Binding Value}" 

@@ -20,11 +20,12 @@ namespace CG.Test.Editor.FrontEnd.ViewModels.Nodes
 			SelectedObject = selectedObject;
         }
 
-        public override void SerializeTo(Utf8JsonWriter writer) => SelectedObject.SerializeTo(writer);
-
         public override IEnumerable<NodeViewModelBase> Children => SelectedObject.Children;
 
-        protected override string GetName(NodeViewModelBase item)
+		public override void SerializeTo(Utf8JsonWriter writer, IReadOnlyDictionary<NodeViewModelBase, ulong> referencedNodes)
+		   => SelectedObject.SerializeTo(writer, referencedNodes);
+
+		protected override string GetName(NodeViewModelBase item)
         {
 			if (SelectedObject.Type.TryGetProperty("name", out var property) && SelectedObject.Nodes[property.Index].Value is StringNodeViewModel stringNode)
 			{

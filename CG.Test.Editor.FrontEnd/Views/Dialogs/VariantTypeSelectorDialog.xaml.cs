@@ -46,6 +46,7 @@ namespace CG.Test.Editor.FrontEnd.Views.Dialogs
 
 		private void Ok_Button_Click(object sender, RoutedEventArgs e)
         {
+			DialogResult = true;
 			Close();
 		}
 	}

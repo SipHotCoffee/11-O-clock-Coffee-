@@ -2,22 +2,15 @@
 using CG.Test.Editor.FrontEnd.ViewModels.Nodes;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using System.Numerics;
 using System.Text.Json;
 
 namespace CG.Test.Editor.FrontEnd.ViewModels
 {
-    public abstract partial class NodeViewModelBase(FileInstanceViewModel editor, NodeViewModelBase? parent) : ObservableObject
+    public abstract partial class NodeViewModelBase(FileInstanceViewModel editor, NodeViewModelBase? parent) : ObservableObject, IEquatable<NodeViewModelBase>, IEqualityOperators<NodeViewModelBase, NodeViewModelBase, bool>
     {
-        [ObservableProperty]
-        private bool _hasChanges;
-
 		[ObservableProperty]
 		private NodeViewModelBase? _selectedNode;
-
-		partial void OnHasChangesChanged(bool oldValue, bool newValue)
-        {
-            Parent?.HasChanges = newValue;   
-        }
 
         public NodeViewModelBase Root => Parent?.Root ?? this;
 
@@ -52,7 +45,6 @@ namespace CG.Test.Editor.FrontEnd.ViewModels
                     }
                 }
 
-                Parent = null;
                 return NodePath.Root;
             }
         }
@@ -71,7 +63,7 @@ namespace CG.Test.Editor.FrontEnd.ViewModels
 
         public abstract NodeViewModelBase Clone(NodeViewModelBase? parent);
 
-        public abstract void SerializeTo(Utf8JsonWriter writer);
+        public abstract void SerializeTo(Utf8JsonWriter writer, IReadOnlyDictionary<NodeViewModelBase, ulong> referencedNodes);
 
 		protected abstract string GetName(NodeViewModelBase item);
 
@@ -80,5 +72,43 @@ namespace CG.Test.Editor.FrontEnd.ViewModels
 		{
 			Editor.Navigate(this);
 		}
-	}
+
+        public bool Equals(NodeViewModelBase? other) => Equals(this, other);
+
+		public static bool Equals(NodeViewModelBase? leftNode, NodeViewModelBase? rightNode)
+        {
+            if (ReferenceEquals(leftNode, rightNode))
+            {
+                return true;
+            }
+
+            var left = leftNode;
+            if (left is VariantNodeViewModel leftVariantNode)
+            {
+                left = leftVariantNode.SelectedObject;
+            }
+
+			var right = rightNode;
+			if (right is VariantNodeViewModel rightVariantNode)
+			{
+				right = rightVariantNode.SelectedObject;
+			}
+
+            return ReferenceEquals(left, right);
+		}
+
+        public static bool operator ==(NodeViewModelBase? left, NodeViewModelBase? right) => Equals(left, right);
+        public static bool operator !=(NodeViewModelBase? left, NodeViewModelBase? right) => !Equals(left, right);
+
+        public override bool Equals(object? obj) => Equals(obj as NodeViewModelBase);
+
+        public override int GetHashCode()
+        {
+            if (this is VariantNodeViewModel variantNode)
+            {
+                return variantNode.SelectedObject.GetHashCode();
+            }
+            return base.GetHashCode();
+        }
+    }
 }

@@ -1,15 +1,15 @@
 ﻿using CG.Test.Editor.FrontEnd.Models.LinkedTypes;
+using CG.Test.Editor.FrontEnd.ViewModels.Nodes;
 using CG.Test.Editor.FrontEnd.Views.Dialogs;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.Win32;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
+using System.Runtime.CompilerServices;
 using System.Text.Json;
 using System.Windows;
-using System.Windows.Data;
-using System.Windows.Threading;
-using System.Xml.Linq;
 
 namespace CG.Test.Editor.FrontEnd.ViewModels
 {
@@ -17,7 +17,7 @@ namespace CG.Test.Editor.FrontEnd.ViewModels
     {
         private static int _lastId = 1;
 
-        private readonly List<NodeViewModelBase> _history;
+		private readonly List<NodeViewModelBase> _history;
 
 		[ObservableProperty]
 		private MainViewModel _mainViewModel;
@@ -35,6 +35,9 @@ namespace CG.Test.Editor.FrontEnd.ViewModels
         private string _name;
 
 		[ObservableProperty]
+		private bool _hasChanges;
+
+		[ObservableProperty]
 		private NodeViewModelBase? _root;
 
 		[ObservableProperty]
@@ -49,7 +52,7 @@ namespace CG.Test.Editor.FrontEnd.ViewModels
 		public FileInstanceViewModel(MainViewModel mainViewModel, FileInfo? file, Window ownerWindow)
         {
 			_history = [];
-            
+
             MainViewModel = mainViewModel;
 
 			HistoryIndex = 0;
@@ -62,8 +65,6 @@ namespace CG.Test.Editor.FrontEnd.ViewModels
 
 			AddressItems = [];
 
-            CachedPaths = new();
-
             HasClipboardNodes = false;
 		}
 
@@ -72,8 +73,6 @@ namespace CG.Test.Editor.FrontEnd.ViewModels
 		public Window OwnerWindow { get; }
 
 		public ObservableCollection<NodeViewModelBase> AddressItems { get; }
-
-        public CachedNodeReferenceCollection CachedPaths { get; }
 
         partial void OnClipboardNodesChanged(ObservableCollection<NodeViewModelBase>? oldValue, ObservableCollection<NodeViewModelBase>? newValue)
         {
@@ -110,9 +109,24 @@ namespace CG.Test.Editor.FrontEnd.ViewModels
 			await using var writer = new Utf8JsonWriter(stream);
 			writer.WriteStartObject();
 			{
+				var referencedNodes = new Dictionary<NodeViewModelBase, ulong>();
+
 				writer.WriteStartArray("referencePaths");
 				{
-					foreach (var (node, id) in CachedPaths)
+					var nextId = 1UL;
+					
+					foreach (var node in Root!.AllChildren)
+					{
+						if (node is ReferenceNodeViewModel referenceNode)
+						{
+							if (referenceNode.Node is not null)
+							{
+								referencedNodes.TryAdd(referenceNode.Node, nextId++);
+							}
+						}
+					}
+
+					foreach (var (node, id) in referencedNodes)
 					{
 						writer.WriteStartObject();
 						{
@@ -124,7 +138,7 @@ namespace CG.Test.Editor.FrontEnd.ViewModels
 									element.SerializeTo(writer);
 								}
 							}
-							writer.WriteEndObject();
+							writer.WriteEndArray();
 						}
 						writer.WriteEndObject();
 					}
@@ -132,12 +146,12 @@ namespace CG.Test.Editor.FrontEnd.ViewModels
 				writer.WriteEndArray();
 
 				writer.WritePropertyName("content");
-				Root!.SerializeTo(writer);
+				Root!.SerializeTo(writer, referencedNodes);
 			}
 			writer.WriteEndObject();
 
 			await writer.FlushAsync();
-			Root.HasChanges = false;
+			HasChanges = false;
 		}
 
 		private async Task SaveAsFileAsync()
@@ -152,6 +166,7 @@ namespace CG.Test.Editor.FrontEnd.ViewModels
 				await using var stream = saveFileDialog.OpenFile();
 				await SaveFileAsync(stream);
 				File = new FileInfo(saveFileDialog.FileName);
+				Name = File.Name;
 			}
 		}
 
@@ -161,9 +176,9 @@ namespace CG.Test.Editor.FrontEnd.ViewModels
 			{
 				await SaveAsFileAsync();
 			}
-			else if (Root!.HasChanges)
+			else if (HasChanges)
 			{
-				await using var stream = File.OpenWrite();
+				await using var stream = File.Open(FileMode.Truncate, FileAccess.Write);
 				await SaveFileAsync(stream);
 			}
 		}
@@ -210,7 +225,7 @@ namespace CG.Test.Editor.FrontEnd.ViewModels
 
 		public async Task<bool> CloseAsync()
 		{
-			if (Root?.HasChanges == true)
+			if (HasChanges)
 			{
 				var messageBoxParameters = new MessageBoxParameters($"Save changes to '{Name}'?", "CG Json Editor", "Yes");
 				messageBoxParameters.AddButton("No");

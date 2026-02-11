@@ -18,8 +18,8 @@ namespace CG.Test.Editor.FrontEnd.ViewModels.Nodes
 
         private void Nodes_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
         {
-            HasChanges = true;
-        }
+            Editor.HasChanges = true;
+		}
 
         public ObservableCollection<KeyValuePair<string, NodeViewModelBase>> Nodes { get; }
 
@@ -56,13 +56,13 @@ namespace CG.Test.Editor.FrontEnd.ViewModels.Nodes
 
         public override IEnumerable<NodeViewModelBase> Children => Nodes.Select((pair) => pair.Value);
 
-		public override void SerializeTo(Utf8JsonWriter writer)
+		public override void SerializeTo(Utf8JsonWriter writer, IReadOnlyDictionary<NodeViewModelBase, ulong> referencedNodes)
 		{
 			writer.WriteStartObject();
 			foreach (var pair in Nodes)
 			{
 				writer.WritePropertyName(pair.Key);
-                pair.Value.SerializeTo(writer);
+                pair.Value.SerializeTo(writer, referencedNodes);
 			}
 			writer.WriteEndObject();
 		}

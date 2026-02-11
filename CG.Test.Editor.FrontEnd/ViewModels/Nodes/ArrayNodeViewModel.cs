@@ -57,7 +57,7 @@ namespace CG.Test.Editor.FrontEnd.ViewModels.Nodes
 
 		private void Elements_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
         {
-            HasChanges = true;
+            Editor.HasChanges = true;
 
             for (var i = Indices.Count; i < Elements.Count; i++)
             {
@@ -107,6 +107,11 @@ namespace CG.Test.Editor.FrontEnd.ViewModels.Nodes
                 {
                     var baseNode = Type.ElementType.Visit(new NodeViewModelGeneratorVisitor(Editor, this, null));
 
+                    if (baseNode is null)
+                    {
+                        return;
+                    }
+
                     for (var i = 0; i < itemDialog.ItemCount; i++)
                     {
                         Elements.Add(baseNode.Clone(this));
@@ -115,20 +120,32 @@ namespace CG.Test.Editor.FrontEnd.ViewModels.Nodes
             }
             else
             {
-                Elements.Add(Type.ElementType.Visit(new NodeViewModelGeneratorVisitor(Editor, this, null)));
+                var newNode = Type.ElementType.Visit(new NodeViewModelGeneratorVisitor(Editor, this, null));
+                if (newNode is not null)
+                {
+                    Elements.Add(newNode);
+                }
             }
         }
 
 		[RelayCommand]
 		void InsertAbove(int selectedIndex)
 		{
-            Elements.Insert(selectedIndex, Type.ElementType.Visit(new NodeViewModelGeneratorVisitor(Editor, this, null)));   
+			var newNode = Type.ElementType.Visit(new NodeViewModelGeneratorVisitor(Editor, this, null));
+            if (newNode is not null)
+            {
+                Elements.Insert(selectedIndex, newNode);
+            }   
 		}
 
 		[RelayCommand]
 		void InsertBelow(int selectedIndex)
 		{
-            Elements.Insert(selectedIndex + 1, Type.ElementType.Visit(new NodeViewModelGeneratorVisitor(Editor, this, null)));
+			var newNode = Type.ElementType.Visit(new NodeViewModelGeneratorVisitor(Editor, this, null));
+            if (newNode is not null)
+            {
+                Elements.Insert(selectedIndex + 1, newNode);
+            }
 		}
 
 		[RelayCommand]
@@ -250,12 +267,12 @@ namespace CG.Test.Editor.FrontEnd.ViewModels.Nodes
 
         public override IReadOnlyList<NodeViewModelBase> Children => Elements;
 
-        public override void SerializeTo(Utf8JsonWriter writer)
+        public override void SerializeTo(Utf8JsonWriter writer, IReadOnlyDictionary<NodeViewModelBase, ulong> referencedNodes)
         {
             writer.WriteStartArray();
             foreach (var element in Elements)
             {
-                element.SerializeTo(writer);
+                element.SerializeTo(writer, referencedNodes);
             }
             writer.WriteEndArray();
         }

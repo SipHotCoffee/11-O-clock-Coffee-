@@ -49,29 +49,29 @@ namespace CG.Test.Editor.FrontEnd.Views.Dialogs
         public partial bool IsFilterEnabled { get; set; }
 
         [DependencyProperty]
-        public partial NodeViewModelBase OldValue { get; set; }
+        public partial NodeViewModelBase? OldValue { get; set; }
 
 		[DependencyProperty]
-		public partial NodeViewModelBase NewValue { get; set; }
+		public partial NodeViewModelBase? NewValue { get; set; }
 
         partial void OnSelectedPropertyChanged(LinkedSchemaProperty oldValue, LinkedSchemaProperty newValue)
         {
             var visitor = new NodeViewModelGeneratorVisitor(_instanceViewModel, _parent, null);
 
-			OldValue = newValue.Type.Visit(visitor);
-			NewValue = newValue.Type.Visit(visitor);
+			OldValue = newValue.Type.Visit(visitor)!;
+			NewValue = newValue.Type.Visit(visitor)!;
 		}
 
         private void OldValueButton_Click(object sender, RoutedEventArgs e)
         {
             var visitor = new NodeEditorVisitor(_instanceViewModel, true);
-            OldValue.Visit(visitor);
+            OldValue?.Visit(visitor);
 		}
 
         private void NewValueButton_Click(object sender, RoutedEventArgs e)
         {
 			var visitor = new NodeEditorVisitor(_instanceViewModel, true);
-			NewValue.Visit(visitor);
+			NewValue?.Visit(visitor);
 		}
 
         private void CloseButton_Click(object sender, RoutedEventArgs e)

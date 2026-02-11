@@ -119,17 +119,42 @@
 					IsEnabled="{Binding IsFilterEnabled}"
 					Margin="5, 2.5, 2.5, 2.5"
 					VerticalAlignment="Center" 
-					Click="OldValueButton_Click">
+					Click="OldValueButton_Click" Resources="{StaticResource NodeVeryCompactDataTemplates}">
+				<Button.Style>
+					<Style TargetType="{x:Type Button}" BasedOn="{StaticResource {x:Type Button}}">
+						<Setter Property="Visibility" Value="Visible"/>
+						<Style.Triggers>
+							<DataTrigger Binding="{Binding OldValue, Converter={StaticResource IsNotNullConverter}}" Value="False">
+								<Setter Property="Visibility" Value="Collapsed"/>
+							</DataTrigger>
+						</Style.Triggers>
+					</Style>
+				</Button.Style>
 				<StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-					<TextBlock Text="Old Value: "/>
-					<ContentPresenter Content="{Binding OldValue}"/>
+					<TextBlock Text="Old Value: " VerticalAlignment="Center"/>
+					<ContentPresenter Content="{Binding OldValue}" VerticalAlignment="Center"/>
 				</StackPanel>
 			</Button>
 		</Grid>
-		<Button x:Name="_newValueButton" Grid.Column="1" Grid.Row="1" Margin="2.5, 2.5, 5, 2.5" VerticalAlignment="Center" Click="NewValueButton_Click">
+		<Button x:Name="_newValueButton" 
+				Grid.Column="1" 
+				Grid.Row="1" Margin="2.5, 2.5, 5, 2.5" 
+				VerticalAlignment="Center" 
+				Resources="{StaticResource NodeVeryCompactDataTemplates}" 
+				Click="NewValueButton_Click">
+			<Button.Style>
+				<Style TargetType="{x:Type Button}" BasedOn="{StaticResource {x:Type Button}}">
+					<Setter Property="Visibility" Value="Visible"/>
+					<Style.Triggers>
+						<DataTrigger Binding="{Binding NewValue, Converter={StaticResource IsNotNullConverter}}" Value="False">
+							<Setter Property="Visibility" Value="Collapsed"/>
+						</DataTrigger>
+					</Style.Triggers>
+				</Style>
+			</Button.Style>
 			<StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-				<TextBlock Text="New Value: "/>
-				<ContentPresenter Content="{Binding NewValue}"/>
+				<TextBlock Text="New Value: " VerticalAlignment="Center"/>
+				<ContentPresenter VerticalAlignment="Center" Content="{Binding NewValue}"/>
 			</StackPanel>
 		</Button>
 
