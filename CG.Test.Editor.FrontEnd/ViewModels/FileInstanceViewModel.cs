@@ -5,6 +5,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.Win32;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.IO;
 using System.Text.Json;
 using System.Windows;
@@ -168,7 +169,7 @@ namespace CG.Test.Editor.FrontEnd.ViewModels
 			}
 		}
 
-		public async Task Save()
+		public async Task SaveAsync()
         {
 			if (File?.Exists != true)
 			{
@@ -181,7 +182,7 @@ namespace CG.Test.Editor.FrontEnd.ViewModels
 			}
 		}
 
-        public async Task SaveAs()
+        public async Task SaveAsAsync()
         {
 			await SaveAsFileAsync();
 		}
@@ -232,7 +233,7 @@ namespace CG.Test.Editor.FrontEnd.ViewModels
 				switch (OwnerWindow.ShowMessage(messageBoxParameters))
 				{
 					case 0:
-						await Save();
+						await SaveAsync();
 						break;
 					case 2:
 						return false;
@@ -241,6 +242,39 @@ namespace CG.Test.Editor.FrontEnd.ViewModels
 
 			MainViewModel.OpenFiles.Remove(this);
 			return true;
+		}
+
+		[RelayCommand]
+		async Task OpenInExplorer()
+		{
+			if (File is null)
+			{
+				return;
+			}
+
+			using var process = Process.Start(new ProcessStartInfo()
+			{
+				FileName = File.DirectoryName,
+				UseShellExecute = true,
+				CreateNoWindow = true
+			});
+
+			if (process is not null)
+			{
+				await process.WaitForExitAsync();
+			}
+		}
+
+		[RelayCommand]
+		async Task Save()
+		{
+			await SaveAsync();
+		}
+
+		[RelayCommand]
+		async Task SaveAs()
+		{
+			await SaveAsAsync();
 		}
 
 		[RelayCommand]

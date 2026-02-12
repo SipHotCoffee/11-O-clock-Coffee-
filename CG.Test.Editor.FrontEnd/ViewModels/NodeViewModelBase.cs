@@ -122,6 +122,7 @@ namespace CG.Test.Editor.FrontEnd.ViewModels
 
         public void Release()
         {
+            Parent = null;
             IsAlive = false;
             foreach (var child in Children)
             {

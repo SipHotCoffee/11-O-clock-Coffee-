@@ -4,8 +4,7 @@
              xmlns:local="clr-namespace:CG.Test.Editor.FrontEnd.Views" 
 			 xmlns:dialogs="clr-namespace:CG.Test.Editor.FrontEnd.Views.Dialogs" 
 			 xmlns:viewmodels="clr-namespace:CG.Test.Editor.FrontEnd.ViewModels" 
-			 xmlns:viewmodelnodes="clr-namespace:CG.Test.Editor.FrontEnd.ViewModels.Nodes"
-			 StartupUri="Views/MainWindow.xaml">
+			 xmlns:viewmodelnodes="clr-namespace:CG.Test.Editor.FrontEnd.ViewModels.Nodes">
 	<Application.Resources>
 		<ResourceDictionary>
 			<ResourceDictionary.MergedDictionaries>

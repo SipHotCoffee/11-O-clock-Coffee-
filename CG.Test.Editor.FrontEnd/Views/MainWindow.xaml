@@ -14,10 +14,7 @@
 					IsMicaBackgroundEnabled="True" 
 					WindowStartupLocation="CenterScreen" 
 					WindowState="Maximized" 
-					Closing="Window_Closing">
-	<Window.DataContext>
-		<viewmodels:MainViewModel/>
-	</Window.DataContext>
+					Closing="Window_Closing" d:DataContext="{d:DesignInstance Type={x:Type viewmodels:MainViewModel}}" Loaded="Window_Loaded">
 	<Window.Resources>
 		<converters:IsNotNullConverter x:Key="IsNotNullConverter"/>
 		<BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
@@ -74,18 +71,28 @@
 			<TabControl.ItemTemplate>
 				<DataTemplate>
 					<Grid VerticalAlignment="Center" HorizontalAlignment="Stretch">
+						<Grid.ContextMenu>
+							<ContextMenu>
+								<MenuItem Header="Save" Command="{Binding SaveCommand}" IsEnabled="{Binding HasChanges}"/>
+								<MenuItem Header="Save As" Command="{Binding SaveAsCommand}"/>
+								<Separator/>
+								<MenuItem Header="Open in File Explorer"
+										  Command="{Binding OpenInExplorerCommand}" 
+										  IsEnabled="{Binding File, Mode=OneWay, Converter={StaticResource IsNotNullConverter}}"/>
+							</ContextMenu>
+						</Grid.ContextMenu>
 						<Grid.ColumnDefinitions>
 							<ColumnDefinition Width="*"/>
 							<ColumnDefinition Width="auto"/>
 							<ColumnDefinition Width="auto"/>
 						</Grid.ColumnDefinitions>
 						<TextBlock Grid.Column="0" TextAlignment="Center" Text="{Binding Name}" VerticalAlignment="Center"/>
-						<TextBlock Grid.Column="1" Text="*" 
+						<TextBlock Grid.Column="1" Text="*" Margin="2.5, 0, 2.5, 0" 
 								   Visibility="{Binding HasChanges, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}"
 								   VerticalAlignment="Center"/>
 						
-						<Button Grid.Column="2" Margin="5, 0, 5, 0" FontSize="10" FontFamily="{StaticResource SymbolFont}" 
-								Content="&#xE8BB;" VerticalAlignment="Center" Command="{Binding CloseCommand}"/>
+						<Button Grid.Column="2" Margin="2.5, 0, 0, 0" Padding="6" FontSize="10" FontFamily="{StaticResource SymbolFont}" 
+								Content="&#xE8BB;" VerticalAlignment="Center" Command="{Binding CloseCommand}" Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}"/>
 					</Grid>
 				</DataTemplate>
 			</TabControl.ItemTemplate>

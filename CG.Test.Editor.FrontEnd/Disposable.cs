@@ -1,4 +1,6 @@
-﻿namespace CG.Test.Editor.FrontEnd
+﻿using System.Collections;
+
+namespace CG.Test.Editor.FrontEnd
 {
     public abstract class Disposable : IDisposable
     {
@@ -56,4 +58,32 @@
 
         protected virtual ValueTask DisposeAsyncCore() => ValueTask.CompletedTask;
     }
+
+    public class DisposableCollection(IEnumerable<IDisposable> disposables) : Disposable, IEnumerable<IDisposable>
+    {
+        private readonly IEnumerable<IDisposable> _disposables = disposables;
+
+        protected override void OnManagedDispose()
+        {
+            foreach (var disposable in _disposables)
+            {
+                disposable.Dispose();
+            }
+        }
+
+        public IEnumerator<IDisposable> GetEnumerator() => _disposables.GetEnumerator();
+
+        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+    }
+
+	public class AsyncDisposableCollection(IEnumerable<IAsyncDisposable> disposables) : AsyncDisposable, IEnumerable<IAsyncDisposable>
+	{
+		private readonly IEnumerable<IAsyncDisposable> _disposables = disposables;
+
+        protected async override ValueTask DisposeAsyncCore() => await Task.WhenAll(_disposables.Select((disposable) => disposable.DisposeAsync().AsTask()));
+
+        public IEnumerator<IAsyncDisposable> GetEnumerator() => _disposables.GetEnumerator();
+
+		IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+	}
 }
