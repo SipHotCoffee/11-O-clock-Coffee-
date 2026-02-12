@@ -4,62 +4,62 @@
         <ResourceDictionary Source="Window.xaml"/>
     </ResourceDictionary.MergedDictionaries>
     
-    <SolidColorBrush x:Key="Button.Normal.Background" Color="{StaticResource Control2}"/>
+    <SolidColorBrush x:Key="Button.Normal.Background" Color="{DynamicResource Control2}"/>
     <LinearGradientBrush x:Key="Button.Normal.Border" StartPoint="0, 0" EndPoint="0, 1">
         <LinearGradientBrush.GradientStops>
-            <GradientStop Color="{StaticResource Control5}" Offset="0.05"/>
-            <GradientStop Color="{StaticResource Control3}" Offset="0.1"/>
+            <GradientStop Color="{DynamicResource Control5}" Offset="0.05"/>
+            <GradientStop Color="{DynamicResource Control3}" Offset="0.1"/>
         </LinearGradientBrush.GradientStops>
     </LinearGradientBrush>
 
-    <SolidColorBrush x:Key="Button.MouseOver.Background" Color="{StaticResource Control3}"/>
+    <SolidColorBrush x:Key="Button.MouseOver.Background" Color="{DynamicResource Control3}"/>
     <LinearGradientBrush x:Key="Button.MouseOver.Border" StartPoint="0, 0" EndPoint="0, 1">
         <LinearGradientBrush.GradientStops>
-            <GradientStop Color="{StaticResource Control7}" Offset="0.05"/>
-            <GradientStop Color="{StaticResource Control4}" Offset="0.1"/>
+            <GradientStop Color="{DynamicResource Control7}" Offset="0.05"/>
+            <GradientStop Color="{DynamicResource Control4}" Offset="0.1"/>
         </LinearGradientBrush.GradientStops>
     </LinearGradientBrush>
 
-    <SolidColorBrush x:Key="Button.Pressed.Background" Color="{StaticResource Control1}"/>
-    <SolidColorBrush x:Key="Button.Pressed.Border"     Color="{StaticResource Control2}"/>
+    <SolidColorBrush x:Key="Button.Pressed.Background" Color="{DynamicResource Control1}"/>
+    <SolidColorBrush x:Key="Button.Pressed.Border"     Color="{DynamicResource Control2}"/>
 
-    <SolidColorBrush x:Key="Button.Disabled.Background" Color="{StaticResource Control3}"/>
-    <SolidColorBrush x:Key="Button.Disabled.Border"     Color="{StaticResource Control3}"/>
+    <SolidColorBrush x:Key="Button.Disabled.Background" Color="{DynamicResource Control3}"/>
+    <SolidColorBrush x:Key="Button.Disabled.Border"     Color="{DynamicResource Control3}"/>
 
-    <SolidColorBrush x:Key="Button.Defaulted.Normal.Background" Color="{StaticResource Accent4}"/>
+    <SolidColorBrush x:Key="Button.Defaulted.Normal.Background" Color="{DynamicResource Accent4}"/>
     <LinearGradientBrush x:Key="Button.Defaulted.Normal.Border" StartPoint="0, 0" EndPoint="0, 1">
         <LinearGradientBrush.GradientStops>
-            <GradientStop Color="{StaticResource Accent5}" Offset="0.05"/>
-            <GradientStop Color="{StaticResource Accent4}" Offset="0.1"/>
-            <GradientStop Color="{StaticResource Accent4}" Offset="0.95"/>
-            <GradientStop Color="{StaticResource Accent2}" Offset="1.0"/>
+            <GradientStop Color="{DynamicResource Accent5}" Offset="0.05"/>
+            <GradientStop Color="{DynamicResource Accent4}" Offset="0.1"/>
+            <GradientStop Color="{DynamicResource Accent4}" Offset="0.95"/>
+            <GradientStop Color="{DynamicResource Accent2}" Offset="1.0"/>
         </LinearGradientBrush.GradientStops>
     </LinearGradientBrush>
 
-    <SolidColorBrush x:Key="Button.Defaulted.MouseOver.Background" Color="{StaticResource Accent5}"/>
+    <SolidColorBrush x:Key="Button.Defaulted.MouseOver.Background" Color="{DynamicResource Accent5}"/>
     <LinearGradientBrush x:Key="Button.Defaulted.MouseOver.Border" StartPoint="0, 0" EndPoint="0, 1">
         <LinearGradientBrush.GradientStops>
-            <GradientStop Color="{StaticResource Accent6}" Offset="0.05"/>
-            <GradientStop Color="{StaticResource Accent5}" Offset="0.1" />
-            <GradientStop Color="{StaticResource Accent5}" Offset="0.95"/>
-            <GradientStop Color="{StaticResource Accent3}" Offset="1.0" />
+            <GradientStop Color="{DynamicResource Accent6}" Offset="0.05"/>
+            <GradientStop Color="{DynamicResource Accent5}" Offset="0.1" />
+            <GradientStop Color="{DynamicResource Accent5}" Offset="0.95"/>
+            <GradientStop Color="{DynamicResource Accent3}" Offset="1.0" />
         </LinearGradientBrush.GradientStops>
     </LinearGradientBrush>
 
-    <SolidColorBrush x:Key="Button.Defaulted.Pressed.Background" Color="{StaticResource Accent2}"/>
+    <SolidColorBrush x:Key="Button.Defaulted.Pressed.Background" Color="{DynamicResource Accent2}"/>
     <LinearGradientBrush x:Key="Button.Defaulted.Pressed.Border" StartPoint="0, 0" EndPoint="0, 1">
         <LinearGradientBrush.GradientStops>
-            <GradientStop Color="{StaticResource Accent1}" Offset="0.05"/>
-            <GradientStop Color="{StaticResource Accent2}" Offset="0.1"/>
-            <GradientStop Color="{StaticResource Accent2}" Offset="0.95"/>
-            <GradientStop Color="{StaticResource Accent3}" Offset="1.0"/>
+            <GradientStop Color="{DynamicResource Accent1}" Offset="0.05"/>
+            <GradientStop Color="{DynamicResource Accent2}" Offset="0.1"/>
+            <GradientStop Color="{DynamicResource Accent2}" Offset="0.95"/>
+            <GradientStop Color="{DynamicResource Accent3}" Offset="1.0"/>
         </LinearGradientBrush.GradientStops>
     </LinearGradientBrush>
 
     <Style TargetType="{x:Type Button}">
-        <Setter Property="Background"      Value="{StaticResource Button.Normal.Background}"/>
-        <Setter Property="BorderBrush"     Value="{StaticResource Button.Normal.Border}"/>
-        <Setter Property="Foreground"      Value="{StaticResource Window.Active.Foreground}"/>
+        <Setter Property="Background"      Value="{DynamicResource Button.Normal.Background}"/>
+        <Setter Property="BorderBrush"     Value="{DynamicResource Button.Normal.Border}"/>
+        <Setter Property="Foreground"      Value="{DynamicResource Window.Active.Foreground}"/>
         <Setter Property="BorderThickness" Value="1"/>
         <Setter Property="FontSize" Value="14"/>
         <Setter Property="Template">
@@ -79,20 +79,20 @@
 
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsMouseOver" Value="True">
-                            <Setter Property="Background"  Value="{StaticResource Button.MouseOver.Background}"/>
-                            <Setter Property="BorderBrush" Value="{StaticResource Button.MouseOver.Border}"/>
+                            <Setter Property="Background"  Value="{DynamicResource Button.MouseOver.Background}"/>
+                            <Setter Property="BorderBrush" Value="{DynamicResource Button.MouseOver.Border}"/>
                         </Trigger>
 
                         <Trigger Property="IsPressed" Value="True">
-                            <Setter Property="Background"  Value="{StaticResource Button.Pressed.Background}"/>
-                            <Setter Property="BorderBrush" Value="{StaticResource Button.Pressed.Border}"/>
+                            <Setter Property="Background"  Value="{DynamicResource Button.Pressed.Background}"/>
+                            <Setter Property="BorderBrush" Value="{DynamicResource Button.Pressed.Border}"/>
                         </Trigger>
 
                         <Trigger Property="IsDefault" Value="True">
-                            <Setter Property="Background"  Value="{StaticResource Button.Defaulted.Normal.Background}"/>
-                            <Setter Property="BorderBrush" Value="{StaticResource Button.Defaulted.Normal.Border}"/>
-                            <Setter Property="Foreground"  Value="{StaticResource Window.Active.InvertedForeground}"/>
-                            <!--<Setter Property="TextElement.Foreground" TargetName="_contentPresenter" Value="{StaticResource Window.Active.InvertedForeground}"/>-->
+                            <Setter Property="Background"  Value="{DynamicResource Button.Defaulted.Normal.Background}"/>
+                            <Setter Property="BorderBrush" Value="{DynamicResource Button.Defaulted.Normal.Border}"/>
+                            <Setter Property="Foreground"  Value="{DynamicResource Window.Active.InvertedForeground}"/>
+                            <!--<Setter Property="TextElement.Foreground" TargetName="_contentPresenter" Value="{DynamicResource Window.Active.InvertedForeground}"/>-->
                         </Trigger>
 
                         <MultiTrigger>
@@ -100,10 +100,10 @@
                                 <Condition Property="IsDefault" Value="True"/>
                                 <Condition Property="IsMouseOver" Value="True"/>
                             </MultiTrigger.Conditions>
-                            <Setter Property="Background"  Value="{StaticResource Button.Defaulted.MouseOver.Background}"/>
-                            <Setter Property="BorderBrush" Value="{StaticResource Button.Defaulted.MouseOver.Border}"/>
-                            <Setter Property="Foreground"  Value="{StaticResource Window.Active.InvertedForeground}"/>
-                            <!--<Setter Property="TextElement.Foreground" TargetName="_contentPresenter" Value="{StaticResource Window.Active.InvertedForeground}"/>-->
+                            <Setter Property="Background"  Value="{DynamicResource Button.Defaulted.MouseOver.Background}"/>
+                            <Setter Property="BorderBrush" Value="{DynamicResource Button.Defaulted.MouseOver.Border}"/>
+                            <Setter Property="Foreground"  Value="{DynamicResource Window.Active.InvertedForeground}"/>
+                            <!--<Setter Property="TextElement.Foreground" TargetName="_contentPresenter" Value="{DynamicResource Window.Active.InvertedForeground}"/>-->
                         </MultiTrigger>
 
                         <MultiTrigger>
@@ -111,16 +111,16 @@
                                 <Condition Property="IsDefault" Value="True"/>
                                 <Condition Property="IsPressed" Value="True"/>
                             </MultiTrigger.Conditions>
-                            <Setter Property="Background"  Value="{StaticResource Button.Defaulted.Pressed.Background}"/>
-                            <Setter Property="BorderBrush" Value="{StaticResource Button.Defaulted.Pressed.Border}"/>
-                            <Setter Property="Foreground"  Value="{StaticResource Window.Active.InvertedForeground}"/>
-                            <!--<Setter Property="TextElement.Foreground" TargetName="_contentPresenter" Value="{StaticResource Window.Active.InvertedForeground}"/>-->
+                            <Setter Property="Background"  Value="{DynamicResource Button.Defaulted.Pressed.Background}"/>
+                            <Setter Property="BorderBrush" Value="{DynamicResource Button.Defaulted.Pressed.Border}"/>
+                            <Setter Property="Foreground"  Value="{DynamicResource Window.Active.InvertedForeground}"/>
+                            <!--<Setter Property="TextElement.Foreground" TargetName="_contentPresenter" Value="{DynamicResource Window.Active.InvertedForeground}"/>-->
                         </MultiTrigger>
 
                         <Trigger Property="IsEnabled" Value="False">
-                            <Setter Property="Background"  Value="{StaticResource Button.Disabled.Background}"/>
-                            <Setter Property="BorderBrush" Value="{StaticResource Button.Disabled.Border}"/>
-                            <Setter Property="Foreground"  Value="{StaticResource Window.Active.Foreground.Disabled}"/>
+                            <Setter Property="Background"  Value="{DynamicResource Button.Disabled.Background}"/>
+                            <Setter Property="BorderBrush" Value="{DynamicResource Button.Disabled.Border}"/>
+                            <Setter Property="Foreground"  Value="{DynamicResource Window.Active.Foreground.Disabled}"/>
                         </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>

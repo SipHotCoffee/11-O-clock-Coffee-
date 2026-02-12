@@ -33,15 +33,6 @@
     <Color x:Key="Accent4" A="255" R="255" G="160" B="0"  />
     <Color x:Key="Accent5" A="255" R="255" G="184" B="64" />
     <Color x:Key="Accent6" A="255" R="255" G="208" B="128"/>
-    <Color x:Key="Accent7" A="255" R="255" G="232" B="192"/>
-
-    <!--<Color x:Key="Black0" A="0"  R="0" G="0" B="0"/>
-    <Color x:Key="Black1" A="8"  R="0" G="0" B="0"/>
-    <Color x:Key="Black2" A="16" R="0" G="0" B="0"/>
-    <Color x:Key="Black3" A="24" R="0" G="0" B="0"/>
-    <Color x:Key="Black4" A="32" R="0" G="0" B="0"/>
-    <Color x:Key="Black5" A="40" R="0" G="0" B="0"/>
-    <Color x:Key="Black6" A="48" R="0" G="0" B="0"/>
-    <Color x:Key="Black7" A="56" R="0" G="0" B="0"/>-->
+	<Color x:Key="Accent7" A="255" R="255" G="232" B="192"/>
 
 </ResourceDictionary>

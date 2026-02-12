@@ -4,28 +4,28 @@
         <ResourceDictionary Source="Window.xaml"/>
     </ResourceDictionary.MergedDictionaries>
 
-    <SolidColorBrush x:Key="Toolbar.Background" Color="{StaticResource Control3}"/>
+    <SolidColorBrush x:Key="Toolbar.Background" Color="{DynamicResource Control3}"/>
 
     <SolidColorBrush x:Key="ToolbarButton.Normal.Background" Color="Transparent"/>
     <SolidColorBrush x:Key="ToolbarButton.Normal.Border"     Color="Transparent"/>
 
-    <SolidColorBrush x:Key="ToolbarButton.MouseOver.Background" Color="{StaticResource Control3}"/>
+    <SolidColorBrush x:Key="ToolbarButton.MouseOver.Background" Color="{DynamicResource Control3}"/>
     <LinearGradientBrush x:Key="ToolbarButton.MouseOver.Border" StartPoint="0, 0" EndPoint="0, 1">
         <LinearGradientBrush.GradientStops>
-            <GradientStop Color="{StaticResource Control7}" Offset="0.05"/>
-            <GradientStop Color="{StaticResource Control4}" Offset="0.1"/>
+            <GradientStop Color="{DynamicResource Control7}" Offset="0.05"/>
+            <GradientStop Color="{DynamicResource Control4}" Offset="0.1"/>
         </LinearGradientBrush.GradientStops>
     </LinearGradientBrush>
 
-    <SolidColorBrush x:Key="ToolbarButton.Pressed.Background" Color="{StaticResource Control1}"/>
+    <SolidColorBrush x:Key="ToolbarButton.Pressed.Background" Color="{DynamicResource Control1}"/>
     <LinearGradientBrush x:Key="ToolbarButton.Pressed.Border" StartPoint="0, 0" EndPoint="0, 1">
         <LinearGradientBrush.GradientStops>
-            <GradientStop Color="{StaticResource Control2}" Offset="0.05"/>
-            <GradientStop Color="{StaticResource Control2}" Offset="0.1"/>
+            <GradientStop Color="{DynamicResource Control2}" Offset="0.05"/>
+            <GradientStop Color="{DynamicResource Control2}" Offset="0.1"/>
         </LinearGradientBrush.GradientStops>
     </LinearGradientBrush>
 
-    <SolidColorBrush x:Key="ToolbarButton.Separator.Background" Color="{StaticResource Control4}"/>
+    <SolidColorBrush x:Key="ToolbarButton.Separator.Background" Color="{DynamicResource Control4}"/>
 
     <SolidColorBrush x:Key="ToolbarTextBox.Normal.Background" Color="{DynamicResource Control2}"/>
 
@@ -65,9 +65,9 @@
     <SolidColorBrush x:Key="ToolbarTextBox.Disabled.Selection" Color="{DynamicResource Control3}"/>
 
     <Style x:Key="{x:Static ToolBar.ButtonStyleKey}" TargetType="{x:Type Button}">
-        <Setter Property="Background"      Value="{StaticResource ToolbarButton.Normal.Background}"/>
-        <Setter Property="BorderBrush"     Value="{StaticResource ToolbarButton.Normal.Border}"/>
-        <Setter Property="Foreground"      Value="{StaticResource Window.Active.Foreground}"/>
+        <Setter Property="Background"      Value="{DynamicResource ToolbarButton.Normal.Background}"/>
+        <Setter Property="BorderBrush"     Value="{DynamicResource ToolbarButton.Normal.Border}"/>
+        <Setter Property="Foreground"      Value="{DynamicResource Window.Active.Foreground}"/>
         <Setter Property="BorderThickness" Value="1"/>
         <Setter Property="Padding"         Value="12"/>
         <Setter Property="Template">
@@ -87,17 +87,17 @@
 
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsMouseOver" Value="True">
-                            <Setter Property="Background"  Value="{StaticResource ToolbarButton.MouseOver.Background}"/>
-                            <Setter Property="BorderBrush" Value="{StaticResource ToolbarButton.MouseOver.Border}"/>
+                            <Setter Property="Background"  Value="{DynamicResource ToolbarButton.MouseOver.Background}"/>
+                            <Setter Property="BorderBrush" Value="{DynamicResource ToolbarButton.MouseOver.Border}"/>
                         </Trigger>
 
                         <Trigger Property="IsPressed" Value="True">
-                            <Setter Property="Background"  Value="{StaticResource ToolbarButton.Pressed.Background}"/>
-                            <Setter Property="BorderBrush" Value="{StaticResource ToolbarButton.Pressed.Border}"/>
+                            <Setter Property="Background"  Value="{DynamicResource ToolbarButton.Pressed.Background}"/>
+                            <Setter Property="BorderBrush" Value="{DynamicResource ToolbarButton.Pressed.Border}"/>
                         </Trigger>
 
                         <Trigger Property="IsEnabled" Value="False">
-                            <Setter Property="Foreground" Value="{StaticResource Window.Active.Foreground.Disabled}"/>
+                            <Setter Property="Foreground" Value="{DynamicResource Window.Active.Foreground.Disabled}"/>
                         </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>
@@ -173,14 +173,14 @@
     </Style>
 
     <Style x:Key="{x:Static ToolBar.SeparatorStyleKey}" TargetType="{x:Type Separator}">
-        <Setter Property="Background" Value="{StaticResource ToolbarButton.Separator.Background}"/>
+        <Setter Property="Background" Value="{DynamicResource ToolbarButton.Separator.Background}"/>
     </Style>
     
     <Style TargetType="{x:Type ToolBar}">
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type ToolBar}">
-                    <Border Padding="4" CornerRadius="4" Background="{StaticResource Toolbar.Background}">
+                    <Border Padding="4" CornerRadius="4" Background="{DynamicResource Toolbar.Background}">
                         <StackPanel IsItemsHost="True" Orientation="Horizontal"/>
                     </Border>
                 </ControlTemplate>

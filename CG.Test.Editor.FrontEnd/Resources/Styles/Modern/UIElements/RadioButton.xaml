@@ -4,28 +4,28 @@
         <ResourceDictionary Source="Window.xaml"/>
     </ResourceDictionary.MergedDictionaries>
     
-    <SolidColorBrush x:Key="RadioButton.Normal.Background" Color="{StaticResource Control2}"/>
-    <SolidColorBrush x:Key="RadioButton.Normal.Border"     Color="{StaticResource Control4}"/>
+    <SolidColorBrush x:Key="RadioButton.Normal.Background" Color="{DynamicResource Control2}"/>
+    <SolidColorBrush x:Key="RadioButton.Normal.Border"     Color="{DynamicResource Control4}"/>
     
-    <SolidColorBrush x:Key="RadioButton.MouseOver.Background" Color="{StaticResource Control4}"/>
-    <SolidColorBrush x:Key="RadioButton.MouseOver.Border"     Color="{StaticResource Control4}"/>
+    <SolidColorBrush x:Key="RadioButton.MouseOver.Background" Color="{DynamicResource Control4}"/>
+    <SolidColorBrush x:Key="RadioButton.MouseOver.Border"     Color="{DynamicResource Control4}"/>
 
-    <SolidColorBrush x:Key="RadioButton.Pressed.Background" Color="{StaticResource Control1}"/>
-    <SolidColorBrush x:Key="RadioButton.Pressed.Border"     Color="{StaticResource Control4}"/>
+    <SolidColorBrush x:Key="RadioButton.Pressed.Background" Color="{DynamicResource Control1}"/>
+    <SolidColorBrush x:Key="RadioButton.Pressed.Border"     Color="{DynamicResource Control4}"/>
 
-    <SolidColorBrush x:Key="RadioButton.Checked.Background" Color="{StaticResource Accent4}"/>
-    <SolidColorBrush x:Key="RadioButton.Checked.Border"     Color="{StaticResource Control4}"/>
+    <SolidColorBrush x:Key="RadioButton.Checked.Background" Color="{DynamicResource Accent4}"/>
+    <SolidColorBrush x:Key="RadioButton.Checked.Border"     Color="{DynamicResource Control4}"/>
 
-    <SolidColorBrush x:Key="RadioButton.Disabled.Background" Color="{StaticResource Control2}"/>
+    <SolidColorBrush x:Key="RadioButton.Disabled.Background" Color="{DynamicResource Control2}"/>
     <SolidColorBrush x:Key="RadioButton.Disabled.Border"     Color="Transparent"/>
 
     <Style TargetType="{x:Type RadioButton}">
-        <Setter Property="Background"  Value="{StaticResource RadioButton.Normal.Background}"/>
-        <Setter Property="BorderBrush" Value="{StaticResource RadioButton.Normal.Border}"/>
+        <Setter Property="Background"  Value="{DynamicResource RadioButton.Normal.Background}"/>
+        <Setter Property="BorderBrush" Value="{DynamicResource RadioButton.Normal.Border}"/>
 
         <Setter Property="HorizontalAlignment" Value="Left"/>
 
-        <Setter Property="Foreground" Value="{StaticResource Window.Active.Foreground}"/>
+        <Setter Property="Foreground" Value="{DynamicResource Window.Active.Foreground}"/>
 
         <Setter Property="FontSize" Value="14"/>
         
@@ -42,7 +42,7 @@
                                      Stroke="{TemplateBinding BorderBrush}"/>
 
                             <Ellipse x:Name="MiddleEllipse"
-                                     Fill="{StaticResource Window.Active.Background}"
+                                     Fill="{DynamicResource Window.Active.Background}"
                                      VerticalAlignment="Center" 
                                      HorizontalAlignment="Center" 
                                      Width="10" Height="10" Visibility="Collapsed"/>
@@ -51,21 +51,21 @@
                     </Grid>
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsMouseOver" Value="True">
-                            <Setter Property="Background"  Value="{StaticResource RadioButton.MouseOver.Background}"/>
-                            <Setter Property="BorderBrush" Value="{StaticResource RadioButton.MouseOver.Border}"/>
+                            <Setter Property="Background"  Value="{DynamicResource RadioButton.MouseOver.Background}"/>
+                            <Setter Property="BorderBrush" Value="{DynamicResource RadioButton.MouseOver.Border}"/>
                         </Trigger>
                         <Trigger Property="IsPressed" Value="True">
-                            <Setter Property="Background"  Value="{StaticResource RadioButton.Pressed.Background}"/>
-                            <Setter Property="BorderBrush" Value="{StaticResource RadioButton.Pressed.Border}"/>
+                            <Setter Property="Background"  Value="{DynamicResource RadioButton.Pressed.Background}"/>
+                            <Setter Property="BorderBrush" Value="{DynamicResource RadioButton.Pressed.Border}"/>
                         </Trigger>
                         <Trigger Property="IsChecked" Value="True">
-                            <Setter Property="Background"  Value="{StaticResource RadioButton.Checked.Background}"/>
-                            <Setter Property="BorderBrush" Value="{StaticResource RadioButton.Checked.Border}"/>
+                            <Setter Property="Background"  Value="{DynamicResource RadioButton.Checked.Background}"/>
+                            <Setter Property="BorderBrush" Value="{DynamicResource RadioButton.Checked.Border}"/>
                             <Setter TargetName="MiddleEllipse" Property="Visibility" Value="Visible"/>
                         </Trigger>
                         <Trigger Property="IsEnabled" Value="False">
-                            <Setter Property="Background"  Value="{StaticResource RadioButton.Disabled.Background}"/>
-                            <Setter Property="BorderBrush" Value="{StaticResource RadioButton.Disabled.Border}"/>
+                            <Setter Property="Background"  Value="{DynamicResource RadioButton.Disabled.Background}"/>
+                            <Setter Property="BorderBrush" Value="{DynamicResource RadioButton.Disabled.Border}"/>
                         </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>

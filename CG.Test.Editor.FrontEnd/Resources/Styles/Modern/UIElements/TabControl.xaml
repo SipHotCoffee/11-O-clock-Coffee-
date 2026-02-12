@@ -4,29 +4,29 @@
         <ResourceDictionary Source="Window.xaml"/>
     </ResourceDictionary.MergedDictionaries>
 
-    <SolidColorBrush x:Key="TabControl.Background" Color="{StaticResource Control2}"/>
-    <SolidColorBrush x:Key="TabControl.Border"     Color="{StaticResource Control3}"/>
+    <SolidColorBrush x:Key="TabControl.Background" Color="{DynamicResource Control2}"/>
+    <SolidColorBrush x:Key="TabControl.Border"     Color="{DynamicResource Control3}"/>
 
-    <SolidColorBrush x:Key="TabHeader.Normal.Background" Color="{StaticResource Control2}"/>
+    <SolidColorBrush x:Key="TabHeader.Normal.Background" Color="{DynamicResource Control2}"/>
     <LinearGradientBrush x:Key="TabHeader.Normal.Border" StartPoint="0, 0" EndPoint="0, 1">
         <LinearGradientBrush.GradientStops>
-            <GradientStop Color="{StaticResource Control5}" Offset="0.05"/>
-            <GradientStop Color="{StaticResource Control3}" Offset="0.1"/>
+            <GradientStop Color="{DynamicResource Control5}" Offset="0.05"/>
+            <GradientStop Color="{DynamicResource Control3}" Offset="0.1"/>
         </LinearGradientBrush.GradientStops>
     </LinearGradientBrush>
 
-    <SolidColorBrush x:Key="TabHeader.MouseOver.Background" Color="{StaticResource Control3}"/>
+    <SolidColorBrush x:Key="TabHeader.MouseOver.Background" Color="{DynamicResource Control3}"/>
     <LinearGradientBrush x:Key="TabHeader.MouseOver.Border" StartPoint="0, 0" EndPoint="0, 1">
         <LinearGradientBrush.GradientStops>
-            <GradientStop Color="{StaticResource Control7}" Offset="0.05"/>
-            <GradientStop Color="{StaticResource Control4}" Offset="0.1"/>
+            <GradientStop Color="{DynamicResource Control7}" Offset="0.05"/>
+            <GradientStop Color="{DynamicResource Control4}" Offset="0.1"/>
         </LinearGradientBrush.GradientStops>
     </LinearGradientBrush>
 
     <Style TargetType="{x:Type TabItem}">
-        <Setter Property="BorderBrush" Value="{StaticResource TabHeader.Normal.Border}"/>
-        <Setter Property="Background" Value="{StaticResource TabHeader.Normal.Background}"/>
-        <Setter Property="Foreground" Value="{StaticResource Window.Active.Foreground}"/>
+        <Setter Property="BorderBrush" Value="{DynamicResource TabHeader.Normal.Border}"/>
+        <Setter Property="Background" Value="{DynamicResource TabHeader.Normal.Background}"/>
+        <Setter Property="Foreground" Value="{DynamicResource Window.Active.Foreground}"/>
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type TabItem}">
@@ -53,8 +53,8 @@
                                 <Condition Property="IsMouseOver" Value="True"/>
                             </MultiTrigger.Conditions>
 
-                            <Setter Property="Background"  Value="{StaticResource TabHeader.MouseOver.Background}"/>
-                            <Setter Property="BorderBrush" Value="{StaticResource TabHeader.MouseOver.Border}"/>
+                            <Setter Property="Background"  Value="{DynamicResource TabHeader.MouseOver.Background}"/>
+                            <Setter Property="BorderBrush" Value="{DynamicResource TabHeader.MouseOver.Border}"/>
                         </MultiTrigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>
@@ -67,10 +67,10 @@
         <Setter Property="Padding"                    Value="0"/>
         <Setter Property="HorizontalContentAlignment" Value="Center"/>
         <Setter Property="VerticalContentAlignment"   Value="Center"/>
-        <Setter Property="Background"                 Value="{StaticResource TabHeader.Normal.Background}"/>
-        <Setter Property="BorderBrush"                Value="{StaticResource TabHeader.Normal.Border}"/>
+        <Setter Property="Background"                 Value="{DynamicResource TabHeader.Normal.Background}"/>
+        <Setter Property="BorderBrush"                Value="{DynamicResource TabHeader.Normal.Border}"/>
         <Setter Property="BorderThickness"            Value="1, 0, 1, 1"/>
-        <Setter Property="Foreground"                 Value="{StaticResource Window.Active.Foreground}"/>
+        <Setter Property="Foreground"                 Value="{DynamicResource Window.Active.Foreground}"/>
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type TabControl}">

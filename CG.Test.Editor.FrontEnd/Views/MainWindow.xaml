@@ -20,7 +20,7 @@
 		<BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
 	</Window.Resources>
 	<Window.InputBindings>
-		<KeyBinding Modifiers="Ctrl" Key="N" Command="{Binding NewFileCommand}"  CommandParameter="{Binding RelativeSource={RelativeSource AncestorType={x:Type Window}}}"/>
+		<KeyBinding Modifiers="Ctrl" Key="N" Command="{Binding  NewFileCommand}" CommandParameter="{Binding RelativeSource={RelativeSource AncestorType={x:Type Window}}}"/>
 		<KeyBinding Modifiers="Ctrl" Key="O" Command="{Binding OpenFileCommand}" CommandParameter="{Binding RelativeSource={RelativeSource AncestorType={x:Type Window}}}"/>
 		<KeyBinding Modifiers="Ctrl" Key="S" Command="{Binding SaveFileCommand}"/>
 	</Window.InputBindings>

@@ -4,16 +4,16 @@
     <SolidColorBrush x:Key="Item.Normal.Background" Color="Transparent"/>
     <SolidColorBrush x:Key="Item.Normal.Border"  Color="Transparent"/>
 
-    <SolidColorBrush x:Key="Item.MouseOver.Background" Color="{StaticResource Control3}"/>
+    <SolidColorBrush x:Key="Item.MouseOver.Background" Color="{DynamicResource Control3}"/>
     <LinearGradientBrush x:Key="Item.MouseOver.Border" StartPoint="0, 0" EndPoint="0, 1">
         <LinearGradientBrush.GradientStops>
-            <GradientStop Color="{StaticResource Control7}" Offset="0.05"/>
-            <GradientStop Color="{StaticResource Control4}" Offset="0.1"/>
+            <GradientStop Color="{DynamicResource Control7}" Offset="0.05"/>
+            <GradientStop Color="{DynamicResource Control4}" Offset="0.1"/>
         </LinearGradientBrush.GradientStops>
     </LinearGradientBrush>
 
-    <SolidColorBrush x:Key="Item.Selected.Background" Color="{StaticResource Control1}"/>
-    <SolidColorBrush x:Key="Item.Selected.Border"     Color="{StaticResource Control2}"/>
+    <SolidColorBrush x:Key="Item.Selected.Background" Color="{DynamicResource Control1}"/>
+    <SolidColorBrush x:Key="Item.Selected.Border"     Color="{DynamicResource Control2}"/>
 
-    <SolidColorBrush x:Key="Item.SelectionHighlight.Border" Color="{StaticResource Accent4}"/>
+    <SolidColorBrush x:Key="Item.SelectionHighlight.Border" Color="{DynamicResource Accent4}"/>
 </ResourceDictionary>

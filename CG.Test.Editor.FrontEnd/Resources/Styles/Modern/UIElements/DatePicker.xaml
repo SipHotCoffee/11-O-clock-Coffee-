@@ -7,16 +7,16 @@
         <ResourceDictionary Source="TextBox.xaml"/>
     </ResourceDictionary.MergedDictionaries>
     
-    <SolidColorBrush x:Key="DatePicker.Background"          Color="{StaticResource Control1}"/>
-    <SolidColorBrush x:Key="DatePicker.Border"              Color="{StaticResource Control2}"/>
+    <SolidColorBrush x:Key="DatePicker.Background"          Color="{DynamicResource Control1}"/>
+    <SolidColorBrush x:Key="DatePicker.Border"              Color="{DynamicResource Control2}"/>
 
-    <SolidColorBrush x:Key="DatePicker.Inactive.Background" Color="{StaticResource Control1}"/>
-    <SolidColorBrush x:Key="DatePicker.Inactive.Border"     Color="{StaticResource Control2}"/>
+    <SolidColorBrush x:Key="DatePicker.Inactive.Background" Color="{DynamicResource Control1}"/>
+    <SolidColorBrush x:Key="DatePicker.Inactive.Border"     Color="{DynamicResource Control2}"/>
 
     <Style x:Key="CalendarDayButtonStyle" TargetType="{x:Type CalendarDayButton}">
-        <Setter Property="Background"      Value="{StaticResource Button.Normal.Background}"/>
-        <Setter Property="BorderBrush"     Value="{StaticResource Button.Normal.Border}"/>
-        <Setter Property="Foreground"      Value="{StaticResource Window.Active.Foreground}"/>
+        <Setter Property="Background"      Value="{DynamicResource Button.Normal.Background}"/>
+        <Setter Property="BorderBrush"     Value="{DynamicResource Button.Normal.Border}"/>
+        <Setter Property="Foreground"      Value="{DynamicResource Window.Active.Foreground}"/>
         <Setter Property="BorderThickness" Value="1"/>
         <Setter Property="FontSize" Value="14"/>
         <Setter Property="Template">
@@ -37,27 +37,27 @@
 
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsInactive" Value="True">
-                            <Setter Property="Background"  Value="{StaticResource Button.Disabled.Background}"/>
-                            <Setter Property="BorderBrush" Value="{StaticResource Button.Disabled.Border}"/>
-                            <Setter Property="Foreground"  Value="{StaticResource Window.Active.Foreground.Disabled}"/>
+                            <Setter Property="Background"  Value="{DynamicResource Button.Disabled.Background}"/>
+                            <Setter Property="BorderBrush" Value="{DynamicResource Button.Disabled.Border}"/>
+                            <Setter Property="Foreground"  Value="{DynamicResource Window.Active.Foreground.Disabled}"/>
                             <Setter Property="Opacity" Value="0.5"/>
                         </Trigger>
 
                         <Trigger Property="IsMouseOver" Value="True">
-                            <Setter Property="Background"  Value="{StaticResource Button.MouseOver.Background}"/>
-                            <Setter Property="BorderBrush" Value="{StaticResource Button.MouseOver.Border}"/>
+                            <Setter Property="Background"  Value="{DynamicResource Button.MouseOver.Background}"/>
+                            <Setter Property="BorderBrush" Value="{DynamicResource Button.MouseOver.Border}"/>
                         </Trigger>
 
                         <Trigger Property="IsPressed" Value="True">
-                            <Setter Property="Background"  Value="{StaticResource Button.Pressed.Background}"/>
-                            <Setter Property="BorderBrush" Value="{StaticResource Button.Pressed.Border}"/>
+                            <Setter Property="Background"  Value="{DynamicResource Button.Pressed.Background}"/>
+                            <Setter Property="BorderBrush" Value="{DynamicResource Button.Pressed.Border}"/>
                         </Trigger>
 
                         <Trigger Property="IsSelected" Value="True">
-                            <Setter Property="Background"  Value="{StaticResource Button.Defaulted.Normal.Background}"/>
-                            <Setter Property="BorderBrush" Value="{StaticResource Button.Defaulted.Normal.Border}"/>
-                            <Setter Property="Foreground"  Value="{StaticResource Window.Active.InvertedForeground}"/>
-                            <!--<Setter Property="TextElement.Foreground" TargetName="_contentPresenter" Value="{StaticResource Window.Active.InvertedForeground}"/>-->
+                            <Setter Property="Background"  Value="{DynamicResource Button.Defaulted.Normal.Background}"/>
+                            <Setter Property="BorderBrush" Value="{DynamicResource Button.Defaulted.Normal.Border}"/>
+                            <Setter Property="Foreground"  Value="{DynamicResource Window.Active.InvertedForeground}"/>
+                            <!--<Setter Property="TextElement.Foreground" TargetName="_contentPresenter" Value="{DynamicResource Window.Active.InvertedForeground}"/>-->
                         </Trigger>
 
                         <MultiTrigger>
@@ -65,10 +65,10 @@
                                 <Condition Property="IsSelected" Value="True"/>
                                 <Condition Property="IsMouseOver" Value="True"/>
                             </MultiTrigger.Conditions>
-                            <Setter Property="Background"  Value="{StaticResource Button.Defaulted.MouseOver.Background}"/>
-                            <Setter Property="BorderBrush" Value="{StaticResource Button.Defaulted.MouseOver.Border}"/>
-                            <Setter Property="Foreground"  Value="{StaticResource Window.Active.InvertedForeground}"/>
-                            <!--<Setter Property="TextElement.Foreground" TargetName="_contentPresenter" Value="{StaticResource Window.Active.InvertedForeground}"/>-->
+                            <Setter Property="Background"  Value="{DynamicResource Button.Defaulted.MouseOver.Background}"/>
+                            <Setter Property="BorderBrush" Value="{DynamicResource Button.Defaulted.MouseOver.Border}"/>
+                            <Setter Property="Foreground"  Value="{DynamicResource Window.Active.InvertedForeground}"/>
+                            <!--<Setter Property="TextElement.Foreground" TargetName="_contentPresenter" Value="{DynamicResource Window.Active.InvertedForeground}"/>-->
                         </MultiTrigger>
 
                         <MultiTrigger>
@@ -76,10 +76,10 @@
                                 <Condition Property="IsSelected" Value="True"/>
                                 <Condition Property="IsPressed" Value="True"/>
                             </MultiTrigger.Conditions>
-                            <Setter Property="Background"  Value="{StaticResource Button.Defaulted.Pressed.Background}"/>
-                            <Setter Property="BorderBrush" Value="{StaticResource Button.Defaulted.Pressed.Border}"/>
-                            <Setter Property="Foreground"  Value="{StaticResource Window.Active.InvertedForeground}"/>
-                            <!--<Setter Property="TextElement.Foreground" TargetName="_contentPresenter" Value="{StaticResource Window.Active.InvertedForeground}"/>-->
+                            <Setter Property="Background"  Value="{DynamicResource Button.Defaulted.Pressed.Background}"/>
+                            <Setter Property="BorderBrush" Value="{DynamicResource Button.Defaulted.Pressed.Border}"/>
+                            <Setter Property="Foreground"  Value="{DynamicResource Window.Active.InvertedForeground}"/>
+                            <!--<Setter Property="TextElement.Foreground" TargetName="_contentPresenter" Value="{DynamicResource Window.Active.InvertedForeground}"/>-->
                         </MultiTrigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>
@@ -91,7 +91,7 @@
         <Setter Property="Background" Value="Transparent"/>
         <Setter Property="BorderThickness" Value="0"/>
         <Setter Property="BorderBrush" Value="Transparent"/>
-        <Setter Property="Foreground" Value="{StaticResource Window.Active.Foreground}"/>
+        <Setter Property="Foreground" Value="{DynamicResource Window.Active.Foreground}"/>
 
         <Setter Property="Template">
             <Setter.Value>
@@ -106,9 +106,9 @@
 
                         <!-- Header with navigation buttons -->
                         <StackPanel Orientation="Horizontal" Grid.Row="0" HorizontalAlignment="Center">
-                            <Button x:Name="PART_PreviousButton" Focusable="False" FontFamily="{StaticResource SymbolFont}" Content="&#xf0b0;" Margin="5, 5, 2.5, 2.5"/>
+                            <Button x:Name="PART_PreviousButton" Focusable="False" FontFamily="{DynamicResource SymbolFont}" Content="&#xf0b0;" Margin="5, 5, 2.5, 2.5"/>
                             <Button x:Name="PART_HeaderButton" Content="Month" Focusable="False" Margin="2.5, 5, 2.5, 2.5"/>
-                            <Button x:Name="PART_NextButton" Focusable="False" FontFamily="{StaticResource SymbolFont}" Content="&#xf0af;" Margin="2.5, 5, 5, 2.5"/>
+                            <Button x:Name="PART_NextButton" Focusable="False" FontFamily="{DynamicResource SymbolFont}" Content="&#xf0af;" Margin="2.5, 5, 5, 2.5"/>
                         </StackPanel>
 
                         <Grid x:Name="PART_MonthView" Grid.Row="1" Margin="5, 2.5, 5, 5">
@@ -174,12 +174,12 @@
     </Style>
 
     <Style x:Key="CalendarStyle" TargetType="{x:Type Calendar}">
-        <Setter Property="Background" Value="{StaticResource Window.Active.Background}"/>
-        <Setter Property="Foreground" Value="{StaticResource Window.Active.Foreground}"/>
-        <Setter Property="BorderBrush" Value="{StaticResource Menu.Separator.Background}"/>
+        <Setter Property="Background" Value="{DynamicResource Window.Active.Background}"/>
+        <Setter Property="Foreground" Value="{DynamicResource Window.Active.Foreground}"/>
+        <Setter Property="BorderBrush" Value="{DynamicResource Menu.Separator.Background}"/>
         <Setter Property="BorderThickness" Value="1"/>
-        <Setter Property="CalendarDayButtonStyle" Value="{StaticResource CalendarDayButtonStyle}"/>
-        <Setter Property="CalendarItemStyle" Value="{StaticResource CalendarItemStyle}"/>
+        <Setter Property="CalendarDayButtonStyle" Value="{DynamicResource CalendarDayButtonStyle}"/>
+        <Setter Property="CalendarItemStyle" Value="{DynamicResource CalendarItemStyle}"/>
 
         <Setter Property="Template">
             <Setter.Value>
@@ -196,10 +196,10 @@
     </Style>
 
     <Style TargetType="{x:Type DatePicker}">
-        <Setter Property="Background"  Value="{StaticResource DatePicker.Background}"/>
-        <Setter Property="BorderBrush" Value="{StaticResource DatePicker.Border}"/>
-        <Setter Property="Foreground"  Value="{StaticResource Window.Active.Foreground}"/>
-        <Setter Property="CalendarStyle" Value="{StaticResource CalendarStyle}"/>
+        <Setter Property="Background"  Value="{DynamicResource DatePicker.Background}"/>
+        <Setter Property="BorderBrush" Value="{DynamicResource DatePicker.Border}"/>
+        <Setter Property="Foreground"  Value="{DynamicResource Window.Active.Foreground}"/>
+        <Setter Property="CalendarStyle" Value="{DynamicResource CalendarStyle}"/>
         <Setter Property="BorderThickness" Value="1"/>
         <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
         <Setter Property="VerticalContentAlignment" Value="Stretch"/>
@@ -235,8 +235,8 @@
                             <DatePickerTextBox x:Name="PART_TextBox"
                                                Grid.Column="0"
                                                Grid.Row="0"
-                                               Background="{StaticResource TextBox.Normal.Background}"
-                                               BorderBrush="{StaticResource TextBox.Normal.Border}"
+                                               Background="{DynamicResource TextBox.Normal.Background}"
+                                               BorderBrush="{DynamicResource TextBox.Normal.Border}"
                                                BorderThickness="1"
                                                Foreground="{TemplateBinding Foreground}"
                                                Focusable="{TemplateBinding Focusable}"
@@ -257,7 +257,7 @@
                                              <Border x:Name="focusBar" 
                                                      CornerRadius="0, 0, 2, 2" 
                                                      BorderThickness="0" 
-                                                     Background="{StaticResource TextBox.Focused.Bar}"
+                                                     Background="{DynamicResource TextBox.Focused.Bar}"
                                                      Visibility="Collapsed"
                                                      Height="2" 
                                                      Margin="1" 
@@ -269,12 +269,12 @@
                                                  <Setter Property="Opacity" TargetName="border" Value="0.56"/>
                                              </Trigger>
                                              <Trigger Property="IsMouseOver" Value="true">
-                                                 <Setter Property="BorderBrush"  TargetName="border" Value="{StaticResource TextBox.MouseOver.Border}"/>
-                                                 <Setter Property="Background"   TargetName="border" Value="{StaticResource TextBox.MouseOver.Background}"/>
+                                                 <Setter Property="BorderBrush"  TargetName="border" Value="{DynamicResource TextBox.MouseOver.Border}"/>
+                                                 <Setter Property="Background"   TargetName="border" Value="{DynamicResource TextBox.MouseOver.Background}"/>
                                              </Trigger>
                                              <Trigger Property="IsKeyboardFocused" Value="true">
-                                                 <Setter Property="BorderBrush" TargetName="border" Value="{StaticResource TextBox.Focused.Border}"/>
-                                                 <Setter Property="Background"  TargetName="border" Value="{StaticResource TextBox.Focused.Background}"/>
+                                                 <Setter Property="BorderBrush" TargetName="border" Value="{DynamicResource TextBox.Focused.Border}"/>
+                                                 <Setter Property="Background"  TargetName="border" Value="{DynamicResource TextBox.Focused.Background}"/>
                                                  <!--<Setter Property="BorderThickness" TargetName="border" Value="1, 1, 1, 2"/>-->
                                                  <Setter Property="CornerRadius" TargetName="border" Value="3, 3, 0, 0"/>
                                                  <Setter Property="Visibility" TargetName="focusBar" Value="Visible"/>

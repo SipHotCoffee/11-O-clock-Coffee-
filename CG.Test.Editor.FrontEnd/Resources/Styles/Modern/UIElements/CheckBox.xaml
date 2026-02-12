@@ -4,28 +4,28 @@
         <ResourceDictionary Source="Window.xaml"/>
     </ResourceDictionary.MergedDictionaries>
 
-    <SolidColorBrush x:Key="CheckBox.Normal.Background" Color="{StaticResource Control2}"/>
-    <SolidColorBrush x:Key="CheckBox.Normal.Border"     Color="{StaticResource Control4}"/>
+    <SolidColorBrush x:Key="CheckBox.Normal.Background" Color="{DynamicResource Control2}"/>
+    <SolidColorBrush x:Key="CheckBox.Normal.Border"     Color="{DynamicResource Control4}"/>
 
-    <SolidColorBrush x:Key="CheckBox.MouseOver.Background" Color="{StaticResource Control4}"/>
-    <SolidColorBrush x:Key="CheckBox.MouseOver.Border"     Color="{StaticResource Control4}"/>
+    <SolidColorBrush x:Key="CheckBox.MouseOver.Background" Color="{DynamicResource Control4}"/>
+    <SolidColorBrush x:Key="CheckBox.MouseOver.Border"     Color="{DynamicResource Control4}"/>
 
-    <SolidColorBrush x:Key="CheckBox.Pressed.Background" Color="{StaticResource Control1}"/>
-    <SolidColorBrush x:Key="CheckBox.Pressed.Border"     Color="{StaticResource Control4}"/>
+    <SolidColorBrush x:Key="CheckBox.Pressed.Background" Color="{DynamicResource Control1}"/>
+    <SolidColorBrush x:Key="CheckBox.Pressed.Border"     Color="{DynamicResource Control4}"/>
 
-    <SolidColorBrush x:Key="CheckBox.Checked.Background" Color="{StaticResource Accent4}"/>
-    <SolidColorBrush x:Key="CheckBox.Checked.Border"     Color="{StaticResource Control4}"/>
+    <SolidColorBrush x:Key="CheckBox.Checked.Background" Color="{DynamicResource Accent4}"/>
+    <SolidColorBrush x:Key="CheckBox.Checked.Border"     Color="{DynamicResource Control4}"/>
 
-    <SolidColorBrush x:Key="CheckBox.Disabled.Background" Color="{StaticResource Control2}"/>
+    <SolidColorBrush x:Key="CheckBox.Disabled.Background" Color="{DynamicResource Control2}"/>
     <SolidColorBrush x:Key="CheckBox.Disabled.Border"     Color="Transparent"/>
 
     <Style TargetType="{x:Type CheckBox}">
-        <Setter Property="Background"  Value="{StaticResource CheckBox.Normal.Background}"/>
-        <Setter Property="BorderBrush" Value="{StaticResource CheckBox.Normal.Border}"/>
+        <Setter Property="Background"  Value="{DynamicResource CheckBox.Normal.Background}"/>
+        <Setter Property="BorderBrush" Value="{DynamicResource CheckBox.Normal.Border}"/>
 
         <Setter Property="HorizontalAlignment" Value="Left"/>
 
-        <Setter Property="Foreground" Value="{StaticResource Window.Active.Foreground}"/>
+        <Setter Property="Foreground" Value="{DynamicResource Window.Active.Foreground}"/>
 
         <Setter Property="FontSize" Value="14"/>
 
@@ -44,11 +44,11 @@
                                     CornerRadius="4">
                                 <TextBlock x:Name="CheckMark"
                                            SnapsToDevicePixels="True"
-                                           Foreground="{StaticResource Window.Active.Background}"
+                                           Foreground="{DynamicResource Window.Active.Background}"
                                            VerticalAlignment="Center" 
                                            HorizontalAlignment="Center" 
                                            FontSize="16px"
-                                           FontFamily="{StaticResource SymbolFont}"
+                                           FontFamily="{DynamicResource SymbolFont}"
                                            FontWeight="ExtraBold"
                                            Text="&#xE73E;"
                                            TextAlignment="Center" Visibility="Collapsed"/>
@@ -58,21 +58,21 @@
                     </Grid>
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsMouseOver" Value="True">
-                            <Setter Property="Background"  Value="{StaticResource CheckBox.MouseOver.Background}"/>
-                            <Setter Property="BorderBrush" Value="{StaticResource CheckBox.MouseOver.Border}"/>
+                            <Setter Property="Background"  Value="{DynamicResource CheckBox.MouseOver.Background}"/>
+                            <Setter Property="BorderBrush" Value="{DynamicResource CheckBox.MouseOver.Border}"/>
                         </Trigger>
                         <Trigger Property="IsPressed" Value="True">
-                            <Setter Property="Background"  Value="{StaticResource CheckBox.Pressed.Background}"/>
-                            <Setter Property="BorderBrush" Value="{StaticResource CheckBox.Pressed.Border}"/>
+                            <Setter Property="Background"  Value="{DynamicResource CheckBox.Pressed.Background}"/>
+                            <Setter Property="BorderBrush" Value="{DynamicResource CheckBox.Pressed.Border}"/>
                         </Trigger>
                         <Trigger Property="IsChecked" Value="True">
-                            <Setter Property="Background"  Value="{StaticResource CheckBox.Checked.Background}"/>
-                            <Setter Property="BorderBrush" Value="{StaticResource CheckBox.Checked.Border}"/>
+                            <Setter Property="Background"  Value="{DynamicResource CheckBox.Checked.Background}"/>
+                            <Setter Property="BorderBrush" Value="{DynamicResource CheckBox.Checked.Border}"/>
                             <Setter TargetName="CheckMark" Property="Visibility" Value="Visible"/>
                         </Trigger>
                         <Trigger Property="IsEnabled" Value="False">
-                            <Setter Property="Background"  Value="{StaticResource CheckBox.Disabled.Background}"/>
-                            <Setter Property="BorderBrush" Value="{StaticResource CheckBox.Disabled.Border}"/>
+                            <Setter Property="Background"  Value="{DynamicResource CheckBox.Disabled.Background}"/>
+                            <Setter Property="BorderBrush" Value="{DynamicResource CheckBox.Disabled.Border}"/>
                         </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>

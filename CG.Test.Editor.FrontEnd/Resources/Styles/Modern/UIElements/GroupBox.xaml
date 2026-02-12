@@ -4,12 +4,12 @@
         <ResourceDictionary Source="Window.xaml"/>
     </ResourceDictionary.MergedDictionaries>
 
-    <SolidColorBrush x:Key="GroupBox.Border" Color="{StaticResource Control3}"/>
+    <SolidColorBrush x:Key="GroupBox.Border" Color="{DynamicResource Control3}"/>
 
     <BorderGapMaskConverter x:Key="BorderGapMaskConverter"/>
     <Style TargetType="{x:Type GroupBox}">
-        <Setter Property="Foreground" Value="{StaticResource Window.Active.Foreground}"/>
-        <Setter Property="BorderBrush" Value="{StaticResource GroupBox.Border}"/> 
+        <Setter Property="Foreground" Value="{DynamicResource Window.Active.Foreground}"/>
+        <Setter Property="BorderBrush" Value="{DynamicResource GroupBox.Border}"/> 
         <Setter Property="BorderThickness" Value="1" />
         <Setter Property="SnapsToDevicePixels" Value="True"/>
         <Setter Property="Template">

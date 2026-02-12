@@ -4,58 +4,58 @@
         <ResourceDictionary Source="Window.xaml"/>
     </ResourceDictionary.MergedDictionaries>
     
-    <SolidColorBrush x:Key="TextBox.Normal.Background" Color="{StaticResource Control2}"/>
+    <SolidColorBrush x:Key="TextBox.Normal.Background" Color="{DynamicResource Control2}"/>
 
     <LinearGradientBrush x:Key="TextBox.Normal.Border" StartPoint="0, 0" EndPoint="0, 1">
         <LinearGradientBrush.GradientStops>
-            <GradientStop Color="{StaticResource Control3}" Offset="0.95"/>
-            <GradientStop Color="{StaticResource Control6}" Offset="1"/>
+            <GradientStop Color="{DynamicResource Control3}" Offset="0.95"/>
+            <GradientStop Color="{DynamicResource Control6}" Offset="1"/>
         </LinearGradientBrush.GradientStops>
     </LinearGradientBrush>
 
-    <SolidColorBrush x:Key="TextBox.MouseOver.Background" Color="{StaticResource Control3}"/>
+    <SolidColorBrush x:Key="TextBox.MouseOver.Background" Color="{DynamicResource Control3}"/>
 
     <LinearGradientBrush x:Key="TextBox.MouseOver.Border" StartPoint="0, 0" EndPoint="0, 1">
         <LinearGradientBrush.GradientStops>
-            <GradientStop Color="{StaticResource Control4}" Offset="0.95"/>
-            <GradientStop Color="{StaticResource Control7}" Offset="1"/>
+            <GradientStop Color="{DynamicResource Control4}" Offset="0.95"/>
+            <GradientStop Color="{DynamicResource Control7}" Offset="1"/>
         </LinearGradientBrush.GradientStops>
     </LinearGradientBrush>
 
-    <SolidColorBrush x:Key="TextBox.Focused.Background" Color="{StaticResource FocusedBackground}"/>
+    <SolidColorBrush x:Key="TextBox.Focused.Background" Color="{DynamicResource FocusedBackground}"/>
 
-    <SolidColorBrush x:Key="TextBox.Focused.Border" Color="{StaticResource Control2}"/>
+    <SolidColorBrush x:Key="TextBox.Focused.Border" Color="{DynamicResource Control2}"/>
 
     <!--<LinearGradientBrush x:Key="TextBox.Focused.Border" StartPoint="0, 0" EndPoint="0, 1">
         <LinearGradientBrush.GradientStops>
-            <GradientStop Color="{StaticResource Control2}" Offset="0.95"/>
-            <GradientStop Color="{StaticResource Accent4}"  Offset="0.95"/>
-            <GradientStop Color="{StaticResource Accent4}"  Offset="1"/>
+            <GradientStop Color="{DynamicResource Control2}" Offset="0.95"/>
+            <GradientStop Color="{DynamicResource Accent4}"  Offset="0.95"/>
+            <GradientStop Color="{DynamicResource Accent4}"  Offset="1"/>
         </LinearGradientBrush.GradientStops>
     </LinearGradientBrush>-->
 
-    <SolidColorBrush x:Key="TextBox.Focused.Bar" Color="{StaticResource Accent4}"/>
+    <SolidColorBrush x:Key="TextBox.Focused.Bar" Color="{DynamicResource Accent4}"/>
 
-    <SolidColorBrush x:Key="TextBox.Disabled.Background" Color="{StaticResource Control1}"/>
+    <SolidColorBrush x:Key="TextBox.Disabled.Background" Color="{DynamicResource Control1}"/>
 
     <LinearGradientBrush x:Key="TextBox.Disabled.Border">
         <LinearGradientBrush.GradientStops>
-            <GradientStop Color="{StaticResource Control2}" Offset="0.95"/>
-            <GradientStop Color="{StaticResource Control2}" Offset="1"/>
+            <GradientStop Color="{DynamicResource Control2}" Offset="0.95"/>
+            <GradientStop Color="{DynamicResource Control2}" Offset="1"/>
         </LinearGradientBrush.GradientStops>
     </LinearGradientBrush>
 
-    <SolidColorBrush x:Key="TextBox.Selection" Color="{StaticResource Accent2}"/>
+    <SolidColorBrush x:Key="TextBox.Selection" Color="{DynamicResource Accent2}"/>
 
-    <SolidColorBrush x:Key="TextBox.Disabled.Selection" Color="{StaticResource Control3}"/>
+    <SolidColorBrush x:Key="TextBox.Disabled.Selection" Color="{DynamicResource Control3}"/>
 
     <Style TargetType="{x:Type TextBox}">
-        <!--<Setter Property="Validation.ErrorTemplate"         Value="{StaticResource TextBoxErrorTemplate}"/>-->
-        <Setter Property="Background"                       Value="{StaticResource TextBox.Normal.Background}"/>
-        <Setter Property="BorderBrush"                      Value="{StaticResource TextBox.Normal.Border}"/>
-        <Setter Property="Foreground"                       Value="{StaticResource Window.Active.Foreground}"/>
-        <Setter Property="CaretBrush"                       Value="{StaticResource Window.Active.Foreground}"/>
-        <Setter Property="SelectionBrush"                   Value="{StaticResource TextBox.Selection}"/>
+        <!--<Setter Property="Validation.ErrorTemplate"         Value="{DynamicResource TextBoxErrorTemplate}"/>-->
+        <Setter Property="Background"                       Value="{DynamicResource TextBox.Normal.Background}"/>
+        <Setter Property="BorderBrush"                      Value="{DynamicResource TextBox.Normal.Border}"/>
+        <Setter Property="Foreground"                       Value="{DynamicResource Window.Active.Foreground}"/>
+        <Setter Property="CaretBrush"                       Value="{DynamicResource Window.Active.Foreground}"/>
+        <Setter Property="SelectionBrush"                   Value="{DynamicResource TextBox.Selection}"/>
         <Setter Property="BorderThickness"                  Value="1"/>
         <Setter Property="KeyboardNavigation.TabNavigation" Value="None"/>
         <Setter Property="HorizontalContentAlignment"       Value="Left"/>
@@ -80,7 +80,7 @@
                         <Border x:Name="focusBar" 
                                 CornerRadius="0, 0, 3, 3" 
                                 BorderThickness="0" 
-                                Background="{StaticResource TextBox.Focused.Bar}"
+                                Background="{DynamicResource TextBox.Focused.Bar}"
                                 Visibility="Collapsed"
                                 Height="2" 
                                 Margin="1" 
@@ -92,12 +92,12 @@
                             <Setter Property="Opacity" TargetName="border" Value="0.56"/>
                         </Trigger>
                         <Trigger Property="IsMouseOver" Value="true">
-                            <Setter Property="BorderBrush"  TargetName="border" Value="{StaticResource TextBox.MouseOver.Border}"/>
-                            <Setter Property="Background"   TargetName="border" Value="{StaticResource TextBox.MouseOver.Background}"/>
+                            <Setter Property="BorderBrush"  TargetName="border" Value="{DynamicResource TextBox.MouseOver.Border}"/>
+                            <Setter Property="Background"   TargetName="border" Value="{DynamicResource TextBox.MouseOver.Background}"/>
                         </Trigger>
                         <Trigger Property="IsKeyboardFocused" Value="true">
-                            <Setter Property="BorderBrush" TargetName="border" Value="{StaticResource TextBox.Focused.Border}"/>
-                            <Setter Property="Background"  TargetName="border" Value="{StaticResource TextBox.Focused.Background}"/>
+                            <Setter Property="BorderBrush" TargetName="border" Value="{DynamicResource TextBox.Focused.Border}"/>
+                            <Setter Property="Background"  TargetName="border" Value="{DynamicResource TextBox.Focused.Background}"/>
                             <!--<Setter Property="BorderThickness" TargetName="border" Value="1, 1, 1, 2"/>-->
                             <Setter Property="CornerRadius" TargetName="border" Value="3, 3, 0, 0"/>
                             <Setter Property="Visibility" TargetName="focusBar" Value="Visible"/>
@@ -112,18 +112,18 @@
                     <Condition Property="IsInactiveSelectionHighlightEnabled" Value="true"/>
                     <Condition Property="IsSelectionActive" Value="false"/>
                 </MultiTrigger.Conditions>
-                <Setter Property="SelectionBrush" Value="{StaticResource TextBox.Disabled.Selection}"/>
+                <Setter Property="SelectionBrush" Value="{DynamicResource TextBox.Disabled.Selection}"/>
             </MultiTrigger>
         </Style.Triggers>
     </Style>
 
     <Style TargetType="{x:Type PasswordBox}">
-        <!--<Setter Property="Validation.ErrorTemplate"         Value="{StaticResource TextBoxErrorTemplate}"/>-->
-        <Setter Property="Background"                       Value="{StaticResource TextBox.Normal.Background}"/>
-        <Setter Property="BorderBrush"                      Value="{StaticResource TextBox.Normal.Border}"/>
-        <Setter Property="Foreground"                       Value="{StaticResource Window.Active.Foreground}"/>
-        <Setter Property="CaretBrush"                       Value="{StaticResource Window.Active.Foreground}"/>
-        <Setter Property="SelectionBrush"                   Value="{StaticResource TextBox.Selection}"/>
+        <!--<Setter Property="Validation.ErrorTemplate"         Value="{DynamicResource TextBoxErrorTemplate}"/>-->
+        <Setter Property="Background"                       Value="{DynamicResource TextBox.Normal.Background}"/>
+        <Setter Property="BorderBrush"                      Value="{DynamicResource TextBox.Normal.Border}"/>
+        <Setter Property="Foreground"                       Value="{DynamicResource Window.Active.Foreground}"/>
+        <Setter Property="CaretBrush"                       Value="{DynamicResource Window.Active.Foreground}"/>
+        <Setter Property="SelectionBrush"                   Value="{DynamicResource TextBox.Selection}"/>
         <Setter Property="BorderThickness"                  Value="1"/>
         <Setter Property="KeyboardNavigation.TabNavigation" Value="None"/>
         <Setter Property="HorizontalContentAlignment"       Value="Left"/>
@@ -147,7 +147,7 @@
                         <Border x:Name="focusBar" 
                              CornerRadius="0, 0, 2, 2" 
                              BorderThickness="0" 
-                             Background="{StaticResource TextBox.Focused.Bar}"
+                             Background="{DynamicResource TextBox.Focused.Bar}"
                              Visibility="Collapsed"
                              Height="2" 
                              Margin="1" 
@@ -159,12 +159,12 @@
                             <Setter Property="Opacity" TargetName="border" Value="0.56"/>
                         </Trigger>
                         <Trigger Property="IsMouseOver" Value="true">
-                            <Setter Property="BorderBrush"  TargetName="border" Value="{StaticResource TextBox.MouseOver.Border}"/>
-                            <Setter Property="Background"   TargetName="border" Value="{StaticResource TextBox.MouseOver.Background}"/>
+                            <Setter Property="BorderBrush"  TargetName="border" Value="{DynamicResource TextBox.MouseOver.Border}"/>
+                            <Setter Property="Background"   TargetName="border" Value="{DynamicResource TextBox.MouseOver.Background}"/>
                         </Trigger>
                         <Trigger Property="IsKeyboardFocused" Value="true">
-                            <Setter Property="BorderBrush" TargetName="border" Value="{StaticResource TextBox.Focused.Border}"/>
-                            <Setter Property="Background"  TargetName="border" Value="{StaticResource TextBox.Focused.Background}"/>
+                            <Setter Property="BorderBrush" TargetName="border" Value="{DynamicResource TextBox.Focused.Border}"/>
+                            <Setter Property="Background"  TargetName="border" Value="{DynamicResource TextBox.Focused.Background}"/>
                             <!--<Setter Property="BorderThickness" TargetName="border" Value="1, 1, 1, 2"/>-->
                             <Setter Property="CornerRadius" TargetName="border" Value="3, 3, 0, 0"/>
                             <Setter Property="Visibility" TargetName="focusBar" Value="Visible"/>
@@ -179,7 +179,7 @@
                     <Condition Property="IsInactiveSelectionHighlightEnabled" Value="true"/>
                     <Condition Property="IsSelectionActive" Value="false"/>
                 </MultiTrigger.Conditions>
-                <Setter Property="SelectionBrush" Value="{StaticResource TextBox.Disabled.Selection}"/>
+                <Setter Property="SelectionBrush" Value="{DynamicResource TextBox.Disabled.Selection}"/>
             </MultiTrigger>
         </Style.Triggers>
     </Style>

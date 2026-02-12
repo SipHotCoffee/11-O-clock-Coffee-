@@ -5,49 +5,49 @@
 
     <FontFamily x:Key="SymbolFont">pack://application:,,,/Resources/Fonts/Segoe Fluent Icons.ttf#Segoe Fluent Icons</FontFamily>
 
-    <SolidColorBrush x:Key="Window.Active.Background"         Color="{StaticResource Background}"/>
-    <SolidColorBrush x:Key="Window.Active.Foreground"         Color="{StaticResource Foreground}"/>
-    <SolidColorBrush x:Key="Window.Active.Border"             Color="{StaticResource Control3}" Opacity="0.5"/>
-    <SolidColorBrush x:Key="Window.Active.InvertedForeground" Color="{StaticResource Background}"/>
+    <SolidColorBrush x:Key="Window.Active.Background"         Color="{DynamicResource Background}"/>
+    <SolidColorBrush x:Key="Window.Active.Foreground"         Color="{DynamicResource Foreground}"/>
+    <SolidColorBrush x:Key="Window.Active.Border"             Color="{DynamicResource Control3}" Opacity="0.5"/>
+    <SolidColorBrush x:Key="Window.Active.InvertedForeground" Color="{DynamicResource Background}"/>
 
-    <SolidColorBrush x:Key="Window.Active.Foreground.Disabled" Color="{StaticResource DisabledForeground}"/>
+    <SolidColorBrush x:Key="Window.Active.Foreground.Disabled" Color="{DynamicResource DisabledForeground}"/>
 
-    <SolidColorBrush x:Key="Separator.Background" Color="{StaticResource Control3}"/>
+    <SolidColorBrush x:Key="Separator.Background" Color="{DynamicResource Control3}"/>
 
 
-    <SolidColorBrush x:Key="CloseButton.Normal.Background" Color="{StaticResource Red2}"/>
+    <SolidColorBrush x:Key="CloseButton.Normal.Background" Color="{DynamicResource Red2}"/>
     <LinearGradientBrush x:Key="CloseButton.Normal.Border" StartPoint="0, 0" EndPoint="0, 1">
         <LinearGradientBrush.GradientStops>
-            <GradientStop Color="{StaticResource Red5}" Offset="0.05"/>
-            <GradientStop Color="{StaticResource Red3}" Offset="0.1"/>
+            <GradientStop Color="{DynamicResource Red5}" Offset="0.05"/>
+            <GradientStop Color="{DynamicResource Red3}" Offset="0.1"/>
         </LinearGradientBrush.GradientStops>
     </LinearGradientBrush>
 
-    <SolidColorBrush x:Key="CloseButton.MouseOver.Background" Color="{StaticResource Red3}"/>
+    <SolidColorBrush x:Key="CloseButton.MouseOver.Background" Color="{DynamicResource Red3}"/>
     <LinearGradientBrush x:Key="CloseButton.MouseOver.Border" StartPoint="0, 0" EndPoint="0, 1">
         <LinearGradientBrush.GradientStops>
-            <GradientStop Color="{StaticResource Red7}" Offset="0.05"/>
-            <GradientStop Color="{StaticResource Red4}" Offset="0.1"/>
+            <GradientStop Color="{DynamicResource Red7}" Offset="0.05"/>
+            <GradientStop Color="{DynamicResource Red4}" Offset="0.1"/>
         </LinearGradientBrush.GradientStops>
     </LinearGradientBrush>
 
-    <SolidColorBrush x:Key="CloseButton.Pressed.Background" Color="{StaticResource Red1}"/>
-    <SolidColorBrush x:Key="CloseButton.Pressed.Border"     Color="{StaticResource Red2}"/>
+    <SolidColorBrush x:Key="CloseButton.Pressed.Background" Color="{DynamicResource Red1}"/>
+    <SolidColorBrush x:Key="CloseButton.Pressed.Border"     Color="{DynamicResource Red2}"/>
 
-    <SolidColorBrush x:Key="CloseButton.Disabled.Background" Color="{StaticResource Red3}"/>
-    <SolidColorBrush x:Key="CloseButton.Disabled.Border"     Color="{StaticResource Red3}"/>
+    <SolidColorBrush x:Key="CloseButton.Disabled.Background" Color="{DynamicResource Red3}"/>
+    <SolidColorBrush x:Key="CloseButton.Disabled.Border"     Color="{DynamicResource Red3}"/>
 
     <Style TargetType="{x:Type GridSplitter}">
-        <Setter Property="Background" Value="Transparent"/>
-        <Setter Property="Foreground" Value="Transparent"/>
-        <Setter Property="BorderBrush" Value="Transparent"/>
+        <Setter Property="Background"      Value="Transparent"/>
+        <Setter Property="Foreground"      Value="Transparent"/>
+        <Setter Property="BorderBrush"     Value="Transparent"/>
         <Setter Property="BorderThickness" Value="0"/>
     </Style>
 
     <Style x:Key="CloseButtonStyle" TargetType="{x:Type Button}">
-        <Setter Property="Background"      Value="{StaticResource CloseButton.Normal.Background}"/>
-        <Setter Property="BorderBrush"     Value="{StaticResource CloseButton.Normal.Border}"/>
-        <Setter Property="Foreground"      Value="{StaticResource Window.Active.Foreground}"/>
+        <Setter Property="Background"      Value="{DynamicResource CloseButton.Normal.Background}"/>
+        <Setter Property="BorderBrush"     Value="{DynamicResource CloseButton.Normal.Border}"/>
+        <Setter Property="Foreground"      Value="{DynamicResource Window.Active.Foreground}"/>
         <Setter Property="BorderThickness" Value="1"/>
         <Setter Property="FontSize" Value="14"/>
         <Setter Property="Template">
@@ -67,19 +67,19 @@
 
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsMouseOver" Value="True">
-                            <Setter Property="Background"  Value="{StaticResource CloseButton.MouseOver.Background}"/>
-                            <Setter Property="BorderBrush" Value="{StaticResource CloseButton.MouseOver.Border}"/>
+                            <Setter Property="Background"  Value="{DynamicResource CloseButton.MouseOver.Background}"/>
+                            <Setter Property="BorderBrush" Value="{DynamicResource CloseButton.MouseOver.Border}"/>
                         </Trigger>
 
                         <Trigger Property="IsPressed" Value="True">
-                            <Setter Property="Background"  Value="{StaticResource CloseButton.Pressed.Background}"/>
-                            <Setter Property="BorderBrush" Value="{StaticResource CloseButton.Pressed.Border}"/>
+                            <Setter Property="Background"  Value="{DynamicResource CloseButton.Pressed.Background}"/>
+                            <Setter Property="BorderBrush" Value="{DynamicResource CloseButton.Pressed.Border}"/>
                         </Trigger>
 
                         <Trigger Property="IsEnabled" Value="False">
-                            <Setter Property="Background"  Value="{StaticResource CloseButton.Disabled.Background}"/>
-                            <Setter Property="BorderBrush" Value="{StaticResource CloseButton.Disabled.Border}"/>
-                            <Setter Property="Foreground"  Value="{StaticResource Window.Active.Foreground.Disabled}"/>
+                            <Setter Property="Background"  Value="{DynamicResource CloseButton.Disabled.Background}"/>
+                            <Setter Property="BorderBrush" Value="{DynamicResource CloseButton.Disabled.Border}"/>
+                            <Setter Property="Foreground"  Value="{DynamicResource Window.Active.Foreground.Disabled}"/>
                         </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>
@@ -90,9 +90,9 @@
     <converters:WindowToBorderVisibilityConverter x:Key="WindowToBorderVisibilityConverter"/>
 
     <Style x:Key="BaseWindowStyle" TargetType="{x:Type local:CustomWindow}">
-        <Setter Property="Background"  Value="{StaticResource Window.Active.Background}"/>
-        <Setter Property="Foreground"  Value="{StaticResource Window.Active.Foreground}"/>
-        <Setter Property="BorderBrush" Value="{StaticResource Window.Active.Border}"/>
+        <Setter Property="Background"  Value="{DynamicResource Window.Active.Background}"/>
+        <Setter Property="Foreground"  Value="{DynamicResource Window.Active.Foreground}"/>
+        <Setter Property="BorderBrush" Value="{DynamicResource Window.Active.Border}"/>
 
         <Setter Property="BorderThickness" Value="1"/>
 
@@ -143,9 +143,9 @@
 
                                         <TextBlock VerticalAlignment="Center" Margin="5" FontSize="16" Text="{TemplateBinding Title}"/>
 
-                                        <Button x:Name="MinimizeButton" Padding="4" Grid.Column="2" Margin="3" Width="{Binding RelativeSource={RelativeSource Mode=Self}, Path=ActualHeight}" FontFamily="{StaticResource SymbolFont}" Content="&#xE921;"/>
-                                        <Button x:Name="MaximizeButton" Padding="4" Grid.Column="3" Margin="3" Width="{Binding RelativeSource={RelativeSource Mode=Self}, Path=ActualHeight}" FontFamily="{StaticResource SymbolFont}" Content="&#xE922;"/>
-                                        <Button x:Name="CloseButton"    Padding="4" Grid.Column="4" Margin="3" Width="{Binding RelativeSource={RelativeSource Mode=Self}, Path=ActualHeight}" FontFamily="{StaticResource SymbolFont}" Content="&#xE8BB;" Style="{StaticResource CloseButtonStyle}"/>
+                                        <Button x:Name="MinimizeButton" Padding="4" Grid.Column="2" Margin="3" Width="{Binding RelativeSource={RelativeSource Mode=Self}, Path=ActualHeight}" FontFamily="{DynamicResource SymbolFont}" Content="&#xE921;"/>
+                                        <Button x:Name="MaximizeButton" Padding="4" Grid.Column="3" Margin="3" Width="{Binding RelativeSource={RelativeSource Mode=Self}, Path=ActualHeight}" FontFamily="{DynamicResource SymbolFont}" Content="&#xE922;"/>
+                                        <Button x:Name="CloseButton"    Padding="4" Grid.Column="4" Margin="3" Width="{Binding RelativeSource={RelativeSource Mode=Self}, Path=ActualHeight}" FontFamily="{DynamicResource SymbolFont}" Content="&#xE8BB;" Style="{DynamicResource CloseButtonStyle}"/>
                                     </Grid>
                                 </Border>
 
@@ -209,8 +209,8 @@
     </Style>
 
     <!--<Style x:Key="BaseWindowStyle" TargetType="{x:Type Window}">
-        <Setter Property="Background" Value="{StaticResource Window.Active.Background}"/>
-        <Setter Property="Foreground" Value="{StaticResource Window.Active.Foreground}"/>
+        <Setter Property="Background" Value="{DynamicResource Window.Active.Background}"/>
+        <Setter Property="Foreground" Value="{DynamicResource Window.Active.Foreground}"/>
         <Setter Property="FontSize" Value="14"/>
     </Style>-->
 
@@ -218,7 +218,7 @@
 
     <Style TargetType="{x:Type ContentControl}">
         <Setter Property="Background" Value="Transparent"/>
-        <Setter Property="Foreground" Value="{StaticResource Window.Active.Foreground}"/>
+        <Setter Property="Foreground" Value="{DynamicResource Window.Active.Foreground}"/>
         <Setter Property="BorderBrush" Value="Transparent"/>
         <Setter Property="BorderThickness" Value="0"/>
 		<Setter Property="Padding" Value="5"/>
@@ -238,11 +238,11 @@
     </Style>
 
     <Style TargetType="{x:Type Separator}">
-        <Setter Property="Background" Value="{StaticResource Separator.Background}"/>
+        <Setter Property="Background" Value="{DynamicResource Separator.Background}"/>
     </Style>
 
     <Style TargetType="{x:Type Label}">
-        <Setter Property="Foreground" Value="{StaticResource Window.Active.Foreground}"/>
+        <Setter Property="Foreground" Value="{DynamicResource Window.Active.Foreground}"/>
     </Style>
 
 </ResourceDictionary>

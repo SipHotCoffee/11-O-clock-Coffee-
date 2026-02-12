@@ -138,7 +138,7 @@ namespace CG.Test.Editor.FrontEnd.Views.Controls
 		private static object LimitValueCallBack(DependencyObject dependencyObject, object baseValue)
 		{
 			var value = (double)baseValue;
-			if (dependencyObject is SpinButton spinButton)
+			if (dependencyObject is SpinButton spinButton && spinButton.Minimum < spinButton.Maximum)
 			{
 				return Math.Clamp(value, spinButton.Minimum, spinButton.Maximum);
 			}
