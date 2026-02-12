@@ -7,7 +7,7 @@ using System.Text.Json;
 
 namespace CG.Test.Editor.FrontEnd.ViewModels
 {
-    public abstract partial class NodeViewModelBase(FileInstanceViewModel editor, NodeViewModelBase? parent) : ObservableObject, IEquatable<NodeViewModelBase>, IEqualityOperators<NodeViewModelBase, NodeViewModelBase, bool>
+    public abstract partial class NodeViewModelBase(FileInstanceViewModel editor, NodeViewModelBase? parent) : ObservableObject, IEqualityOperators<NodeViewModelBase, NodeViewModelBase, bool>
     {
 		[ObservableProperty]
 		private NodeViewModelBase? _selectedNode;
@@ -73,8 +73,6 @@ namespace CG.Test.Editor.FrontEnd.ViewModels
 			Editor.Navigate(this);
 		}
 
-        public bool Equals(NodeViewModelBase? other) => Equals(this, other);
-
 		public static bool Equals(NodeViewModelBase? leftNode, NodeViewModelBase? rightNode)
         {
             if (ReferenceEquals(leftNode, rightNode))
@@ -97,10 +95,10 @@ namespace CG.Test.Editor.FrontEnd.ViewModels
             return ReferenceEquals(left, right);
 		}
 
-        public static bool operator ==(NodeViewModelBase? left, NodeViewModelBase? right) => Equals(left, right);
-        public static bool operator !=(NodeViewModelBase? left, NodeViewModelBase? right) => !Equals(left, right);
+        public static bool operator==(NodeViewModelBase? left, NodeViewModelBase? right) =>  Equals(left, right);
+        public static bool operator!=(NodeViewModelBase? left, NodeViewModelBase? right) => !Equals(left, right);
 
-        public override bool Equals(object? obj) => Equals(obj as NodeViewModelBase);
+        public override bool Equals(object? obj) => Equals(this, obj as NodeViewModelBase);
 
         public override int GetHashCode()
         {

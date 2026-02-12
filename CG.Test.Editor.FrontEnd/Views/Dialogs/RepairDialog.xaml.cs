@@ -81,6 +81,11 @@ namespace CG.Test.Editor.FrontEnd.Views.Dialogs
 
         private void ReplaceButton_Click(object sender, RoutedEventArgs e)
         {
+            if (NewValue is null)
+            {
+                return;
+            }
+
             var occurences = 0;
 
 			foreach (var child in _instanceViewModel.Current!.AllChildren)
