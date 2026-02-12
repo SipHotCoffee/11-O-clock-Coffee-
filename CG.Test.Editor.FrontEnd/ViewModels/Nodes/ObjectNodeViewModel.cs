@@ -19,6 +19,14 @@ namespace CG.Test.Editor.FrontEnd.ViewModels.Nodes
         private void Nodes_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
         {
             Editor.HasChanges = true;
+
+			if (e.OldItems is not null)
+			{
+				foreach (var (_, removedNode) in e.OldItems.OfType<KeyValuePair<string, NodeViewModelBase>>())
+				{
+					removedNode.Release();
+				}
+			}
 		}
 
         public ObservableCollection<KeyValuePair<string, NodeViewModelBase>> Nodes { get; }

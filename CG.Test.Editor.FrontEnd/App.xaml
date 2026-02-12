@@ -12,6 +12,9 @@
 				<ResourceDictionary Source="/Resources/Styles/Modern/ColorSchemes/Dark.xaml"/>
 				<ResourceDictionary Source="/Resources/Styles/Modern/Style.xaml"/>
 			</ResourceDictionary.MergedDictionaries>
+
+			<BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
+
 			<Style TargetType="{x:Type local:MainWindow}"                  BasedOn="{StaticResource BaseWindowStyle}"/>
 			<Style TargetType="{x:Type dialogs:NumberValueDialog}"         BasedOn="{StaticResource BaseWindowStyle}"/>
 			<Style TargetType="{x:Type dialogs:StringValueDialog}"         BasedOn="{StaticResource BaseWindowStyle}"/>
@@ -64,7 +67,7 @@
 			<ResourceDictionary x:Key="NodeCompactDataTemplates">
 				<DataTemplate DataType="{x:Type viewmodelnodes:ArrayNodeViewModel}">
 					<StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-						<TextBlock FontFamily="Cascadia Mono" Text="{Binding Type.ElementType.Name}"/>
+						<TextBlock FontFamily="Cascadia Mono" Text="{Binding Type.ElementType}"/>
 						<TextBlock FontFamily="Cascadia Mono" Text="["/>
 						<TextBlock FontFamily="Cascadia Mono" Text="{Binding Elements.Count}"/>
 						<TextBlock FontFamily="Cascadia Mono" Text="]"/>
@@ -148,7 +151,13 @@
 						<TextBlock VerticalAlignment="Center" FontFamily="Cascadia Mono" Text="{Binding Type.TargetType}"/>
 						<TextBlock VerticalAlignment="Center" FontFamily="Cascadia Mono" Text=" -> "/>
 						<TextBlock VerticalAlignment="Center" FontFamily="Cascadia Mono" Text="("/>
-						<ContentControl Margin="0" Padding="0" VerticalContentAlignment="Center" VerticalAlignment="Center" FontFamily="Cascadia Mono" Content="{Binding Node}"/>
+						<ContentControl Margin="0" 
+										Padding="0" 
+										VerticalContentAlignment="Center"
+										VerticalAlignment="Center" 
+										FontFamily="Cascadia Mono" 
+										Content="{Binding Node}"
+										Visibility="{Binding Node.IsAlive, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}"/>
 						<TextBlock VerticalAlignment="Center" FontFamily="Cascadia Mono" Text=")"/>
 					</StackPanel>
 				</DataTemplate>

@@ -68,6 +68,14 @@ namespace CG.Test.Editor.FrontEnd.ViewModels.Nodes
             {
                 Indices.RemoveAt(Indices.Count - 1);
             }
+
+            if (e.OldItems is not null)
+            {
+                foreach (var removedNode in e.OldItems.OfType<NodeViewModelBase>())
+                {
+                    removedNode.Release();
+                }
+            }
         }
 
         public override ArrayNodeViewModel Clone(NodeViewModelBase? parent)
@@ -151,7 +159,7 @@ namespace CG.Test.Editor.FrontEnd.ViewModels.Nodes
 		[RelayCommand]
         void CutElements(IEnumerable selectedItems)
         {
-            Editor.ClipboardNodes = new(selectedItems.OfType<NodeViewModelBase>());
+            Editor.ClipboardNodes = new(selectedItems.ClonedNodes(null));
 
             foreach (var node in Editor.ClipboardNodes)
             {
@@ -162,7 +170,7 @@ namespace CG.Test.Editor.FrontEnd.ViewModels.Nodes
         [RelayCommand]
         void CopyElements(IEnumerable selectedItems)
         {
-            Editor.ClipboardNodes = new(selectedItems.OfType<NodeViewModelBase>().Select((node, index) => node.Clone(null)));
+            Editor.ClipboardNodes = new(selectedItems.ClonedNodes(null));
 		}
 
         [RelayCommand]

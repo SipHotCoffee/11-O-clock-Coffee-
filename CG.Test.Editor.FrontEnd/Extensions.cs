@@ -1,4 +1,5 @@
 ﻿using CG.Test.Editor.FrontEnd.Models.LinkedTypes;
+using CG.Test.Editor.FrontEnd.ViewModels;
 using System.Collections;
 using System.ComponentModel.DataAnnotations;
 using System.Diagnostics.CodeAnalysis;
@@ -11,6 +12,11 @@ namespace CG.Test.Editor.FrontEnd
 {
     public static class Extensions
     {
+		extension(IEnumerable enumerable)
+		{
+			public IEnumerable<NodeViewModelBase> ClonedNodes(NodeViewModelBase? parent) => enumerable.OfType<NodeViewModelBase>().Select((node) => node.Clone(parent));
+		}
+
 		extension<TInteger>(TInteger) where TInteger : IBinaryInteger<TInteger>, IMinMaxValue<TInteger>
 		{
             public static LinkedSchemaIntegerType GetIntegerSchema(ParameterInfo? parameter)

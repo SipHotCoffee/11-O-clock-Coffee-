@@ -7,10 +7,21 @@ using System.Text.Json;
 
 namespace CG.Test.Editor.FrontEnd.ViewModels
 {
-    public abstract partial class NodeViewModelBase(FileInstanceViewModel editor, NodeViewModelBase? parent) : ObservableObject, IEqualityOperators<NodeViewModelBase, NodeViewModelBase, bool>
+    public abstract partial class NodeViewModelBase : ObservableObject, IEqualityOperators<NodeViewModelBase, NodeViewModelBase, bool>
     {
+        [ObservableProperty]
+        private bool _isAlive;
+
 		[ObservableProperty]
 		private NodeViewModelBase? _selectedNode;
+
+        public NodeViewModelBase(FileInstanceViewModel editor, NodeViewModelBase? parent)
+        {
+            IsAlive = true;
+
+            Editor = editor;
+            Parent = parent;
+        }
 
         public NodeViewModelBase Root => Parent?.Root ?? this;
 
@@ -49,9 +60,9 @@ namespace CG.Test.Editor.FrontEnd.ViewModels
             }
         }
 
-		public FileInstanceViewModel Editor { get; } = editor;
+		public FileInstanceViewModel Editor { get; }
 
-        public NodeViewModelBase? Parent { get; private set; } = parent;
+        public NodeViewModelBase? Parent { get; private set; }
 
         public string Name => Parent?.GetName(this) ?? "(Root)";
 
@@ -107,6 +118,15 @@ namespace CG.Test.Editor.FrontEnd.ViewModels
                 return variantNode.SelectedObject.GetHashCode();
             }
             return base.GetHashCode();
+        }
+
+        public void Release()
+        {
+            IsAlive = false;
+            foreach (var child in Children)
+            {
+                child.Release();
+            }
         }
     }
 }
