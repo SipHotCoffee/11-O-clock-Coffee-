@@ -1,7 +1,7 @@
 ﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
-
-    <ResourceDictionary.MergedDictionaries>
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+					xmlns:system="clr-namespace:System;assembly=mscorlib">
+	<ResourceDictionary.MergedDictionaries>
         <ResourceDictionary Source="UIElements/Window.xaml"/>
         <ResourceDictionary Source="UIElements/Button.xaml"/>
         <ResourceDictionary Source="UIElements/RepeatButton.xaml"/>
@@ -23,6 +23,8 @@
         <ResourceDictionary Source="UIElements/DatePicker.xaml"/>
     </ResourceDictionary.MergedDictionaries>
 
-    <!--<Style TargetType="{x:Type ListViewItem}"/>-->
+	<system:String x:Key="NodeType">Style</system:String>
+
+	<system:String x:Key="StyleName">Modern</system:String>
 
 </ResourceDictionary>

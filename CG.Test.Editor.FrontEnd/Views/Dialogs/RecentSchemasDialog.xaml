@@ -8,7 +8,7 @@
 					   xmlns:converters="clr-namespace:CG.Test.Editor.FrontEnd.Converters"
 					   mc:Ignorable="d"
 					   DataContext="{Binding RelativeSource={RelativeSource Mode=Self}}"
-                       Title="Select Schema" Height="450" Width="600" WindowStartupLocation="CenterScreen" Loaded="Window_Loaded">
+                       Title="Select Schema" Height="450" Width="600" WindowStartupLocation="CenterScreen">
 	<Window.Resources>
 		<converters:IsNotNullConverter x:Key="IsNotNullConverter"/>
 	</Window.Resources>

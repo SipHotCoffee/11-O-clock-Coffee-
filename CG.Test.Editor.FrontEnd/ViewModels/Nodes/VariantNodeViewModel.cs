@@ -1,4 +1,4 @@
-﻿using CG.Test.Editor.FrontEnd.Models.LinkedTypes;
+﻿using CG.Test.Editor.FrontEnd.Models.Types;
 using CommunityToolkit.Mvvm.ComponentModel;
 using System.Text.Json;
 
@@ -6,14 +6,14 @@ namespace CG.Test.Editor.FrontEnd.ViewModels.Nodes
 {
     public partial class VariantNodeViewModel : NodeViewModelBase
     {
-		public LinkedSchemaVariantType VariantType { get; }
+		public SchemaVariantType VariantType { get; }
 
-        public override LinkedSchemaObjectType Type => SelectedObject.Type;
+        public override SchemaObjectType Type => SelectedObject.Type;
 
 		[ObservableProperty]
 		private ObjectNodeViewModel _selectedObject;
 
-        public VariantNodeViewModel(FileInstanceViewModel editor, NodeViewModelBase? parent, LinkedSchemaVariantType type, ObjectNodeViewModel selectedObject) : base(editor, parent)
+        public VariantNodeViewModel(NodeTree tree, NodeViewModelBase? parent, SchemaVariantType type, ObjectNodeViewModel selectedObject) : base(tree, parent)
         {
 			VariantType = type;
 
@@ -42,6 +42,6 @@ namespace CG.Test.Editor.FrontEnd.ViewModels.Nodes
 			return "Child not found!";
 		}
 
-        public override VariantNodeViewModel Clone(NodeViewModelBase? parent) => new(Editor, parent, VariantType, SelectedObject.Clone(parent));
+        public override VariantNodeViewModel Clone(NodeViewModelBase? parent) => new(Tree, parent, VariantType, SelectedObject.Clone(parent));
 	}
 }

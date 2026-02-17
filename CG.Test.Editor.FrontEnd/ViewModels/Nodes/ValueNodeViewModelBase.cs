@@ -7,14 +7,14 @@ namespace CG.Test.Editor.FrontEnd.ViewModels.Nodes
 		[ObservableProperty]
 		private TValue _value;
 
-		public ValueNodeViewModelBase(FileInstanceViewModel editor, NodeViewModelBase? parent, TValue value) : base(editor, parent)
+		public ValueNodeViewModelBase(NodeTree tree, NodeViewModelBase? parent, TValue value) : base(tree, parent)
 		{
 			Value = value;
 		}
 
 		partial void OnValueChanged(TValue? oldValue, TValue newValue)
 		{
-			Editor.HasChanges = true;
+			Tree.Editor?.HasChanges = true;
 		}
 
 		public bool Equals(ValueNodeViewModelBase<TValue>? other) => other is not null && Value.Equals(other.Value);

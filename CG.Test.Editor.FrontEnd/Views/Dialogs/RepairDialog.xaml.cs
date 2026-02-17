@@ -1,4 +1,4 @@
-﻿using CG.Test.Editor.FrontEnd.Models.LinkedTypes;
+﻿using CG.Test.Editor.FrontEnd.Models.Types;
 using CG.Test.Editor.FrontEnd.ViewModels;
 using CG.Test.Editor.FrontEnd.ViewModels.Nodes;
 using CG.Test.Editor.FrontEnd.Visitors;
@@ -20,24 +20,24 @@ namespace CG.Test.Editor.FrontEnd.Views.Dialogs
 
     public partial class RepairDialog : CustomWindow
     {
-        private readonly FileInstanceViewModel _instanceViewModel;
+        private readonly NodeTree _tree;
         
         private readonly NodeViewModelBase? _parent;
 
-        public RepairDialog(FileInstanceViewModel instanceViewModel, NodeViewModelBase? parent)
+        public RepairDialog(NodeTree tree, NodeViewModelBase? parent)
         {
             InitializeComponent();
 
-            _instanceViewModel = instanceViewModel;
+			_tree = tree;
 
             _parent = parent;
         }
 
 		[DependencyProperty]
-		public partial ObservableCollection<LinkedSchemaObjectType> AvailableTypes { get; set; }
+		public partial ObservableCollection<SchemaObjectType> AvailableTypes { get; set; }
 
         [DependencyProperty]
-        public partial LinkedSchemaObjectType SelectedType { get; set; }
+        public partial SchemaObjectType SelectedType { get; set; }
 
         [DependencyProperty]
         public partial IEnumerable<LinkedSchemaProperty> Properties { get; set; }
@@ -56,7 +56,7 @@ namespace CG.Test.Editor.FrontEnd.Views.Dialogs
 
         partial void OnSelectedPropertyChanged(LinkedSchemaProperty oldValue, LinkedSchemaProperty newValue)
         {
-            var visitor = new NodeViewModelGeneratorVisitor(_instanceViewModel, _parent, null);
+            var visitor = new NodeViewModelGeneratorVisitor(this, _tree, _parent, null);
 
 			OldValue = newValue.Type.Visit(visitor)!;
 			NewValue = newValue.Type.Visit(visitor)!;
@@ -64,13 +64,13 @@ namespace CG.Test.Editor.FrontEnd.Views.Dialogs
 
         private void OldValueButton_Click(object sender, RoutedEventArgs e)
         {
-            var visitor = new NodeEditorVisitor(_instanceViewModel, true);
+            var visitor = new NodeEditorVisitor(true);
             OldValue?.Visit(visitor);
 		}
 
         private void NewValueButton_Click(object sender, RoutedEventArgs e)
         {
-			var visitor = new NodeEditorVisitor(_instanceViewModel, true);
+			var visitor = new NodeEditorVisitor(true);
 			NewValue?.Visit(visitor);
 		}
 
@@ -88,7 +88,7 @@ namespace CG.Test.Editor.FrontEnd.Views.Dialogs
 
             var occurences = 0;
 
-			foreach (var child in _instanceViewModel.Current!.AllChildren)
+			foreach (var child in _tree.Editor!.Current!.AllChildren)
 			{
 				if (child is ObjectNodeViewModel childObject && childObject.Type == SelectedType)
 				{

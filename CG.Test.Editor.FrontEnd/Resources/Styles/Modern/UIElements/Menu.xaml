@@ -37,22 +37,20 @@
                 Padding="8"
                 CornerRadius="4">
             <Grid>
-                <ContentPresenter Content="{TemplateBinding Header}"/>
+				<ContentPresenter Content="{TemplateBinding Header}" 
+							      ContentTemplate="{TemplateBinding HeaderTemplate}" 
+							      ContentTemplateSelector="{TemplateBinding HeaderTemplateSelector}"/>
 
-                <Popup x:Name="_popup" 
+				<Popup x:Name="_popup" 
                        Grid.ColumnSpan="2"
                        IsOpen="{Binding RelativeSource={RelativeSource Mode=TemplatedParent}, Path=IsSubmenuOpen, Mode=OneWay}"
                        AllowsTransparency="True"
                        Placement="Bottom"
                        PlacementTarget="{Binding RelativeSource={RelativeSource Mode=TemplatedParent}}">
-                    <Border Background="{DynamicResource Window.Active.Background}" BorderThickness="1" CornerRadius="4">
-                        <Border.BorderBrush>
-                            <SolidColorBrush Color="White" Opacity="0.1"/>
-                        </Border.BorderBrush>
-                        <ItemsPresenter/>
-                    </Border>
-
-                </Popup>
+					<Border Background="{DynamicResource Window.Active.Background}" BorderBrush="{DynamicResource Menu.Separator.Background}" BorderThickness="1" CornerRadius="4">
+						<ItemsPresenter/>
+					</Border>
+				</Popup>
             </Grid>
         </Border>
         <ControlTemplate.Triggers>
@@ -83,19 +81,18 @@
                 Padding="8"
                 CornerRadius="4">
             <Grid MinWidth="100">
-                <ContentPresenter Content="{TemplateBinding Header}"/>
+                <ContentPresenter Content="{TemplateBinding Header}" 
+								  ContentTemplate="{TemplateBinding HeaderTemplate}" 
+								  ContentTemplateSelector="{TemplateBinding HeaderTemplateSelector}"/>
 
                 <Popup x:Name="_popup" 
                        Grid.ColumnSpan="2"
                        IsOpen="{Binding RelativeSource={RelativeSource Mode=TemplatedParent}, Path=IsSubmenuOpen, Mode=OneWay}"
                        AllowsTransparency="True"
-                       Placement="Bottom"
+                       Placement="Right"
                        PlacementTarget="{Binding RelativeSource={RelativeSource Mode=TemplatedParent}}">
-                    <Border Background="{DynamicResource Window.Active.Background}" BorderThickness="1" CornerRadius="4">
-                        <Border.BorderBrush>
-                            <SolidColorBrush Color="White" Opacity="0.1"/>
-                        </Border.BorderBrush>
-                        <ItemsPresenter/>
+					<Border Background="{DynamicResource Window.Active.Background}" BorderBrush="{DynamicResource Menu.Separator.Background}" BorderThickness="1" CornerRadius="4">
+						<ItemsPresenter/>
                     </Border>
 
                 </Popup>

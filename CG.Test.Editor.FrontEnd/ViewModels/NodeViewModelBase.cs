@@ -1,29 +1,195 @@
-﻿using CG.Test.Editor.FrontEnd.Models.LinkedTypes;
+﻿using CG.Test.Editor.FrontEnd.Models.Types;
 using CG.Test.Editor.FrontEnd.ViewModels.Nodes;
+using CG.Test.Editor.FrontEnd.Visitors;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using System.IO;
 using System.Numerics;
 using System.Text.Json;
+using System.Text.Json.Nodes;
+using System.Windows;
 
 namespace CG.Test.Editor.FrontEnd.ViewModels
 {
+	public class NodeTree(FileInfo? file, FileInstanceViewModel? editor)
+	{
+		public FileInfo? File { get; } = file;
+
+		public FileInstanceViewModel? Editor { get; } = editor;
+	}
+
+	public class GlobalPath(FileInfo? sourceFile, NodePath path)
+	{
+		public FileInfo? SourceFile { get; } = sourceFile;
+		public NodePath Path { get; } = path;
+	}
+
     public abstract partial class NodeViewModelBase : ObservableObject, IEqualityOperators<NodeViewModelBase, NodeViewModelBase, bool>
     {
-        [ObservableProperty]
+        public static async Task<NodeViewModelBase?> ParseFromStream(Window window, FileInstanceViewModel? fileInstance, SchemaTypeBase schemaType, FileInfo file, Stream stream) 
+			=> await LoadFromFileInternal(window, fileInstance, schemaType, file, stream, []);
+
+        private static async Task<NodeViewModelBase?> LoadFromFileInternal(Window window, FileInstanceViewModel? fileInstance, SchemaTypeBase schemaType, FileInfo file, Stream stream, HashSet<string> alreadyIncludedFileNames)
+		{
+			if (fileInstance is not null && fileInstance.File is not null)
+			{
+				alreadyIncludedFileNames.Add(fileInstance.File.FullName);
+			}
+
+			var fileNode = await JsonNode.ParseAsync(stream);
+
+			var fileObjectNode = fileNode!.AsObject();
+			
+			var includedFileNameNodes = fileObjectNode["includeFileNames"]!.AsArray();
+
+			var includedFiles = new Dictionary<string, IncludedFile>();
+			foreach (var includedFileNode in includedFileNameNodes)
+			{
+				if (includedFileNode is null)
+				{
+					return null;
+				}
+
+				var includedFileSchemaFileName = includedFileNode["schemaFileName"]!.GetValue<string>();
+
+				var schemaParsingMessages = new HashSet<SchemaParsingMessage>(10, new SchemaParsingMessageComparer());
+				var schemaLogger = new CollectionLogger<SchemaParsingMessage>(schemaParsingMessages);
+
+				await using var schemaStream = File.OpenRead(includedFileSchemaFileName);
+				var type = await SchemaTypeBase.LoadFromStream(schemaStream, schemaLogger);
+
+				foreach (var message in schemaParsingMessages)
+				{
+					window.ShowMessage(message.Message);
+				}
+
+				if (type is null)
+				{
+					return null;
+				}
+
+				var includedFileName = includedFileNode["schemaFileName"]!.GetValue<string>();
+
+				if (!alreadyIncludedFileNames.Add(includedFileName))
+				{
+					window.ShowMessage("Circular file include detected.");
+					return null;
+				}
+
+				var includedFile = new FileInfo(includedFileName);
+				await using var includedFileStream = includedFile.OpenRead();
+
+				var rootNode = await LoadFromFileInternal(window, null, type, includedFile, includedFileStream, alreadyIncludedFileNames);
+				
+				if (rootNode is null)
+				{
+					return null;
+				}
+
+				includedFiles.Add(includedFileName, new IncludedFile()
+				{
+					File     = new FileInfo(includedFileName),
+					RootNode = rootNode
+				});
+			}
+
+			var referencePathsArrayNode = fileObjectNode["referencePaths"]!.AsArray();
+
+			var paths = new Dictionary<ulong, GlobalPath>();
+
+			foreach (var pathNode in referencePathsArrayNode)
+			{
+				var id = pathNode!["id"]!.GetValue<ulong>();
+
+				FileInfo? sourceFile = null;
+
+				var path = NodePath.Root;
+
+				if (pathNode.AsObject().TryGetPropertyValue("sourceFile", out var sourceFileNode) && sourceFileNode is JsonValue sourceFileValueNode && sourceFileValueNode.TryGetValue<string>(out var sourceFileName))
+				{
+					sourceFile = new FileInfo(sourceFileName);
+				}
+
+				var pathElementsArrayNode = pathNode["path"]!.AsArray();
+
+				foreach (var pathElementValueNode in pathElementsArrayNode.OfType<JsonValue>())
+				{
+					switch (pathElementValueNode.GetValueKind())
+					{
+						case JsonValueKind.String:
+							path = path.GetChild(new NameIdentifier(pathElementValueNode.GetValue<string>()));
+							break;
+						case JsonValueKind.Number:
+							path = path.GetChild(new IndexIdentifier(pathElementValueNode.GetValue<int>()));
+							break;
+					}
+				}
+
+				paths.Add(id, new GlobalPath(sourceFile, path));
+			}
+
+			var contentNode = fileObjectNode["content"];
+
+			var messages = new List<NodeParsingMessage>();
+			var logger = new CollectionLogger<NodeParsingMessage>(messages);
+
+			var tree = new NodeTree(file, fileInstance);
+
+			var referenceNodesToAssign = new Dictionary<ulong, List<ReferenceNodeViewModel>>();
+			var rootNodeViewModel = schemaType!.Visit(new NodeParserVisitor(tree, NodePath.Root, referenceNodesToAssign, null, logger, contentNode));
+
+			foreach (var (pathId, referenceNodes) in referenceNodesToAssign)
+			{
+				var globalPath = paths[pathId];
+
+				var rootNode = rootNodeViewModel;
+
+				if (globalPath.SourceFile is not null && includedFiles.TryGetValue(globalPath.SourceFile.FullName, out var includedFile))
+				{
+					rootNode = includedFile.RootNode;
+				}
+
+				if (rootNode is not null && globalPath.Path.TryNavigate(rootNode, out var targetNode))
+				{
+					foreach (var referenceNode in referenceNodes)
+					{
+						referenceNode.Node = targetNode;
+					}
+				}
+			}
+			
+			foreach (var message in messages)
+			{
+				var messageParameters = new MessageBoxParameters($"Error: {message.Message} Error occured here: '{string.Join("/", message.Path)}'", string.Empty, "Next");
+				messageParameters.AddButton("Cancel");
+
+				if (window.ShowMessage(messageParameters) == 1)
+				{
+					return null;
+				}
+			}
+
+			return rootNodeViewModel;
+		}
+
+		[ObservableProperty]
         private bool _isAlive;
 
 		[ObservableProperty]
 		private NodeViewModelBase? _selectedNode;
 
-        public NodeViewModelBase(FileInstanceViewModel editor, NodeViewModelBase? parent)
+        public NodeViewModelBase(NodeTree tree, NodeViewModelBase? parent)
         {
-            IsAlive = true;
+			Tree = tree;
 
-            Editor = editor;
+			IsAlive = true;
+
             Parent = parent;
         }
 
         public NodeViewModelBase Root => Parent?.Root ?? this;
+
+		public NodeTree Tree { get; }
 
         public NodePath Address
         {
@@ -38,7 +204,7 @@ namespace CG.Test.Editor.FrontEnd.ViewModels
                 {
                     for (var i = 0; i < arrayNode.Elements.Count; i++)
                     {
-                        if (arrayNode.Elements[i] == this)
+                        if (ReferenceEquals(arrayNode.Elements[i], this))
                         {
 							return Parent.Address.GetChild(new IndexIdentifier(i));
 						}
@@ -49,24 +215,22 @@ namespace CG.Test.Editor.FrontEnd.ViewModels
                 {
                     foreach (var (name, node) in objectNode.Nodes)
                     {
-                        if (node == this)
+                        if (ReferenceEquals(node, this))
                         {
 							return Parent.Address.GetChild(new NameIdentifier(name));
 						}
                     }
                 }
 
-                return NodePath.Root;
-            }
+				return NodePath.Root;
+			}
         }
-
-		public FileInstanceViewModel Editor { get; }
 
         public NodeViewModelBase? Parent { get; private set; }
 
         public string Name => Parent?.GetName(this) ?? "(Root)";
 
-        public abstract LinkedSchemaTypeBase Type { get; }
+        public abstract SchemaTypeBase Type { get; }
 
         public virtual IEnumerable<NodeViewModelBase> Children { get; } = [];
 
@@ -81,7 +245,7 @@ namespace CG.Test.Editor.FrontEnd.ViewModels
 		[RelayCommand]
 		void Navigate()
 		{
-			Editor.Navigate(this);
+			Tree.Editor?.Navigate(this);
 		}
 
 		public static bool Equals(NodeViewModelBase? leftNode, NodeViewModelBase? rightNode)

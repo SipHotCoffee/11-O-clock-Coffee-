@@ -1,13 +1,13 @@
-﻿using CG.Test.Editor.FrontEnd.Models.LinkedTypes;
+﻿using CG.Test.Editor.FrontEnd.Models.Types;
 using System.Text.Json;
 
 namespace CG.Test.Editor.FrontEnd.ViewModels.Nodes
 {
-    public partial class BooleanNodeViewModel(FileInstanceViewModel editor, NodeViewModelBase? parent, LinkedSchemaBooleanType type, bool value) : ValueNodeViewModelBase<bool>(editor, parent, value)
+    public partial class BooleanNodeViewModel(NodeTree tree, NodeViewModelBase? parent, SchemaBooleanType type, bool value) : ValueNodeViewModelBase<bool>(tree, parent, value)
 	{
-        public override LinkedSchemaBooleanType Type { get; } = type;
+        public override SchemaBooleanType Type { get; } = type;
 
-        public override BooleanNodeViewModel Clone(NodeViewModelBase? parent) => new(Editor, parent, Type, Value);
+        public override BooleanNodeViewModel Clone(NodeViewModelBase? parent) => new(Tree, parent, Type, Value);
 
         protected override string GetName(NodeViewModelBase item) => Value.ToString();
 

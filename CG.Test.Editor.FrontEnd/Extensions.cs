@@ -1,4 +1,4 @@
-﻿using CG.Test.Editor.FrontEnd.Models.LinkedTypes;
+﻿using CG.Test.Editor.FrontEnd.Models.Types;
 using CG.Test.Editor.FrontEnd.ViewModels;
 using System.Collections;
 using System.ComponentModel.DataAnnotations;
@@ -19,37 +19,37 @@ namespace CG.Test.Editor.FrontEnd
 
 		extension<TInteger>(TInteger) where TInteger : IBinaryInteger<TInteger>, IMinMaxValue<TInteger>
 		{
-            public static LinkedSchemaIntegerType GetIntegerSchema(ParameterInfo? parameter)
+            public static SchemaIntegerType GetIntegerSchema(ParameterInfo? parameter)
             {
 				var rangeAttribute = parameter?.GetCustomAttribute<RangeAttribute>();
 
 				if (rangeAttribute is not null)
 				{
-					return new LinkedSchemaIntegerType((int)rangeAttribute.Minimum, (int)rangeAttribute.Maximum);
+					return new SchemaIntegerType((int)rangeAttribute.Minimum, (int)rangeAttribute.Maximum);
 				}
 
-                return new LinkedSchemaIntegerType(long.CreateTruncating(TInteger.MinValue), long.CreateTruncating(TInteger.MaxValue));
+                return new SchemaIntegerType(long.CreateTruncating(TInteger.MinValue), long.CreateTruncating(TInteger.MaxValue));
             }
         }
 
 		extension<TFloat>(TFloat) where TFloat : IFloatingPoint<TFloat>, IMinMaxValue<TFloat>
 		{
-            public static LinkedSchemaNumberType GetFloatSchema(ParameterInfo? parameter)
+            public static SchemaNumberType GetFloatSchema(ParameterInfo? parameter)
             {
 				var rangeAttribute = parameter?.GetCustomAttribute<RangeAttribute>();
 
 				if (rangeAttribute is not null)
 				{
-					return new LinkedSchemaNumberType(((IConvertible)rangeAttribute.Minimum).ToDouble(CultureInfo.CurrentCulture), ((IConvertible)rangeAttribute.Maximum).ToDouble(CultureInfo.CurrentCulture));
+					return new SchemaNumberType(((IConvertible)rangeAttribute.Minimum).ToDouble(CultureInfo.CurrentCulture), ((IConvertible)rangeAttribute.Maximum).ToDouble(CultureInfo.CurrentCulture));
 				}
 
-				return new LinkedSchemaNumberType(double.CreateTruncating(TFloat.MinValue), double.CreateTruncating(TFloat.MaxValue));
+				return new SchemaNumberType(double.CreateTruncating(TFloat.MinValue), double.CreateTruncating(TFloat.MaxValue));
             }
         }
 
 		extension(Type type)
 		{
-			public LinkedSchemaTypeBase GetSchemaFromType(ParameterInfo? parameter)
+			public SchemaTypeBase GetSchemaFromType(ParameterInfo? parameter)
 			{
 				     if (type == typeof(byte))    { return    byte.GetIntegerSchema(parameter); }
 				else if (type == typeof(ushort))  { return  ushort.GetIntegerSchema(parameter); }
@@ -64,25 +64,25 @@ namespace CG.Test.Editor.FrontEnd
 				else if (type == typeof(decimal)) { return decimal.GetFloatSchema(parameter);   }
 				else if (type == typeof(bool))
 				{
-					return new LinkedSchemaBooleanType();
+					return new SchemaBooleanType();
 				}
 				else if (type == typeof(string))
 				{
-					return new LinkedSchemaStringType(int.MaxValue);
+					return new SchemaStringType(int.MaxValue);
 				}
 				else if (type.IsArray)
 				{
-					return new LinkedSchemaArrayType((type.GetElementType() ?? typeof(object)).GetSchemaFromType(null), int.MinValue, int.MaxValue);
+					return new SchemaArrayType((type.GetElementType() ?? typeof(object)).GetSchemaFromType(null), int.MinValue, int.MaxValue);
 				}
 				else if (type.IsAssignableTo(typeof(IEnumerable)))
 				{
 					if (type.GenericTypeArguments.Length > 0)
 					{
-						return new LinkedSchemaArrayType(type.GenericTypeArguments[0].GetSchemaFromType(null), int.MinValue, int.MaxValue);
+						return new SchemaArrayType(type.GenericTypeArguments[0].GetSchemaFromType(null), int.MinValue, int.MaxValue);
 					}
 					else
 					{
-						return new LinkedSchemaArrayType(typeof(object).GetSchemaFromType(null), int.MinValue, int.MaxValue);
+						return new SchemaArrayType(typeof(object).GetSchemaFromType(null), int.MinValue, int.MaxValue);
 					}
 				}
 				else
@@ -90,7 +90,7 @@ namespace CG.Test.Editor.FrontEnd
 					var constructor = type.GetConstructors(BindingFlags.Public | BindingFlags.Instance).First();
 					var properties = new Dictionary<string, LinkedSchemaProperty>();
                     var parameters = constructor.GetParameters();
-					return new LinkedSchemaObjectType(type.Name, parameters.Select((parameter, index) => new LinkedSchemaProperty()
+					return new SchemaObjectType(type.Name, parameters.Select((parameter, index) => new LinkedSchemaProperty()
 					{ 
 						Index = index,
 						Name = parameter.Name ?? string.Empty,
@@ -100,15 +100,15 @@ namespace CG.Test.Editor.FrontEnd
 			}
 		}
 
-		extension(LinkedSchemaTypeBase type)
+		extension(SchemaTypeBase type)
 		{
-			public IEnumerable<LinkedSchemaObjectType> EnumerateObjectTypes()
+			public IEnumerable<SchemaObjectType> EnumerateObjectTypes()
 			{
-				if (type is LinkedSchemaObjectType objectType)
+				if (type is SchemaObjectType objectType)
 				{
 					yield return objectType;
 				}
-				else if (type is LinkedSchemaVariantType variantType)
+				else if (type is SchemaVariantType variantType)
 				{
 					foreach (var possibleType in variantType.PossibleTypes)
 					{
@@ -118,7 +118,7 @@ namespace CG.Test.Editor.FrontEnd
 						}
 					}
 				}
-				else if (type is LinkedSchemaSymbolType symbolType)
+				else if (type is SchemaSymbolType symbolType)
 				{
 					foreach (var possibleObjectType in symbolType.LinkedType.EnumerateObjectTypes())
 					{
@@ -130,7 +130,7 @@ namespace CG.Test.Editor.FrontEnd
 
 		extension(JsonObject objectNode)
 		{
-			public bool TryParseSchemaDefinitions(ILogger<SchemaParsingMessage> logger, Dictionary<string, LinkedSchemaTypeBase> namedTypes)
+			public bool TryParseSchemaDefinitions(ILogger<SchemaParsingMessage> logger, Dictionary<string, SchemaTypeBase> namedTypes)
 			{
 				foreach (var (typeName, typeNode) in objectNode)
 				{
@@ -168,7 +168,7 @@ namespace CG.Test.Editor.FrontEnd
 				return false;
 			}
 
-			private bool TryParseSchemaIntegerType(ILogger<SchemaParsingMessage> logger, [NotNullWhen(true)] out LinkedSchemaTypeBase? type)
+			private bool TryParseSchemaIntegerType(ILogger<SchemaParsingMessage> logger, [NotNullWhen(true)] out SchemaTypeBase? type)
 			{
 				if (!objectNode.TryGetValue<long>("minimum", logger, out var minimum))
 				{
@@ -180,11 +180,11 @@ namespace CG.Test.Editor.FrontEnd
 					maximum = long.MaxValue;
 				}
 
-				type = new LinkedSchemaIntegerType(minimum, maximum);
+				type = new SchemaIntegerType(minimum, maximum);
 				return true;
 			}
 
-			private bool TryParseSchemaNumberType(ILogger<SchemaParsingMessage> logger, [NotNullWhen(true)] out LinkedSchemaTypeBase? type)
+			private bool TryParseSchemaNumberType(ILogger<SchemaParsingMessage> logger, [NotNullWhen(true)] out SchemaTypeBase? type)
 			{
 				if (!objectNode.TryGetValue<double>("minimum", logger, out var minimum))
 				{
@@ -195,16 +195,16 @@ namespace CG.Test.Editor.FrontEnd
 				{
 					maximum = double.MaxValue;
 				}
-				type = new LinkedSchemaNumberType(minimum, maximum);
+				type = new SchemaNumberType(minimum, maximum);
 				return true;
 			}
 
-			private bool TryParseSchemaStringType(ILogger<SchemaParsingMessage> logger, [NotNullWhen(true)] out LinkedSchemaTypeBase? type)
+			private bool TryParseSchemaStringType(ILogger<SchemaParsingMessage> logger, [NotNullWhen(true)] out SchemaTypeBase? type)
 			{
 				if (objectNode.TryGetPropertyValue("enum", out var node) && node is JsonArray arrayNode)
 				{
 					var successful = true;
-					type = new LinkedSchemaEnumType(arrayNode.OfType<JsonValue>().Select((valueNode) =>
+					type = new SchemaEnumType(arrayNode.OfType<JsonValue>().Select((valueNode) =>
 					{
 						if (valueNode.TryGetValue<string>(out var elementName))
 						{
@@ -224,11 +224,11 @@ namespace CG.Test.Editor.FrontEnd
 				{
 					maxLength = int.MaxValue;
 				}
-				type = new LinkedSchemaStringType(maxLength);
+				type = new SchemaStringType(maxLength);
 				return true;
 			}
 
-			private bool TryParseSchemaObjectType(ILogger<SchemaParsingMessage> logger, IReadOnlyDictionary<string, LinkedSchemaTypeBase> registeredTypes, [NotNullWhen(true)] out LinkedSchemaTypeBase? type)
+			private bool TryParseSchemaObjectType(ILogger<SchemaParsingMessage> logger, IReadOnlyDictionary<string, SchemaTypeBase> registeredTypes, [NotNullWhen(true)] out SchemaTypeBase? type)
 			{
 				if (objectNode.TryGetPropertyValue("properties", out var propertiesNode))
 				{
@@ -262,7 +262,7 @@ namespace CG.Test.Editor.FrontEnd
 								}
 							}
 					
-							type = new LinkedSchemaObjectType(typeName, properties);
+							type = new SchemaObjectType(typeName, properties);
 
 							return true;
 						}
@@ -280,7 +280,7 @@ namespace CG.Test.Editor.FrontEnd
 				{
 					if (oneOfNode is JsonArray arrayNode)
 					{
-						var possibleTypes = new List<LinkedSchemaTypeBase>();
+						var possibleTypes = new List<SchemaTypeBase>();
 
 						foreach (var node in arrayNode)
 						{
@@ -295,7 +295,7 @@ namespace CG.Test.Editor.FrontEnd
 							}
 						}
 
-						type = new LinkedSchemaVariantType(string.Empty, possibleTypes);
+						type = new SchemaVariantType(string.Empty, possibleTypes);
 						return true;
 					}
 					else
@@ -312,7 +312,7 @@ namespace CG.Test.Editor.FrontEnd
 			}
 
 
-			private bool TryParseSchemaArrayType(ILogger<SchemaParsingMessage> logger, IReadOnlyDictionary<string, LinkedSchemaTypeBase> registeredTypes, [NotNullWhen(true)] out LinkedSchemaTypeBase? type)
+			private bool TryParseSchemaArrayType(ILogger<SchemaParsingMessage> logger, IReadOnlyDictionary<string, SchemaTypeBase> registeredTypes, [NotNullWhen(true)] out SchemaTypeBase? type)
 			{
 				if (objectNode.TryGetPropertyValue("items", out var itemsNode) && itemsNode is not null)
 				{
@@ -328,7 +328,7 @@ namespace CG.Test.Editor.FrontEnd
 							maximumItemCount = int.MaxValue;
 						}
 
-						type = new LinkedSchemaArrayType(elementType, minimumItemCount, maximumItemCount);
+						type = new SchemaArrayType(elementType, minimumItemCount, maximumItemCount);
 						return true;
 					}
 				}
@@ -340,13 +340,13 @@ namespace CG.Test.Editor.FrontEnd
 				return false;
 			}
 
-			private bool TryParseSchemaReferenceType(ILogger<SchemaParsingMessage> logger, IReadOnlyDictionary<string, LinkedSchemaTypeBase> registeredTypes, [NotNullWhen(true)] out LinkedSchemaTypeBase? type)
+			private bool TryParseSchemaReferenceType(ILogger<SchemaParsingMessage> logger, IReadOnlyDictionary<string, SchemaTypeBase> registeredTypes, [NotNullWhen(true)] out SchemaTypeBase? type)
 			{
 				if (objectNode.TryGetPropertyValue("target", out var targetNode) && targetNode is not null)
 				{
 					if (targetNode.TryParseLinkedSchemaType(logger, registeredTypes, out var elementType))
 					{
-						type = new LinkedSchemaReferenceType(elementType);
+						type = new SchemaReferenceType(elementType);
 						return true;
 					}
 
@@ -364,7 +364,7 @@ namespace CG.Test.Editor.FrontEnd
 		extension(JsonNode node)
 		{
 
-			public bool TryParseLinkedSchemaType(ILogger<SchemaParsingMessage> logger, IReadOnlyDictionary<string, LinkedSchemaTypeBase> typeDefinitions, [NotNullWhen(true)] out LinkedSchemaTypeBase? type)
+			public bool TryParseLinkedSchemaType(ILogger<SchemaParsingMessage> logger, IReadOnlyDictionary<string, SchemaTypeBase> typeDefinitions, [NotNullWhen(true)] out SchemaTypeBase? type)
 			{
 				if (node is JsonObject objectNode)
 				{
@@ -378,7 +378,7 @@ namespace CG.Test.Editor.FrontEnd
 						}
 
 						var typeName = pathTokens[^1];
-						type = new LinkedSchemaSymbolType(typeName, typeDefinitions);
+						type = new SchemaSymbolType(typeName, typeDefinitions);
 						return true;
 					}
 					else if (objectNode.TryGetPropertyValue("type", out var childNode) && childNode is not null)
@@ -388,7 +388,7 @@ namespace CG.Test.Editor.FrontEnd
 							switch (typeName)
 							{
 								case "boolean":
-									type = new LinkedSchemaBooleanType();
+									type = new SchemaBooleanType();
 									return true;
 								case "integer":
 									return objectNode.TryParseSchemaIntegerType  (logger, out type);

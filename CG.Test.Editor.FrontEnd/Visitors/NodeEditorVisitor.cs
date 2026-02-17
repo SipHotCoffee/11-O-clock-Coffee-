@@ -5,20 +5,18 @@ using System.Collections.ObjectModel;
 
 namespace CG.Test.Editor.FrontEnd.Visitors
 {
-    public class NodeEditorVisitor(FileInstanceViewModel editor, bool askForChangingType) : Visitor<NodeEditorVisitor, NodeViewModelBase, Void>
+    public class NodeEditorVisitor(bool askForChangingType) : Visitor<NodeEditorVisitor, NodeViewModelBase, Void>
     {
-        private readonly FileInstanceViewModel _editor = editor;
-
         private readonly bool _askForChangingType = askForChangingType;
 
 		public void Visit(ArrayNodeViewModel arrayNode)
         {
-            _editor.Navigate(arrayNode);
+			arrayNode.Tree.Editor?.Navigate(arrayNode);
         }
 
 		public void Visit(ObjectNodeViewModel objectNode)
 		{
-			_editor.Navigate(objectNode);
+			objectNode.Tree.Editor?.Navigate(objectNode);
 		}
 
         public void Visit(VariantNodeViewModel variantNode)
@@ -31,9 +29,9 @@ namespace CG.Test.Editor.FrontEnd.Visitors
 
             var parameters = new MessageBoxParameters($"Change or edit variant node of type '{variantNode.VariantType.Name}'", "Edit variant node.", "Edit");
             parameters.AddButton("Change Type");
-            if (_editor.OwnerWindow.ShowMessage(parameters) == 1)
+            if (variantNode.Tree.Editor!.OwnerWindow.ShowMessage(parameters) == 1)
             {   
-                var generatedVariantNode = (VariantNodeViewModel?)variantNode.VariantType.Visit(new NodeViewModelGeneratorVisitor(_editor, variantNode.Parent, null));
+                var generatedVariantNode = (VariantNodeViewModel?)variantNode.VariantType.Visit(new NodeViewModelGeneratorVisitor(variantNode.Tree.Editor!.OwnerWindow, variantNode.Tree, variantNode.Parent, null));
                 if (generatedVariantNode is null)
                 {
                     return;
@@ -49,7 +47,7 @@ namespace CG.Test.Editor.FrontEnd.Visitors
         {
             var numberValueDialog = new NumberValueDialog
             {
-                Owner      = _editor.OwnerWindow,
+                Owner      = numberNode.Tree.Editor!.OwnerWindow,
                 Minimum    = numberNode.Type.Minimum,
                 Maximum    = numberNode.Type.Maximum,
                 Value      = numberNode.Value,
@@ -66,7 +64,7 @@ namespace CG.Test.Editor.FrontEnd.Visitors
 		{
 			var numberValueDialog = new NumberValueDialog
 			{
-				Owner      = _editor.OwnerWindow,
+				Owner      = integerNode.Tree.Editor!.OwnerWindow,
 				Minimum    = integerNode.Type.Minimum,
 				Maximum    = integerNode.Type.Maximum,
 				Value      = integerNode.Value,
@@ -83,7 +81,7 @@ namespace CG.Test.Editor.FrontEnd.Visitors
         {
             var enumValueDialog = new EnumValueDialog()
             {
-                Owner          = _editor.OwnerWindow,
+                Owner          = enumNode.Tree.Editor!.OwnerWindow,
                 PossibleValues = new ObservableCollection<string>(enumNode.Type.PossibleValues),
                 SelectedIndex  = enumNode.SelectedIndex
             };
@@ -103,7 +101,7 @@ namespace CG.Test.Editor.FrontEnd.Visitors
         {
             var stringValueDialog = new StringValueDialog()
             {
-				Owner         = _editor.OwnerWindow,
+				Owner         = stringNode.Tree.Editor!.OwnerWindow,
 				MaximumLength = stringNode.Type.MaximumLength,
 				Text          = stringNode.Value,
 			};
@@ -114,6 +112,7 @@ namespace CG.Test.Editor.FrontEnd.Visitors
 			}
 		}
 
+
         public void Visit(ReferenceNodeViewModel referenceNode)
         {
             if (referenceNode.Root.AllChildren.Any((node) => referenceNode.Type.TargetType.IsConvertibleFrom(node.Type)))
@@ -121,7 +120,7 @@ namespace CG.Test.Editor.FrontEnd.Visitors
 				var referenceDialog = new ReferencePickerDialog()
 				{
 					FilterType = referenceNode.Type.TargetType,
-					Root = new TreeNodeViewModel(referenceNode.Type.TargetType, referenceNode.Root),
+					Roots = new([new TreeNodeViewModel(referenceNode.Type.TargetType.ToString(), referenceNode.Root.Type, referenceNode.Root)]),
                     SelectedNode = referenceNode.Node,
 				};
 
@@ -136,8 +135,41 @@ namespace CG.Test.Editor.FrontEnd.Visitors
             }
             else
             {
-				_editor.OwnerWindow.ShowMessage($"No node of type '{referenceNode.Type.TargetType}' can be referenced.");
+				referenceNode.Tree.Editor!.OwnerWindow.ShowMessage($"No node of type '{referenceNode.Type.TargetType}' can be referenced.");
 			}
         }
+
+        public void Visit(ExternalReferenceNodeViewModel externalReferenceNode)
+        {
+			if (externalReferenceNode.Root.AllChildren.Any((node) => externalReferenceNode.Type.TargetType.IsConvertibleFrom(node.Type)))
+			{
+                var roots = new ObservableCollection<TreeNodeViewModel>([new TreeNodeViewModel(externalReferenceNode.Root.Type.ToString(), externalReferenceNode.Type.TargetType, externalReferenceNode.Root)]);
+
+                foreach (var (fileName, includeFile) in externalReferenceNode.Tree.Editor!.IncludedFiles)
+                {
+                    roots.Add(new TreeNodeViewModel(fileName, externalReferenceNode.Type.TargetType, includeFile.RootNode));
+                }
+
+				var referenceDialog = new ReferencePickerDialog()
+				{
+					FilterType = externalReferenceNode.Type.TargetType,
+					Roots = new(roots),
+					SelectedNode = externalReferenceNode.Node,
+				};
+
+				if (referenceDialog.ShowDialog() == true)
+				{
+					externalReferenceNode.Node = referenceDialog.SelectedNode;
+				}
+				else
+				{
+					externalReferenceNode.Node = null;
+				}
+			}
+			else
+			{
+				externalReferenceNode.Tree.Editor!.OwnerWindow.ShowMessage($"No node of type '{externalReferenceNode.Type.TargetType}' can be referenced.");
+			}
+		}
 	}
 }

@@ -23,7 +23,7 @@ namespace CG.Test.Editor.FrontEnd.Views
             var item = (ListViewItem)sender;
             if (ViewModel.SelectedFile is not null && item.Content is KeyValuePair<string, NodeViewModelBase> node)
             {
-                node.Value.Visit(new NodeEditorVisitor(ViewModel.SelectedFile, true));
+                node.Value.Visit(new NodeEditorVisitor(true));
 			}
         }
 
@@ -32,7 +32,7 @@ namespace CG.Test.Editor.FrontEnd.Views
 			var item = (ListViewItem)sender;
 			if (ViewModel.SelectedFile is not null && item.Content is NodeViewModelBase node)
 			{
-				node.Visit(new NodeEditorVisitor(ViewModel.SelectedFile, false));
+				node.Visit(new NodeEditorVisitor(false));
 			}
 		}
 

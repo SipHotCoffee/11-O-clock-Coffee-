@@ -36,5 +36,10 @@ namespace CG.Test.Editor.FrontEnd.Visitors
 		{
 			referenceNode.Node = ((ReferenceNodeViewModel)_source).Node;
 		}
+
+		public void Visit(ExternalReferenceNodeViewModel referenceNode)
+		{
+			referenceNode.Node = ((ReferenceNodeViewModel)_source).Node;
+		}
 	}
 }

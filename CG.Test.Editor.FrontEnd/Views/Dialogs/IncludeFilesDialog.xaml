@@ -1,0 +1,40 @@
+﻿<frontend:CustomWindow x:Class="CG.Test.Editor.FrontEnd.Views.Dialogs.IncludeFilesDialog"
+					   xmlns:frontend="clr-namespace:CG.Test.Editor.FrontEnd"
+					   xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+					   xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+					   xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+					   xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+					   xmlns:local="clr-namespace:CG.Test.Editor.FrontEnd.Views.Dialogs"
+					   mc:Ignorable="d"
+					   Title="Include Files" Height="350" Width="500" WindowStartupLocation="CenterScreen" DataContext="{Binding RelativeSource={RelativeSource Mode=Self}}">
+	<Grid>
+		<Grid.RowDefinitions>
+			<RowDefinition Height="auto"/>
+			<RowDefinition Height="*"/>
+			<RowDefinition Height="auto"/>
+		</Grid.RowDefinitions>
+
+		<ToolBar Grid.Row="0">
+			<Button x:Name="_insertButton"					 FontSize="18" FontFamily="{StaticResource SymbolFont}" Content="&#xe948;" Click="InsertButton_Click"/>
+			<Button x:Name="_deleteButton" IsEnabled="False" FontSize="18" FontFamily="{StaticResource SymbolFont}" Content="&#xe74d;" Click="DeleteButton_Click"/>
+		</ToolBar>
+
+		<ListView x:Name="_includedFilesListView" Grid.Row="1" Margin="5, 2.5, 5, 2.5" 
+				  ItemsSource="{Binding IncludedFiles}" SelectionChanged="IncludedFilesListView_SelectionChanged">
+			<ListView.ItemTemplate>
+				<DataTemplate>
+					<TextBlock Text="{Binding File.FullName}"/>
+				</DataTemplate>
+			</ListView.ItemTemplate>
+		</ListView>
+
+		<Grid Grid.Row="2">
+			<Grid.ColumnDefinitions>
+				<ColumnDefinition Width="*"/>
+				<ColumnDefinition Width="*"/>
+			</Grid.ColumnDefinitions>
+			<Button x:Name="_okButton"     Grid.Column="0" Margin="5, 2.5, 2.5, 5" IsDefault="True" Content="OK" Click="OkButton_Click"/>
+			<Button x:Name="_cancelButton" Grid.Column="1" Margin="2.5, 2.5, 5, 5" IsCancel="True"  Content="Cancel"/>
+		</Grid>
+	</Grid>
+</frontend:CustomWindow>

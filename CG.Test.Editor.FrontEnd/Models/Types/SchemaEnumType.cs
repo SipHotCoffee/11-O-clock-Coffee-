@@ -1,6 +1,8 @@
-﻿namespace CG.Test.Editor.FrontEnd.Models.LinkedTypes
+﻿using CG.Test.Editor.FrontEnd;
+
+namespace CG.Test.Editor.FrontEnd.Models.Types
 {
-    public class LinkedSchemaEnumType(IEnumerable<string> possibleValues) : LinkedSchemaTypeBase
+    public class SchemaEnumType(IEnumerable<string> possibleValues) : SchemaTypeBase
     {
         private readonly Dictionary<string, int> _possibleValueSet = possibleValues.Select((stringValue, index) => new KeyValuePair<string, int>(stringValue, index)).ToDictionary();
 
@@ -10,7 +12,7 @@
 
 		public override bool IsValueType => true;
 
-		public override bool IsConvertibleFrom(LinkedSchemaTypeBase sourceType) => sourceType == this;
+		public override bool IsConvertibleFrom(SchemaTypeBase sourceType) => sourceType == this;
 
         public override string ToString() => "Enum";
     }

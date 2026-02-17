@@ -33,7 +33,7 @@
 				<ColumnDefinition Width="*"/>
 			</Grid.ColumnDefinitions>
 
-			<TreeView Grid.Column="0" Margin="5, 5, 2.5, 5" ItemsSource="{Binding Root.Children}" MinWidth="200" SelectedItemChanged="TreeView_SelectedItemChanged">
+			<TreeView Grid.Column="0" Margin="5, 5, 2.5, 5" ItemsSource="{Binding Roots}" MinWidth="200" SelectedItemChanged="TreeView_SelectedItemChanged">
 				<TreeView.ItemTemplate>
 					<HierarchicalDataTemplate ItemsSource="{Binding Children}">
 						<TextBlock Text="{Binding Name}"/>

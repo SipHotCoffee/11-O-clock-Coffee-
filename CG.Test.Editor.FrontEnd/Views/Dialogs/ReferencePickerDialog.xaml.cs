@@ -1,4 +1,4 @@
-﻿using CG.Test.Editor.FrontEnd.Models.LinkedTypes;
+﻿using CG.Test.Editor.FrontEnd.Models.Types;
 using CG.Test.Editor.FrontEnd.ViewModels;
 using CG.Test.Editor.FrontEnd.ViewModels.Nodes;
 using DependencyPropertyToolkit;
@@ -10,23 +10,23 @@ using System.Windows.Data;
 
 namespace CG.Test.Editor.FrontEnd.Views.Dialogs
 {
-	public class TreeNodeViewModel(LinkedSchemaTypeBase typeFilter, NodeViewModelBase node)
+	public class TreeNodeViewModel(string name, SchemaTypeBase typeFilter, NodeViewModelBase node)
     {
-        public NodeViewModelBase Node { get; } = node;
+		public string Name { get; } = name;
 
-        public string Name { get; } = node.Name;
+		public NodeViewModelBase Node { get; } = node;
 
         public List<TreeNodeViewModel> Children { get; } = [.. node.Children.Where((node) => node is ArrayNodeViewModel || node is ObjectNodeViewModel)
                                                                             .Where((node) => node.Children.Any((node) => typeFilter.IsConvertibleFrom(node.Type)))
-                                                                            .Select((node) => new TreeNodeViewModel(typeFilter, node)) ];
+                                                                            .Select((node) => new TreeNodeViewModel(node.Name, typeFilter, node)) ];
     }
 
 	public class NodeContainsMatchingType : MultiValueConverterBase<bool>
 	{
-        public bool Convert(NodeViewModelBase node, LinkedSchemaTypeBase type) 
+        public bool Convert(NodeViewModelBase node, SchemaTypeBase type) 
 			=> type.IsConvertibleFrom(node.Type) || node.AllChildren.Any((child) => type.IsConvertibleFrom(child.Type));
 
-        public void ConvertBack(bool source, out NodeViewModelBase node, out LinkedSchemaTypeBase type)
+        public void ConvertBack(bool source, out NodeViewModelBase node, out SchemaTypeBase type)
         {
             throw new NotImplementedException();
         }
@@ -34,9 +34,9 @@ namespace CG.Test.Editor.FrontEnd.Views.Dialogs
 
 	public class SelectedNodeHasMatchingType : MultiValueConverterBase<bool>
 	{
-        public bool Convert(NodeViewModelBase node, LinkedSchemaTypeBase type) => type.IsConvertibleFrom(node.Type);
+        public bool Convert(NodeViewModelBase node, SchemaTypeBase type) => type.IsConvertibleFrom(node.Type);
 
-        public void ConvertBack(bool source, out NodeViewModelBase node, out LinkedSchemaTypeBase type)
+        public void ConvertBack(bool source, out NodeViewModelBase node, out SchemaTypeBase type)
         {
             throw new NotImplementedException();
         }
@@ -65,7 +65,7 @@ namespace CG.Test.Editor.FrontEnd.Views.Dialogs
 		}
 
 		[DependencyProperty]
-		public partial LinkedSchemaTypeBase FilterType { get; set; }
+		public partial SchemaTypeBase FilterType { get; set; }
 
 		[DependencyProperty]
 		public partial int HistoryIndex { get; set; }
@@ -77,7 +77,7 @@ namespace CG.Test.Editor.FrontEnd.Views.Dialogs
 		public partial bool IsForwardButtonEnabled { get; set; }
 
 		[DependencyProperty]
-        public partial TreeNodeViewModel Root { get; set; }
+        public partial ObservableCollection<TreeNodeViewModel> Roots { get; set; }
 
         [DependencyProperty]
         public partial NodeViewModelBase? CurrentNode { get; set; }
@@ -88,9 +88,9 @@ namespace CG.Test.Editor.FrontEnd.Views.Dialogs
 		[DependencyProperty]
 		public partial ObservableCollection<NodeViewModelBase> AddressItems { get; set; }
 
-		partial void OnRootChanged(TreeNodeViewModel oldValue, TreeNodeViewModel newValue)
+		partial void OnRootsChanged(ObservableCollection<TreeNodeViewModel> oldValue, ObservableCollection<TreeNodeViewModel> newValue)
         {
-            CurrentNode = newValue.Node;
+            CurrentNode = newValue.FirstOrDefault()?.Node;
         }
 
         partial void OnSelectedNodeChanged(NodeViewModelBase? oldValue, NodeViewModelBase? newValue)

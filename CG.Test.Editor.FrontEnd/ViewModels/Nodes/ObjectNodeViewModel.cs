@@ -1,5 +1,5 @@
 ﻿using CG.Test.Editor.FrontEnd;
-using CG.Test.Editor.FrontEnd.Models.LinkedTypes;
+using CG.Test.Editor.FrontEnd.Models.Types;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Text.Json;
@@ -8,7 +8,7 @@ namespace CG.Test.Editor.FrontEnd.ViewModels.Nodes
 {
     public class ObjectNodeViewModel : NodeViewModelBase
     {
-		public ObjectNodeViewModel(FileInstanceViewModel editor, NodeViewModelBase? parent, LinkedSchemaObjectType type) : base(editor, parent)
+		public ObjectNodeViewModel(NodeTree tree, NodeViewModelBase? parent, SchemaObjectType type) : base(tree, parent)
 		{
 			Type = type;
 
@@ -18,7 +18,7 @@ namespace CG.Test.Editor.FrontEnd.ViewModels.Nodes
 
         private void Nodes_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
         {
-            Editor.HasChanges = true;
+            Tree.Editor?.HasChanges = true;
 
 			if (e.OldItems is not null)
 			{
@@ -31,11 +31,11 @@ namespace CG.Test.Editor.FrontEnd.ViewModels.Nodes
 
         public ObservableCollection<KeyValuePair<string, NodeViewModelBase>> Nodes { get; }
 
-        public override LinkedSchemaObjectType Type { get; }
+        public override SchemaObjectType Type { get; }
 
         public override ObjectNodeViewModel Clone(NodeViewModelBase? parent)
         {
-            var result = new ObjectNodeViewModel(Editor, parent, Type);
+            var result = new ObjectNodeViewModel(Tree, parent, Type);
 
 			foreach (var property in Type.Properties)
             {

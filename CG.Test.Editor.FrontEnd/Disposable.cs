@@ -59,31 +59,37 @@ namespace CG.Test.Editor.FrontEnd
         protected virtual ValueTask DisposeAsyncCore() => ValueTask.CompletedTask;
     }
 
-    public class DisposableCollection(IEnumerable<IDisposable> disposables) : Disposable, IEnumerable<IDisposable>
-    {
-        private readonly IEnumerable<IDisposable> _disposables = disposables;
+	public interface IDisposableCollection : IDisposable
+	{
+		IEnumerable<IDisposable> Items { get; }
+	}
 
-        protected override void OnManagedDispose()
+	public class DisposableCollection<TEnumerable>(TEnumerable disposableItems) : Disposable, IDisposableCollection where TEnumerable : IEnumerable<IDisposable>
+    {
+		public TEnumerable Items { get; } = disposableItems;
+
+		protected override void OnManagedDispose()
         {
-            foreach (var disposable in _disposables)
+            foreach (var disposable in Items)
             {
                 disposable.Dispose();
             }
         }
 
-        public IEnumerator<IDisposable> GetEnumerator() => _disposables.GetEnumerator();
-
-        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+        IEnumerable<IDisposable> IDisposableCollection.Items => Items;
     }
 
-	public class AsyncDisposableCollection(IEnumerable<IAsyncDisposable> disposables) : AsyncDisposable, IEnumerable<IAsyncDisposable>
+	public interface IAsyncDisposableCollection : IAsyncDisposable
+    {
+        IEnumerable<IAsyncDisposable> Items { get; }
+    }
+
+	public class AsyncDisposableCollection<TEnumerable>(TEnumerable disposableItems) : AsyncDisposable, IAsyncDisposableCollection where TEnumerable : IEnumerable<IAsyncDisposable>
 	{
-		private readonly IEnumerable<IAsyncDisposable> _disposables = disposables;
+        public TEnumerable Items { get; } = disposableItems;
 
-        protected async override ValueTask DisposeAsyncCore() => await Task.WhenAll(_disposables.Select((disposable) => disposable.DisposeAsync().AsTask()));
+        protected async override ValueTask DisposeAsyncCore() => await Task.WhenAll(Items.Select((disposable) => disposable.DisposeAsync().AsTask()));
 
-        public IEnumerator<IAsyncDisposable> GetEnumerator() => _disposables.GetEnumerator();
-
-		IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
-	}
+        IEnumerable<IAsyncDisposable> IAsyncDisposableCollection.Items => Items;
+    }
 }

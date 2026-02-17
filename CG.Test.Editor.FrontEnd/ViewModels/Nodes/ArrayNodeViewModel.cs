@@ -1,4 +1,4 @@
-﻿using CG.Test.Editor.FrontEnd.Models.LinkedTypes;
+﻿using CG.Test.Editor.FrontEnd.Models.Types;
 using CG.Test.Editor.FrontEnd.Views.Dialogs;
 using CG.Test.Editor.FrontEnd.Visitors;
 using CommunityToolkit.Mvvm.Input;
@@ -14,7 +14,7 @@ namespace CG.Test.Editor.FrontEnd.ViewModels.Nodes
 {
     public class IsInsertEnabledConverter : MultiValueConverterBase<bool>
     {
-        public bool Convert(int count, LinkedSchemaArrayType type)
+        public bool Convert(int count, SchemaArrayType type)
         {
             return count + 1 <= type.MaximumItemCount;
         }
@@ -22,7 +22,7 @@ namespace CG.Test.Editor.FrontEnd.ViewModels.Nodes
 
 	public class IsDeleteEnabledConverter : MultiValueConverterBase<bool>
 	{
-		public bool Convert(int elementCount, LinkedSchemaArrayType arrayType, int selectionCount)
+		public bool Convert(int elementCount, SchemaArrayType arrayType, int selectionCount)
 		{
 			return selectionCount > 0 && elementCount - selectionCount >= arrayType.MinimumItemCount;
 		}
@@ -30,7 +30,7 @@ namespace CG.Test.Editor.FrontEnd.ViewModels.Nodes
 
 	public class IsPasteEnabledConverter : MultiValueConverterBase<bool>
 	{
-		public bool Convert(int elementCount, LinkedSchemaArrayType arrayType, int clipboardCount)
+		public bool Convert(int elementCount, SchemaArrayType arrayType, int clipboardCount)
 		{
 			return clipboardCount > 0 && elementCount + clipboardCount <= arrayType.MaximumItemCount;
 		}
@@ -38,7 +38,7 @@ namespace CG.Test.Editor.FrontEnd.ViewModels.Nodes
 
 	public partial class ArrayNodeViewModel : NodeViewModelBase
     {
-        public ArrayNodeViewModel(FileInstanceViewModel editor, NodeViewModelBase? parent, IEnumerable<NodeViewModelBase> nodes, LinkedSchemaArrayType type) : base(editor, parent)
+        public ArrayNodeViewModel(NodeTree tree, NodeViewModelBase? parent, IEnumerable<NodeViewModelBase> nodes, SchemaArrayType type) : base(tree, parent)
         {
             Type = type;
 
@@ -53,11 +53,11 @@ namespace CG.Test.Editor.FrontEnd.ViewModels.Nodes
 
 		public ObservableCollection<int> Indices { get; }
 
-		public override LinkedSchemaArrayType Type { get; }
+		public override SchemaArrayType Type { get; }
 
 		private void Elements_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
         {
-            Editor.HasChanges = true;
+            Tree.Editor?.HasChanges = true;
 
             for (var i = Indices.Count; i < Elements.Count; i++)
             {
@@ -80,7 +80,7 @@ namespace CG.Test.Editor.FrontEnd.ViewModels.Nodes
 
         public override ArrayNodeViewModel Clone(NodeViewModelBase? parent)
         {
-            var result = new ArrayNodeViewModel(Editor, parent, [], Type);
+            var result = new ArrayNodeViewModel(Tree, parent, [], Type);
             foreach (var element in Elements)
             {
                 result.Elements.Add(element.Clone(result));
@@ -113,7 +113,7 @@ namespace CG.Test.Editor.FrontEnd.ViewModels.Nodes
 
                 if (itemDialog.ShowDialog() == true)
                 {
-                    var baseNode = Type.ElementType.Visit(new NodeViewModelGeneratorVisitor(Editor, this, null));
+                    var baseNode = Type.ElementType.Visit(new NodeViewModelGeneratorVisitor(Tree.Editor!.OwnerWindow, Tree, this, null));
 
                     if (baseNode is null)
                     {
@@ -128,7 +128,7 @@ namespace CG.Test.Editor.FrontEnd.ViewModels.Nodes
             }
             else
             {
-                var newNode = Type.ElementType.Visit(new NodeViewModelGeneratorVisitor(Editor, this, null));
+                var newNode = Type.ElementType.Visit(new NodeViewModelGeneratorVisitor(Tree.Editor!.OwnerWindow, Tree, this, null));
                 if (newNode is not null)
                 {
                     Elements.Add(newNode);
@@ -139,7 +139,7 @@ namespace CG.Test.Editor.FrontEnd.ViewModels.Nodes
 		[RelayCommand]
 		void InsertAbove(int selectedIndex)
 		{
-			var newNode = Type.ElementType.Visit(new NodeViewModelGeneratorVisitor(Editor, this, null));
+			var newNode = Type.ElementType.Visit(new NodeViewModelGeneratorVisitor(Tree.Editor!.OwnerWindow, Tree, this, null));
             if (newNode is not null)
             {
                 Elements.Insert(selectedIndex, newNode);
@@ -149,7 +149,7 @@ namespace CG.Test.Editor.FrontEnd.ViewModels.Nodes
 		[RelayCommand]
 		void InsertBelow(int selectedIndex)
 		{
-			var newNode = Type.ElementType.Visit(new NodeViewModelGeneratorVisitor(Editor, this, null));
+			var newNode = Type.ElementType.Visit(new NodeViewModelGeneratorVisitor(Tree.Editor!.OwnerWindow, Tree, this, null));
             if (newNode is not null)
             {
                 Elements.Insert(selectedIndex + 1, newNode);
@@ -159,9 +159,9 @@ namespace CG.Test.Editor.FrontEnd.ViewModels.Nodes
 		[RelayCommand]
         void CutElements(IEnumerable selectedItems)
         {
-            Editor.ClipboardNodes = new(selectedItems.ClonedNodes(null));
+			Tree.Editor!.ClipboardNodes = new(selectedItems.ClonedNodes(null));
 
-            foreach (var node in Editor.ClipboardNodes)
+            foreach (var node in Tree.Editor.ClipboardNodes)
             {
                 Elements.Remove(node);
             }
@@ -170,7 +170,7 @@ namespace CG.Test.Editor.FrontEnd.ViewModels.Nodes
         [RelayCommand]
         void CopyElements(IEnumerable selectedItems)
         {
-            Editor.ClipboardNodes = new(selectedItems.ClonedNodes(null));
+			Tree.Editor!.ClipboardNodes = new(selectedItems.ClonedNodes(null));
 		}
 
         [RelayCommand]
@@ -183,7 +183,7 @@ namespace CG.Test.Editor.FrontEnd.ViewModels.Nodes
 				{
 					for (var i = 0; i < itemDialog.ItemCount; i++)
 					{
-						foreach (var node in Editor.ClipboardNodes!.Where((node) => Type.ElementType.IsConvertibleFrom(node.Type)))
+						foreach (var node in Tree.Editor!.ClipboardNodes!.Where((node) => Type.ElementType.IsConvertibleFrom(node.Type)))
 						{
 							Elements.Add(node.Clone(this));
 						}
@@ -192,7 +192,7 @@ namespace CG.Test.Editor.FrontEnd.ViewModels.Nodes
 			}
 			else
             {
-                foreach (var node in Editor.ClipboardNodes!.Where((node) => Type.ElementType.IsConvertibleFrom(node.Type)))
+                foreach (var node in Tree.Editor!.ClipboardNodes!.Where((node) => Type.ElementType.IsConvertibleFrom(node.Type)))
                 {
                     Elements.Add(node.Clone(this));
                 }
@@ -203,7 +203,7 @@ namespace CG.Test.Editor.FrontEnd.ViewModels.Nodes
         void PasteAboveElements(int selectedIndex)
         {
             var index = selectedIndex;
-            foreach (var node in Editor.ClipboardNodes!.Where((node) => Type.ElementType.IsConvertibleFrom(node.Type)))
+            foreach (var node in Tree.Editor!.ClipboardNodes!.Where((node) => Type.ElementType.IsConvertibleFrom(node.Type)))
             {
                 Elements.Insert(index, node.Clone(this));
                 ++index;
@@ -214,7 +214,7 @@ namespace CG.Test.Editor.FrontEnd.ViewModels.Nodes
 		void PasteBelowElements(int selectedIndex)
 		{
             var index = selectedIndex + 1;
-            foreach (var node in Editor.ClipboardNodes!.Where((node) => Type.ElementType.IsConvertibleFrom(node.Type)))
+            foreach (var node in Tree.Editor!.ClipboardNodes!.Where((node) => Type.ElementType.IsConvertibleFrom(node.Type)))
             {
                 Elements.Insert(index, node.Clone(this));
                 ++index;
@@ -269,7 +269,7 @@ namespace CG.Test.Editor.FrontEnd.ViewModels.Nodes
 
             if (dialog.ShowDialog() == true)
             {
-				dialog.SelectedNode.Visit(new NodeEditorVisitor(Editor, false));
+				dialog.SelectedNode.Visit(new NodeEditorVisitor(false));
 			}
         }
 

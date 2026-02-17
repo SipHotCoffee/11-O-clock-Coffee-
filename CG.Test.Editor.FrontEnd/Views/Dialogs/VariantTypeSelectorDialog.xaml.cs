@@ -1,4 +1,4 @@
-﻿using CG.Test.Editor.FrontEnd.Models.LinkedTypes;
+﻿using CG.Test.Editor.FrontEnd.Models.Types;
 using CG.Test.Editor.FrontEnd.ViewModels;
 using CG.Test.Editor.FrontEnd.ViewModels.Nodes;
 using DependencyPropertyToolkit;
@@ -22,7 +22,7 @@ namespace CG.Test.Editor.FrontEnd.Views.Dialogs
 		public partial ICollectionView PossibleTypes { get; set; }
 
 		[DependencyProperty]
-		public partial LinkedSchemaObjectType SelectedType { get; set; }
+		public partial SchemaObjectType SelectedType { get; set; }
 
         [DependencyProperty]
         public partial string SearchText { get; set; }
@@ -31,12 +31,12 @@ namespace CG.Test.Editor.FrontEnd.Views.Dialogs
         {
 			PossibleTypes.Filter = (value) =>
 			{
-				if (value is LinkedSchemaObjectType type)
+				if (value is SchemaObjectType type)
 				{
 					return type.Name.Contains(newValue, StringComparison.CurrentCultureIgnoreCase);
 				}
 
-				if (value is LinkedSchemaSymbolType symbolType)
+				if (value is SchemaSymbolType symbolType)
 				{
 					return symbolType.TypeName.Contains(newValue, StringComparison.CurrentCultureIgnoreCase);
 				}

@@ -2,6 +2,7 @@
 using CG.Test.Editor.FrontEnd.ViewModels.Nodes;
 using System.Collections;
 using System.Diagnostics.CodeAnalysis;
+using System.IO;
 using System.Text.Json;
 
 namespace CG.Test.Editor.FrontEnd
@@ -25,9 +26,9 @@ namespace CG.Test.Editor.FrontEnd
         public void SerializeTo(Utf8JsonWriter writer) => writer.WriteStringValue(PropertyName);
     }
 
-    public class NodePath : IEnumerable<INodeIdentifier>
+	public class NodePath : IEnumerable<INodeIdentifier>
     {
-		public static NodePath Root { get; } = new NodePath([]);
+        public static NodePath Root { get; } = new NodePath([]);
 
 		private readonly INodeIdentifier[] _path;
 
@@ -36,7 +37,7 @@ namespace CG.Test.Editor.FrontEnd
             _path = [.. path];
         }
 
-        public NodePath GetParent() { return new NodePath(_path.SkipLast(1)); }
+		public NodePath GetParent() { return new NodePath(_path.SkipLast(1)); }
 
 		public NodePath GetChild(INodeIdentifier identifier) => new NodePath(_path.Append(identifier));
 

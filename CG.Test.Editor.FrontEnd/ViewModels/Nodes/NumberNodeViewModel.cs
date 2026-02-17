@@ -1,13 +1,13 @@
-﻿using CG.Test.Editor.FrontEnd.Models.LinkedTypes;
+﻿using CG.Test.Editor.FrontEnd.Models.Types;
 using System.Text.Json;
 
 namespace CG.Test.Editor.FrontEnd.ViewModels.Nodes
 {
-    public partial class NumberNodeViewModel(FileInstanceViewModel editor, NodeViewModelBase? parent, LinkedSchemaNumberType type, double value) : ValueNodeViewModelBase<double>(editor, parent, value)
+    public partial class NumberNodeViewModel(NodeTree tree, NodeViewModelBase? parent, SchemaNumberType type, double value) : ValueNodeViewModelBase<double>(tree, parent, value)
     {
-        public override LinkedSchemaNumberType Type { get; } = type;
+        public override SchemaNumberType Type { get; } = type;
 
-        public override NumberNodeViewModel Clone(NodeViewModelBase? parent) => new(Editor, parent, Type, Value);
+        public override NumberNodeViewModel Clone(NodeViewModelBase? parent) => new(Tree, parent, Type, Value);
 
         protected override string GetName(NodeViewModelBase item) => string.Format("{0:F2}", Value);
 

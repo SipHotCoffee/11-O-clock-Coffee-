@@ -1,23 +1,26 @@
-﻿using CG.Test.Editor.FrontEnd.Models.LinkedTypes;
+﻿using CG.Test.Editor.FrontEnd.Models.Types;
 using CG.Test.Editor.FrontEnd.ViewModels;
 using CG.Test.Editor.FrontEnd.ViewModels.Nodes;
 using CG.Test.Editor.FrontEnd.Views.Dialogs;
 using System.Collections.ObjectModel;
+using System.Windows;
 using System.Windows.Data;
 
 namespace CG.Test.Editor.FrontEnd.Visitors
 {
-    public class NodeViewModelGeneratorVisitor(FileInstanceViewModel editor, NodeViewModelBase? parent, string? propertyName) : Visitor<NodeViewModelGeneratorVisitor, LinkedSchemaTypeBase, NodeViewModelBase?>
+    public class NodeViewModelGeneratorVisitor(Window ownerWindow, NodeTree tree, NodeViewModelBase? parent, string? propertyName) : Visitor<NodeViewModelGeneratorVisitor, SchemaTypeBase, NodeViewModelBase?>
     {
-        private readonly FileInstanceViewModel _editor = editor;
+        private readonly Window _ownerWindow = ownerWindow;
+
+        private readonly NodeTree _tree = tree;
 
         private readonly NodeViewModelBase? _parent = parent;
 
         private readonly string? _propertyName = propertyName;
 
-		public NodeViewModelBase? Visit(LinkedSchemaSymbolType symbolType) => Invoke(symbolType.LinkedType);
+		public NodeViewModelBase? Visit(SchemaSymbolType symbolType) => Invoke(symbolType.LinkedType);
 
-        public ArrayNodeViewModel? Visit(LinkedSchemaArrayType arrayType)
+        public ArrayNodeViewModel? Visit(SchemaArrayType arrayType)
         {
             var nodes = Enumerable.Range(0, arrayType.MinimumItemCount).Select((index) => arrayType.ElementType.Visit(this));
             if (nodes.Any((node) => node is null))
@@ -25,16 +28,16 @@ namespace CG.Test.Editor.FrontEnd.Visitors
                 return null;
             }
 
-			return new ArrayNodeViewModel(_editor, _parent, nodes.OfType<NodeViewModelBase>(), arrayType);
+			return new ArrayNodeViewModel(_tree, _parent, nodes.OfType<NodeViewModelBase>(), arrayType);
         }
 
-        public ObjectNodeViewModel? Visit(LinkedSchemaObjectType objectType)
+        public ObjectNodeViewModel? Visit(SchemaObjectType objectType)
         {
-			var result = new ObjectNodeViewModel(_editor, _parent, objectType);
+			var result = new ObjectNodeViewModel(_tree, _parent, objectType);
 
 			foreach (var property in objectType.Properties)
 			{
-                var node = property.Type.Visit(new NodeViewModelGeneratorVisitor(_editor, result, property.Name));
+                var node = property.Type.Visit(new NodeViewModelGeneratorVisitor(_ownerWindow, _tree, result, property.Name));
                 if (node is null)
                 {
                     return null;
@@ -46,9 +49,9 @@ namespace CG.Test.Editor.FrontEnd.Visitors
             return result;
         }
 
-        public NodeViewModelBase? Visit(LinkedSchemaVariantType variantType)
+        public NodeViewModelBase? Visit(SchemaVariantType variantType)
         {
-			var possibleTypes = new ObservableCollection<LinkedSchemaObjectType>(variantType.EnumerateObjectTypes());
+			var possibleTypes = new ObservableCollection<SchemaObjectType>(variantType.EnumerateObjectTypes());
             if (possibleTypes.Count == 0)
             {
                 return null;
@@ -61,7 +64,7 @@ namespace CG.Test.Editor.FrontEnd.Visitors
 
             var dialog = new VariantTypeSelectorDialog
             {
-                Owner = _editor.OwnerWindow,
+                Owner = _ownerWindow,
                 PossibleTypes = CollectionViewSource.GetDefaultView(possibleTypes)
             };
 
@@ -72,22 +75,22 @@ namespace CG.Test.Editor.FrontEnd.Visitors
 
 			if (dialog.ShowDialog() == true && dialog.SelectedType.Visit(this) is ObjectNodeViewModel objectNode)
             {
-				return new VariantNodeViewModel(_editor, _parent, variantType, objectNode);
+				return new VariantNodeViewModel(_tree, _parent, variantType, objectNode);
 			}
 
             return null;
         }
 
-        public EnumNodeViewModel? Visit(LinkedSchemaEnumType enumType) => new(_editor, _parent, enumType, 0);
+        public EnumNodeViewModel? Visit(SchemaEnumType enumType) => new(_tree, _parent, enumType, 0);
 
-		public NumberNodeViewModel? Visit(LinkedSchemaNumberType numberType) => new(_editor, _parent, numberType, Math.Min(Math.Max(numberType.Minimum, 0), numberType.Maximum));
+		public NumberNodeViewModel? Visit(SchemaNumberType numberType) => new(_tree, _parent, numberType, Math.Min(Math.Max(numberType.Minimum, 0), numberType.Maximum));
 
-        public IntegerNodeViewModel? Visit(LinkedSchemaIntegerType integerType) => new(_editor, _parent, integerType, Math.Min(Math.Max(integerType.Minimum, 0), integerType.Maximum));
+        public IntegerNodeViewModel? Visit(SchemaIntegerType integerType) => new(_tree, _parent, integerType, Math.Min(Math.Max(integerType.Minimum, 0), integerType.Maximum));
 
-        public StringNodeViewModel? Visit(LinkedSchemaStringType stringType) => new(_editor, _parent, stringType, string.Empty);
+        public StringNodeViewModel? Visit(SchemaStringType stringType) => new(_tree, _parent, stringType, string.Empty);
 
-		public BooleanNodeViewModel? Visit(LinkedSchemaBooleanType booleanType) => new(_editor, _parent, booleanType, false);
+		public BooleanNodeViewModel? Visit(SchemaBooleanType booleanType) => new(_tree, _parent, booleanType, false);
 
-        public ReferenceNodeViewModel? Visit(LinkedSchemaReferenceType referenceType) => new(_editor, _parent, referenceType, null);
+        public ReferenceNodeViewModel? Visit(SchemaReferenceType referenceType) => new(_tree, _parent, referenceType, null);
 	}
 }

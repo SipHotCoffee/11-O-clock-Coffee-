@@ -1,4 +1,4 @@
-﻿using CG.Test.Editor.FrontEnd.Models.LinkedTypes;
+﻿using CG.Test.Editor.FrontEnd.Models.Types;
 using CG.Test.Editor.FrontEnd.ViewModels.Nodes;
 using CG.Test.Editor.FrontEnd.Views.Dialogs;
 using CommunityToolkit.Mvvm.ComponentModel;
@@ -12,6 +12,13 @@ using System.Windows;
 
 namespace CG.Test.Editor.FrontEnd.ViewModels
 {
+	public class IncludedFile
+	{
+		public required FileInfo File { get; init; }
+
+		public required NodeViewModelBase RootNode { get; init; }
+	}
+
     public partial class FileInstanceViewModel : ObservableObject
     {
         private static int _lastId = 1;
@@ -50,6 +57,8 @@ namespace CG.Test.Editor.FrontEnd.ViewModels
 
 		public FileInstanceViewModel(MainViewModel mainViewModel, FileInfo? file, Window ownerWindow)
         {
+			IncludedFiles = [];
+
 			_history = [];
 
             MainViewModel = mainViewModel;
@@ -67,7 +76,9 @@ namespace CG.Test.Editor.FrontEnd.ViewModels
             HasClipboardNodes = false;
 		}
 
-        public FileInfo? File { get; set; }
+		public Dictionary<string, IncludedFile> IncludedFiles { get; }
+
+		public FileInfo? File { get; set; }
 
 		public Window OwnerWindow { get; }
 
@@ -113,15 +124,22 @@ namespace CG.Test.Editor.FrontEnd.ViewModels
 				writer.WriteStartArray("referencePaths");
 				{
 					var nextId = 1UL;
-					
+
+					writer.WriteStartArray();
+					{
+						foreach (var fileName in IncludedFiles.Keys)
+						{
+							writer.WriteStringValue(fileName);
+						}
+					}
+
+					writer.WriteEndArray();
+
 					foreach (var node in Root!.AllChildren)
 					{
-						if (node is ReferenceNodeViewModel referenceNode)
+						if (node is ReferenceNodeViewModel referenceNode && referenceNode.Node is not null)
 						{
-							if (referenceNode.Node is not null)
-							{
-								referencedNodes.TryAdd(referenceNode.Node, nextId++);
-							}
+							referencedNodes.TryAdd(referenceNode.Node, nextId++);	
 						}
 					}
 
@@ -130,6 +148,13 @@ namespace CG.Test.Editor.FrontEnd.ViewModels
 						writer.WriteStartObject();
 						{
 							writer.WriteNumber("id", id);
+
+							var sourceFile = node.Tree.File;
+							if (sourceFile is not null && sourceFile != File)
+							{
+								writer.WriteString("sourceFile", sourceFile.FullName);
+							}
+
 							writer.WriteStartArray("path");
 							{
 								foreach (var element in node.Address)
@@ -286,15 +311,50 @@ namespace CG.Test.Editor.FrontEnd.ViewModels
         [RelayCommand]
         void Repair()
         {
-            var availableTypes = Current!.AllChildren.Select((node) => node.Type).OfType<LinkedSchemaObjectType>().ToHashSet();
+            var availableTypes = Current!.AllChildren.Select((node) => node.Type).OfType<SchemaObjectType>().ToHashSet();
 
-            var repairDialog = new RepairDialog(this, Current)
+            var repairDialog = new RepairDialog(Root!.Tree, Current)
             {
                 AvailableTypes = new(availableTypes)
             };
 
             repairDialog.ShowDialog();
         }
+
+		[RelayCommand]
+		async Task Include()
+		{
+			var includeFilesDialog = new IncludeFilesDialog()
+			{
+				IncludedFiles = new(IncludedFiles.Values.Select((includedFile) => new FileIncludeInfo()
+				{
+					File = includedFile.File,
+					Type = includedFile.RootNode.Type
+				}))
+			};
+			
+			if (includeFilesDialog.ShowDialog() == true)
+			{
+				foreach (var includedFile in includeFilesDialog.IncludedFiles)
+				{
+					if (!IncludedFiles.ContainsKey(includedFile.File.FullName))
+					{
+						await using var stream = includedFile.File.OpenRead();
+
+						var rootNode = await NodeViewModelBase.ParseFromStream(OwnerWindow, null, includedFile.Type, includedFile.File, stream);
+
+						if (rootNode is not null)
+						{
+							IncludedFiles.Add(includedFile.File.FullName, new IncludedFile()
+							{
+								File     = includedFile.File,
+								RootNode = rootNode,
+							});
+						}
+					}
+				}
+			}
+		}
 
 		public void Navigate(NodeViewModelBase target)
         {

@@ -13,6 +13,13 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Page Remove="Resources\Styles\Modern\ColorSchemes\Black.xaml" />
+    <Page Remove="Resources\Styles\Modern\ColorSchemes\Dark.xaml" />
+    <Page Remove="Resources\Styles\Modern\ColorSchemes\Light.xaml" />
+    <Page Remove="Resources\Styles\Modern\Style.xaml" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
     <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="3.11.0">
       <PrivateAssets>all</PrivateAssets>
@@ -27,6 +34,10 @@
 
   <ItemGroup>
     <Resource Include="Resources\Fonts\Segoe Fluent Icons.ttf" />
+    <Resource Include="Resources\Styles\Modern\ColorSchemes\Black.xaml" />
+    <Resource Include="Resources\Styles\Modern\ColorSchemes\Dark.xaml" />
+    <Resource Include="Resources\Styles\Modern\ColorSchemes\Light.xaml" />
+    <Resource Include="Resources\Styles\Modern\Style.xaml" />
   </ItemGroup>
 
   <ItemGroup>
@@ -36,7 +47,7 @@
   </ItemGroup>
 
 	<Target Name="RunPowerShellScript" AfterTargets="Publish">
-		<Exec WorkingDirectory="..\VersionControlEditor" Command="AssemblyVersionUpdate.bat"/>
+		<Exec WorkingDirectory="..\VersionControlEditor" Command="AssemblyVersionUpdate.bat" />
 	</Target>
 
 </Project>

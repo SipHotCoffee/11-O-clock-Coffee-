@@ -66,6 +66,21 @@
 				<MenuItem Header="Exit" InputGestureText="Alt+F4" Command="{Binding ExitCommand}"
 						  CommandParameter="{Binding RelativeSource={RelativeSource AncestorType={x:Type Window}}}"/>
 			</MenuItem>
+
+			<MenuItem Header="Options">
+				<MenuItem Header="Appearance" ItemsSource="{Binding Styles}">
+					<MenuItem.ItemContainerStyle>
+						<Style TargetType="{x:Type MenuItem}" BasedOn="{StaticResource {x:Type MenuItem}}">
+							<Setter Property="Command" Value="{Binding ApplyCommand}"/>
+						</Style>
+					</MenuItem.ItemContainerStyle>
+					<MenuItem.ItemTemplate>
+						<HierarchicalDataTemplate DataType="{x:Type viewmodels:AppStyleNode}" ItemsSource="{Binding Children}">
+							<TextBlock Text="{Binding Name}"/>
+						</HierarchicalDataTemplate>
+					</MenuItem.ItemTemplate>
+				</MenuItem>
+			</MenuItem>
 		</Menu>
 		<TabControl Grid.Row="1" ItemsSource="{Binding OpenFiles}" SelectedItem="{Binding SelectedFile}">
 			<TabControl.ItemTemplate>
@@ -104,19 +119,32 @@
 							<RowDefinition Height="*"/>
 						</Grid.RowDefinitions>
 						<ToolBar Grid.Row="0">
-							<Button Margin="5, 5, 2.5, 5"   Content="&#xe72b;" FontFamily="{StaticResource SymbolFont}"
-									IsEnabled="{Binding IsBackButtonEnabled}" Command="{Binding MoveBackCommand}"/>
-							<Button Margin="2.5, 5, 2.5, 5" Content="&#xe72a;" FontFamily="{StaticResource SymbolFont}" 
-									IsEnabled="{Binding IsForwardButtonEnabled}" Command="{Binding MoveForwardCommand}"/>
+							<Button Margin="5, 5, 2.5, 5"   
+									Content="&#xe72b;" 
+									FontFamily="{StaticResource SymbolFont}"
+									IsEnabled="{Binding IsBackButtonEnabled}" 
+									Command="{Binding MoveBackCommand}"/>
+							
+							<Button Margin="2.5, 5, 2.5, 5" Content="&#xe72a;" 
+									FontFamily="{StaticResource SymbolFont}" 
+									IsEnabled="{Binding IsForwardButtonEnabled}" 
+									Command="{Binding MoveForwardCommand}"/>
+							
 							<Separator/>
-							<Button Margin="2.5, 5, 2.5, 5" Content="&#xe74a;" FontFamily="{StaticResource SymbolFont}" Command="{Binding MoveUpCommand}" 
+							
+							<Button Margin="2.5, 5, 2.5, 5" Content="&#xe74a;" 
+									FontFamily="{StaticResource SymbolFont}" 
+									Command="{Binding MoveUpCommand}" 
 									IsEnabled="{Binding Current.Parent, Converter={StaticResource IsNotNullConverter}}"/>
+							
 							<Separator/>
 
 							<Button Margin="2.5, 5, 5, 5" Content="&#xe90f;" FontFamily="{StaticResource SymbolFont}" Command="{Binding RepairCommand}"/>
 							
 							<Separator/>
-							
+
+							<Button Margin="2.5, 5, 5, 5" Content="&#xe8b5;" FontFamily="{StaticResource SymbolFont}" Command="{Binding IncludeCommand}"/>
+
 							<ItemsControl ItemsSource="{Binding AddressItems}">
 								<ItemsControl.ItemsPanel>
 									<ItemsPanelTemplate>
@@ -260,7 +288,8 @@
 													<StackPanel Orientation="Horizontal" Margin="0">
 														<TextBlock FontSize="18" FontFamily="{StaticResource SymbolFont}" Text="&#xe948;"/>
 														<TextBlock Text=" *"
-																   Visibility="{Binding Editor.MainViewModel.IsAltDown, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+																   Visibility="{Binding Tree.Editor.MainViewModel.IsAltDown, 
+																						Converter={StaticResource BooleanToVisibilityConverter}}"/>
 													</StackPanel>
 												</Button.Content>
 											</Button>
@@ -305,7 +334,8 @@
 													<StackPanel Orientation="Horizontal">
 														<TextBlock FontFamily="{StaticResource SymbolFont}" Text="&#xe77f;"/>
 														<TextBlock Text=" *" 
-																   Visibility="{Binding Editor.MainViewModel.IsAltDown, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+																   Visibility="{Binding Tree.Editor.MainViewModel.IsAltDown, 
+																						Converter={StaticResource BooleanToVisibilityConverter}}"/>
 													</StackPanel>
 												</Button.Content>
 											</Button>

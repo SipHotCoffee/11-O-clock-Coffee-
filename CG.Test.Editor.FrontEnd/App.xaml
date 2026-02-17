@@ -24,7 +24,8 @@
 			<Style TargetType="{x:Type dialogs:RepairDialog}"              BasedOn="{StaticResource BaseWindowStyle}"/>
 			<Style TargetType="{x:Type dialogs:ReferencePickerDialog}"     BasedOn="{StaticResource BaseWindowStyle}"/>
 			<Style TargetType="{x:Type dialogs:ItemCountDialog}"           BasedOn="{StaticResource BaseWindowStyle}"/>
-			
+			<Style TargetType="{x:Type dialogs:IncludeFilesDialog}"        BasedOn="{StaticResource BaseWindowStyle}"/>
+
 			<ResourceDictionary x:Key="NodeVeryCompactDataTemplates">
 				<DataTemplate DataType="{x:Type viewmodelnodes:ArrayNodeViewModel}">
 					<StackPanel Orientation="Horizontal">
