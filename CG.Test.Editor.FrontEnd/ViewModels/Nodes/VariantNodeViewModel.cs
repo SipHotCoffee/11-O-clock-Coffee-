@@ -22,7 +22,7 @@ namespace CG.Test.Editor.FrontEnd.ViewModels.Nodes
 
         public override IEnumerable<NodeViewModelBase> Children => SelectedObject.Children;
 
-		public override void SerializeTo(Utf8JsonWriter writer, IReadOnlyDictionary<NodeViewModelBase, ulong> referencedNodes)
+		public override void SerializeTo(Utf8JsonWriter writer, IReadOnlyDictionary<NodeViewModelBase, int> referencedNodes)
 		   => SelectedObject.SerializeTo(writer, referencedNodes);
 
 		protected override string GetName(NodeViewModelBase item)

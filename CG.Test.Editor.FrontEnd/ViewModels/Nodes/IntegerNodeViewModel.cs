@@ -11,7 +11,7 @@ namespace CG.Test.Editor.FrontEnd.ViewModels.Nodes
 
         protected override string GetName(NodeViewModelBase item) => Value.ToString();
 
-        public override void SerializeTo(Utf8JsonWriter writer, IReadOnlyDictionary<NodeViewModelBase, ulong> referencedNodes)
+        public override void SerializeTo(Utf8JsonWriter writer, IReadOnlyDictionary<NodeViewModelBase, int> referencedNodes)
         {
 			writer.WriteNumberValue(Value);
         }

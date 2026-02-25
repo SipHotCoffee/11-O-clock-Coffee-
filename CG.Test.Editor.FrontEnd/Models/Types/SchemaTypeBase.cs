@@ -12,8 +12,7 @@ namespace CG.Test.Editor.FrontEnd.Models.Types
 			if (node is JsonObject objectNode && objectNode.TryGetPropertyValue("$defs", out var defsNode) && defsNode is JsonObject defsObjectNode)
 			{
 				var types = new Dictionary<string, SchemaTypeBase>();
-				defsObjectNode.TryParseSchemaDefinitions(logger, types);
-				if (objectNode.TryParseLinkedSchemaType(logger, types, out var type))
+				if (defsObjectNode.TryParseSchemaDefinitions(logger, types) && objectNode.TryParseSchemaType(logger, types, out var type))
 				{
 					return type;
 				}

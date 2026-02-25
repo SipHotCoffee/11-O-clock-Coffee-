@@ -24,7 +24,7 @@ namespace CG.Test.Editor.FrontEnd.ViewModels.Nodes
 
         protected override string GetName(NodeViewModelBase item) => $"Reference -> ({(Node?.Name) ?? "null"})";
 
-        public override void SerializeTo(Utf8JsonWriter writer, IReadOnlyDictionary<NodeViewModelBase, ulong> referencedNodes)
+        public override void SerializeTo(Utf8JsonWriter writer, IReadOnlyDictionary<NodeViewModelBase, int> referencedNodes)
 		{
 			if (Node is not null && Node.IsAlive && referencedNodes.TryGetValue(Node, out var id))
 			{
@@ -32,7 +32,7 @@ namespace CG.Test.Editor.FrontEnd.ViewModels.Nodes
 			}
 			else
 			{
-				writer.WriteNumberValue(0);
+				writer.WriteNumberValue(-1);
 			}
 		}
 	}

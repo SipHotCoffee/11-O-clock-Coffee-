@@ -24,12 +24,19 @@ namespace CG.Test.Editor.FrontEnd.ViewModels
 		public NodePath Path { get; } = path;
 	}
 
+	public class LoadedNodeFile
+	{
+		public required FileInfo SchemaFile { get; init; }
+
+		public required NodeViewModelBase RootNode { get; init; }
+	}
+
     public abstract partial class NodeViewModelBase : ObservableObject, IEqualityOperators<NodeViewModelBase, NodeViewModelBase, bool>
     {
-        public static async Task<NodeViewModelBase?> ParseFromStream(Window window, FileInstanceViewModel? fileInstance, SchemaTypeBase schemaType, FileInfo file, Stream stream) 
-			=> await LoadFromFileInternal(window, fileInstance, schemaType, file, stream, []);
+        public static async Task<LoadedNodeFile?> ParseFromStream(Window window, FileInstanceViewModel? fileInstance, FileInfo file, Stream stream, ILogger<string> logger) 
+			=> await ParseFromStreamInternal(window, fileInstance, file, stream, logger, []);
 
-        private static async Task<NodeViewModelBase?> LoadFromFileInternal(Window window, FileInstanceViewModel? fileInstance, SchemaTypeBase schemaType, FileInfo file, Stream stream, HashSet<string> alreadyIncludedFileNames)
+        private static async Task<LoadedNodeFile?> ParseFromStreamInternal(Window window, FileInstanceViewModel? fileInstance, FileInfo file, Stream stream, ILogger<string> logger, HashSet<string> alreadyIncludedFileNames)
 		{
 			if (fileInstance is not null && fileInstance.File is not null)
 			{
@@ -39,114 +46,128 @@ namespace CG.Test.Editor.FrontEnd.ViewModels
 			var fileNode = await JsonNode.ParseAsync(stream);
 
 			var fileObjectNode = fileNode!.AsObject();
-			
-			var includedFileNameNodes = fileObjectNode["includeFileNames"]!.AsArray();
 
-			var includedFiles = new Dictionary<string, IncludedFile>();
-			foreach (var includedFileNode in includedFileNameNodes)
+			var schemaParsingMessages = new HashSet<SchemaParsingMessage>(10, new SchemaParsingMessageComparer());
+			var schemaLogger = new CollectionLogger<SchemaParsingMessage>(schemaParsingMessages);
+
+			if (!fileObjectNode.TryGetValue<string>("schemaFileName", logger, out var schemaFileName))
 			{
-				if (includedFileNode is null)
-				{
-					return null;
-				}
-
-				var includedFileSchemaFileName = includedFileNode["schemaFileName"]!.GetValue<string>();
-
-				var schemaParsingMessages = new HashSet<SchemaParsingMessage>(10, new SchemaParsingMessageComparer());
-				var schemaLogger = new CollectionLogger<SchemaParsingMessage>(schemaParsingMessages);
-
-				await using var schemaStream = File.OpenRead(includedFileSchemaFileName);
-				var type = await SchemaTypeBase.LoadFromStream(schemaStream, schemaLogger);
-
-				foreach (var message in schemaParsingMessages)
-				{
-					window.ShowMessage(message.Message);
-				}
-
-				if (type is null)
-				{
-					return null;
-				}
-
-				var includedFileName = includedFileNode["schemaFileName"]!.GetValue<string>();
-
-				if (!alreadyIncludedFileNames.Add(includedFileName))
-				{
-					window.ShowMessage("Circular file include detected.");
-					return null;
-				}
-
-				var includedFile = new FileInfo(includedFileName);
-				await using var includedFileStream = includedFile.OpenRead();
-
-				var rootNode = await LoadFromFileInternal(window, null, type, includedFile, includedFileStream, alreadyIncludedFileNames);
-				
-				if (rootNode is null)
-				{
-					return null;
-				}
-
-				includedFiles.Add(includedFileName, new IncludedFile()
-				{
-					File     = new FileInfo(includedFileName),
-					RootNode = rootNode
-				});
+				return null;
 			}
 
-			var referencePathsArrayNode = fileObjectNode["referencePaths"]!.AsArray();
+			var schemaFile = new FileInfo(schemaFileName);
 
-			var paths = new Dictionary<ulong, GlobalPath>();
+			await using var schemaStream = schemaFile.OpenRead();
+			var schemaType = await SchemaTypeBase.LoadFromStream(schemaStream, schemaLogger);
 
-			foreach (var pathNode in referencePathsArrayNode)
+			foreach (var message in schemaParsingMessages)
 			{
-				var id = pathNode!["id"]!.GetValue<ulong>();
+				window.ShowMessage(message.Message);
+			}
 
-				FileInfo? sourceFile = null;
+			if (schemaType is null)
+			{
+				return null;
+			}
 
-				var path = NodePath.Root;
+			var includedFiles = new List<IncludedFile>();
 
-				if (pathNode.AsObject().TryGetPropertyValue("sourceFile", out var sourceFileNode) && sourceFileNode is JsonValue sourceFileValueNode && sourceFileValueNode.TryGetValue<string>(out var sourceFileName))
+			var includedFileIndexMap = new Dictionary<string, int>();
+
+			if (fileObjectNode.TryGetArray("includeFileNames", out var includedFileNameNodes))
+			{
+				foreach (var includedFileNode in includedFileNameNodes)
 				{
-					sourceFile = new FileInfo(sourceFileName);
-				}
-
-				var pathElementsArrayNode = pathNode["path"]!.AsArray();
-
-				foreach (var pathElementValueNode in pathElementsArrayNode.OfType<JsonValue>())
-				{
-					switch (pathElementValueNode.GetValueKind())
+					if (includedFileNode is null)
 					{
-						case JsonValueKind.String:
-							path = path.GetChild(new NameIdentifier(pathElementValueNode.GetValue<string>()));
-							break;
-						case JsonValueKind.Number:
-							path = path.GetChild(new IndexIdentifier(pathElementValueNode.GetValue<int>()));
-							break;
+						return null;
 					}
-				}
 
-				paths.Add(id, new GlobalPath(sourceFile, path));
+					//GLITCH HERE!!!
+					var includedFileName = includedFileNode["schemaFileName"]!.GetValue<string>();
+
+					if (!alreadyIncludedFileNames.Add(includedFileName))
+					{
+						window.ShowMessage("Circular file include detected.");
+						return null;
+					}
+
+					var includedFile = new FileInfo(includedFileName);
+					await using var includedFileStream = includedFile.OpenRead();
+
+					var loadedFile = await ParseFromStreamInternal(window, null, includedFile, includedFileStream, logger, alreadyIncludedFileNames);
+
+					if (loadedFile is null)
+					{
+						return null;
+					}
+
+					includedFileIndexMap.Add(includedFileName, includedFiles.Count);
+
+					includedFiles.Add(new IncludedFile()
+					{
+						File = new FileInfo(includedFileName),
+						RootNode = loadedFile.RootNode
+					});
+				}
 			}
 
-			var contentNode = fileObjectNode["content"];
+			var paths = new List<GlobalPath>();
+			if (fileObjectNode.TryGetArray("referencePaths", out var referencePathsArrayNode))
+			{
+				foreach (var pathNode in referencePathsArrayNode)
+				{
+					FileInfo? sourceFile = null;
+
+					var path = NodePath.Root;
+
+					if (pathNode!.AsObject().TryGetPropertyValue("sourceFile", out var sourceFileNode) && sourceFileNode is JsonValue sourceFileValueNode && sourceFileValueNode.TryGetValue<string>(out var sourceFileName))
+					{
+						sourceFile = new FileInfo(sourceFileName);
+					}
+
+					var pathElementsArrayNode = pathNode["path"]!.AsArray();
+
+					foreach (var pathElementValueNode in pathElementsArrayNode.OfType<JsonValue>())
+					{
+						switch (pathElementValueNode.GetValueKind())
+						{
+							case JsonValueKind.String:
+								path = path.GetChild(new NameIdentifier(pathElementValueNode.GetValue<string>()));
+								break;
+							case JsonValueKind.Number:
+								path = path.GetChild(new IndexIdentifier(pathElementValueNode.GetValue<int>()));
+								break;
+						}
+					}
+
+					paths.Add(new GlobalPath(sourceFile, path));
+				}
+			}
+
+			if (!fileObjectNode.TryGetPropertyValue("content", out var contentNode))
+			{
+				logger.Log("Json file does not contain any valid content.");
+			}
 
 			var messages = new List<NodeParsingMessage>();
-			var logger = new CollectionLogger<NodeParsingMessage>(messages);
+			var contentLogger = new CollectionLogger<NodeParsingMessage>(messages);
 
 			var tree = new NodeTree(file, fileInstance);
 
-			var referenceNodesToAssign = new Dictionary<ulong, List<ReferenceNodeViewModel>>();
-			var rootNodeViewModel = schemaType!.Visit(new NodeParserVisitor(tree, NodePath.Root, referenceNodesToAssign, null, logger, contentNode));
+			var referenceNodesToAssign = new List<ReferenceNodeViewModel>[paths.Count];
+			var rootNodeViewModel = schemaType.Visit(new NodeParserVisitor(tree, NodePath.Root, referenceNodesToAssign, null, contentLogger, contentNode));
 
-			foreach (var (pathId, referenceNodes) in referenceNodesToAssign)
+			for (var pathIndex = 0; pathIndex < referenceNodesToAssign.Length; pathIndex++)
 			{
-				var globalPath = paths[pathId];
+				var referenceNodes = referenceNodesToAssign[pathIndex];
+				var globalPath = paths[pathIndex];
 
 				var rootNode = rootNodeViewModel;
 
-				if (globalPath.SourceFile is not null && includedFiles.TryGetValue(globalPath.SourceFile.FullName, out var includedFile))
+				if (globalPath.SourceFile is not null && includedFileIndexMap.TryGetValue(globalPath.SourceFile.FullName, out var includedFileIndex))
 				{
-					rootNode = includedFile.RootNode;
+					rootNode = includedFiles[includedFileIndex].RootNode;
 				}
 
 				if (rootNode is not null && globalPath.Path.TryNavigate(rootNode, out var targetNode))
@@ -157,7 +178,7 @@ namespace CG.Test.Editor.FrontEnd.ViewModels
 					}
 				}
 			}
-			
+
 			foreach (var message in messages)
 			{
 				var messageParameters = new MessageBoxParameters($"Error: {message.Message} Error occured here: '{string.Join("/", message.Path)}'", string.Empty, "Next");
@@ -169,7 +190,16 @@ namespace CG.Test.Editor.FrontEnd.ViewModels
 				}
 			}
 
-			return rootNodeViewModel;
+			if (rootNodeViewModel is null)
+			{
+				return null;
+			}
+
+			return new LoadedNodeFile()
+			{
+				SchemaFile = schemaFile,
+				RootNode = rootNodeViewModel,
+			};
 		}
 
 		[ObservableProperty]
@@ -236,9 +266,11 @@ namespace CG.Test.Editor.FrontEnd.ViewModels
 
         public IEnumerable<NodeViewModelBase> AllChildren => Children.Concat(Children.SelectMany((child) => child.AllChildren));
 
-        public abstract NodeViewModelBase Clone(NodeViewModelBase? parent);
+		public IEnumerable<NodeViewModelBase> EnumerateOfType(SchemaTypeBase type) => AllChildren.Prepend(this).Where((child) => type.IsConvertibleFrom(child.Type));
+		
+		public abstract NodeViewModelBase Clone(NodeViewModelBase? parent);
 
-        public abstract void SerializeTo(Utf8JsonWriter writer, IReadOnlyDictionary<NodeViewModelBase, ulong> referencedNodes);
+        public abstract void SerializeTo(Utf8JsonWriter writer, IReadOnlyDictionary<NodeViewModelBase, int> referencedNodes);
 
 		protected abstract string GetName(NodeViewModelBase item);
 

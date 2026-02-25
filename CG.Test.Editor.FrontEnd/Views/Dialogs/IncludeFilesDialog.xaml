@@ -23,7 +23,7 @@
 				  ItemsSource="{Binding IncludedFiles}" SelectionChanged="IncludedFilesListView_SelectionChanged">
 			<ListView.ItemTemplate>
 				<DataTemplate>
-					<TextBlock Text="{Binding File.FullName}"/>
+					<TextBlock Text="{Binding FullName}"/>
 				</DataTemplate>
 			</ListView.ItemTemplate>
 		</ListView>

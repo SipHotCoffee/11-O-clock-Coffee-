@@ -1,5 +1,6 @@
 ﻿using CG.Test.Editor.FrontEnd.Models.Types;
 using CG.Test.Editor.FrontEnd.ViewModels;
+using CG.Test.Editor.FrontEnd.Visitors;
 using System.Collections;
 using System.ComponentModel.DataAnnotations;
 using System.Diagnostics.CodeAnalysis;
@@ -25,10 +26,10 @@ namespace CG.Test.Editor.FrontEnd
 
 				if (rangeAttribute is not null)
 				{
-					return new SchemaIntegerType((int)rangeAttribute.Minimum, (int)rangeAttribute.Maximum);
+					return new SchemaIntegerType((int)rangeAttribute.Minimum, (int)rangeAttribute.Maximum, default);
 				}
 
-                return new SchemaIntegerType(long.CreateTruncating(TInteger.MinValue), long.CreateTruncating(TInteger.MaxValue));
+                return new SchemaIntegerType(long.CreateTruncating(TInteger.MinValue), long.CreateTruncating(TInteger.MaxValue), default);
             }
         }
 
@@ -40,10 +41,10 @@ namespace CG.Test.Editor.FrontEnd
 
 				if (rangeAttribute is not null)
 				{
-					return new SchemaNumberType(((IConvertible)rangeAttribute.Minimum).ToDouble(CultureInfo.CurrentCulture), ((IConvertible)rangeAttribute.Maximum).ToDouble(CultureInfo.CurrentCulture));
+					return new SchemaNumberType(((IConvertible)rangeAttribute.Minimum).ToDouble(CultureInfo.CurrentCulture), ((IConvertible)rangeAttribute.Maximum).ToDouble(CultureInfo.CurrentCulture), default);
 				}
 
-				return new SchemaNumberType(double.CreateTruncating(TFloat.MinValue), double.CreateTruncating(TFloat.MaxValue));
+				return new SchemaNumberType(double.CreateTruncating(TFloat.MinValue), double.CreateTruncating(TFloat.MaxValue), default);
             }
         }
 
@@ -64,11 +65,11 @@ namespace CG.Test.Editor.FrontEnd
 				else if (type == typeof(decimal)) { return decimal.GetFloatSchema(parameter);   }
 				else if (type == typeof(bool))
 				{
-					return new SchemaBooleanType();
+					return new SchemaBooleanType(default);
 				}
 				else if (type == typeof(string))
 				{
-					return new SchemaStringType(int.MaxValue);
+					return new SchemaStringType(int.MaxValue, string.Empty);
 				}
 				else if (type.IsArray)
 				{
@@ -139,7 +140,7 @@ namespace CG.Test.Editor.FrontEnd
 						continue;
 					}
 
-					if (typeNode.TryParseLinkedSchemaType(logger, namedTypes, out var type))
+					if (typeNode.TryParseSchemaType(logger, namedTypes, out var type))
 					{
 						namedTypes.Add(typeName, type);
 					}
@@ -149,6 +150,44 @@ namespace CG.Test.Editor.FrontEnd
 					}
 				}
 				return true;
+			}
+
+			public bool TryGetValue<TValue>(string propertyName, [MaybeNullWhen(false)] out TValue value)
+			{
+				value = default;
+				return objectNode.TryGetPropertyValue(propertyName, out var childNode) && childNode is JsonValue childValueNode && childValueNode.TryGetValue(out value);
+			}
+
+			public bool TryGetArray(string propertyName, out JsonArray array)
+			{
+				if (objectNode.TryGetPropertyValue(propertyName, out var childNode) && childNode is JsonArray childArrayNode)
+				{
+					array = childArrayNode;
+					return true;
+				}
+				array = [];
+				return false;
+			}
+
+			public bool TryGetValue<TValue>(string propertyName, ILogger<string> logger, [MaybeNullWhen(false)] out TValue value)
+			{
+				if (objectNode.TryGetPropertyValue(propertyName, out var childNode))
+				{
+					if (childNode is JsonValue childValueNode && childValueNode.TryGetValue(out value))
+					{
+						return true;
+					}
+					else
+					{
+						logger.Log($"Property of name: '{propertyName}', must be a '{typeof(JsonValue)}' of type '{typeof(TValue)}'.");
+					}
+				}
+				else
+				{
+					logger.Log($"Missing property of name: '{propertyName}'.");
+				}
+				value = default;
+				return false;
 			}
 
 			public bool TryGetValue<TValue>(string propertyName, ILogger<SchemaParsingMessage> logger, [MaybeNullWhen(false)] out TValue value)
@@ -168,6 +207,17 @@ namespace CG.Test.Editor.FrontEnd
 				return false;
 			}
 
+			private bool TryParseSchemaBooleanType(ILogger<SchemaParsingMessage> logger, [NotNullWhen(true)] out SchemaTypeBase? type)
+			{
+				if (!objectNode.TryGetValue<bool>("default", logger, out var defaultValue))
+				{
+					defaultValue = default;
+				}
+
+				type = new SchemaBooleanType(defaultValue);
+				return true;
+			}
+
 			private bool TryParseSchemaIntegerType(ILogger<SchemaParsingMessage> logger, [NotNullWhen(true)] out SchemaTypeBase? type)
 			{
 				if (!objectNode.TryGetValue<long>("minimum", logger, out var minimum))
@@ -180,7 +230,12 @@ namespace CG.Test.Editor.FrontEnd
 					maximum = long.MaxValue;
 				}
 
-				type = new SchemaIntegerType(minimum, maximum);
+				if (!objectNode.TryGetValue<long>("default", logger, out var defaultValue))
+				{
+					defaultValue = Math.Clamp(default, minimum, maximum);
+				}
+
+				type = new SchemaIntegerType(minimum, maximum, defaultValue);
 				return true;
 			}
 
@@ -195,7 +250,13 @@ namespace CG.Test.Editor.FrontEnd
 				{
 					maximum = double.MaxValue;
 				}
-				type = new SchemaNumberType(minimum, maximum);
+
+				if (!objectNode.TryGetValue<double>("default", logger, out var defaultValue))
+				{
+					defaultValue = Math.Clamp(default, minimum, maximum);
+				}
+
+				type = new SchemaNumberType(minimum, maximum, defaultValue);
 				return true;
 			}
 
@@ -224,7 +285,13 @@ namespace CG.Test.Editor.FrontEnd
 				{
 					maxLength = int.MaxValue;
 				}
-				type = new SchemaStringType(maxLength);
+
+				if (!objectNode.TryGetValue<string>("default", logger, out var defaultValue))
+				{
+					defaultValue = string.Empty;
+				}
+
+				type = new SchemaStringType(maxLength, defaultValue);
 				return true;
 			}
 
@@ -246,7 +313,7 @@ namespace CG.Test.Editor.FrontEnd
 									continue;
 								}
 
-								if (propertyNode is not null && propertyNode.TryParseLinkedSchemaType(logger, registeredTypes, out var propertyType))
+								if (propertyNode is not null && propertyNode.TryParseSchemaType(logger, registeredTypes, out var propertyType))
 								{
 									properties.Add(new LinkedSchemaProperty()
 									{
@@ -284,7 +351,7 @@ namespace CG.Test.Editor.FrontEnd
 
 						foreach (var node in arrayNode)
 						{
-							if (node is not null && node.TryParseLinkedSchemaType(logger, registeredTypes, out var possibleType))
+							if (node is not null && node.TryParseSchemaType(logger, registeredTypes, out var possibleType))
 							{
 								possibleTypes.Add(possibleType);
 							}
@@ -316,7 +383,7 @@ namespace CG.Test.Editor.FrontEnd
 			{
 				if (objectNode.TryGetPropertyValue("items", out var itemsNode) && itemsNode is not null)
 				{
-					if (itemsNode.TryParseLinkedSchemaType(logger, registeredTypes, out var elementType))
+					if (itemsNode.TryParseSchemaType(logger, registeredTypes, out var elementType))
 					{
 						if (!objectNode.TryGetValue<int>("minItems", logger, out var minimumItemCount))
 						{
@@ -340,11 +407,11 @@ namespace CG.Test.Editor.FrontEnd
 				return false;
 			}
 
-			private bool TryParseSchemaReferenceType(ILogger<SchemaParsingMessage> logger, IReadOnlyDictionary<string, SchemaTypeBase> registeredTypes, [NotNullWhen(true)] out SchemaTypeBase? type)
+			private bool TryParseSchemaInternalReferenceType(ILogger<SchemaParsingMessage> logger, IReadOnlyDictionary<string, SchemaTypeBase> registeredTypes, [NotNullWhen(true)] out SchemaTypeBase? type)
 			{
 				if (objectNode.TryGetPropertyValue("target", out var targetNode) && targetNode is not null)
 				{
-					if (targetNode.TryParseLinkedSchemaType(logger, registeredTypes, out var elementType))
+					if (targetNode.TryParseSchemaType(logger, registeredTypes, out var elementType))
 					{
 						type = new SchemaReferenceType(elementType);
 						return true;
@@ -359,12 +426,32 @@ namespace CG.Test.Editor.FrontEnd
 				type = null;
 				return false;
 			}
+
+			private bool TryParseSchemaExternalReferenceType(ILogger<SchemaParsingMessage> logger, IReadOnlyDictionary<string, SchemaTypeBase> registeredTypes, [NotNullWhen(true)] out SchemaTypeBase? type)
+			{
+				if (objectNode.TryGetPropertyValue("target", out var targetNode) && targetNode is not null)
+				{
+					if (targetNode.TryParseSchemaType(logger, registeredTypes, out var elementType))
+					{
+						type = new SchemaExternalReferenceType(elementType);
+						return true;
+					}
+
+					logger.Log(new SchemaParsingMessage($"Target type of 'external reference' node is not available: '{targetNode["$ref"]?.GetValue<string>()}'", objectNode));
+				}
+				else
+				{
+					logger.Log(new SchemaParsingMessage($"Node of type 'external reference' must contain a 'target' object.", objectNode));
+				}
+				type = null;
+				return false;
+			}
 		}
 
 		extension(JsonNode node)
 		{
 
-			public bool TryParseLinkedSchemaType(ILogger<SchemaParsingMessage> logger, IReadOnlyDictionary<string, SchemaTypeBase> typeDefinitions, [NotNullWhen(true)] out SchemaTypeBase? type)
+			public bool TryParseSchemaType(ILogger<SchemaParsingMessage> logger, IReadOnlyDictionary<string, SchemaTypeBase> typeDefinitions, [NotNullWhen(true)] out SchemaTypeBase? type)
 			{
 				if (node is JsonObject objectNode)
 				{
@@ -388,20 +475,21 @@ namespace CG.Test.Editor.FrontEnd
 							switch (typeName)
 							{
 								case "boolean":
-									type = new SchemaBooleanType();
-									return true;
+									return objectNode.TryParseSchemaBooleanType          (logger, out type);
 								case "integer":
-									return objectNode.TryParseSchemaIntegerType  (logger, out type);
-								case "number":								     
-									return objectNode.TryParseSchemaNumberType   (logger, out type);
-								case "string":								     
-									return objectNode.TryParseSchemaStringType   (logger, out type);
-								case "object":								     
-									return objectNode.TryParseSchemaObjectType   (logger, typeDefinitions, out type);
-								case "array":								     
-									return objectNode.TryParseSchemaArrayType    (logger, typeDefinitions, out type);
-								case "reference":
-									return objectNode.TryParseSchemaReferenceType(logger, typeDefinitions, out type);
+									return objectNode.TryParseSchemaIntegerType          (logger, out type);
+								case "number":								             
+									return objectNode.TryParseSchemaNumberType           (logger, out type);
+								case "string":								             
+									return objectNode.TryParseSchemaStringType           (logger, out type);
+								case "object":								             
+									return objectNode.TryParseSchemaObjectType           (logger, typeDefinitions, out type);
+								case "array":								             
+									return objectNode.TryParseSchemaArrayType            (logger, typeDefinitions, out type);
+								case "reference":								         
+									return objectNode.TryParseSchemaInternalReferenceType(logger, typeDefinitions, out type);
+								case "external":
+									return objectNode.TryParseSchemaExternalReferenceType(logger, typeDefinitions, out type);
 							}
 						}
 						else

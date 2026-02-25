@@ -204,7 +204,7 @@
 													   TargetType="{x:Type Button}" BasedOn="{StaticResource {x:Static ToolBar.ButtonStyleKey}}">
 													<Setter Property="IsEnabled" Value="False"/>
 													<Style.Triggers>
-														<DataTrigger Binding="{Binding Path=Editor.HasClipboardNodes}" Value="True">
+														<DataTrigger Binding="{Binding Path=Tree.Editor.HasClipboardNodes}" Value="True">
 															<Setter Property="IsEnabled" Value="True"/>
 														</DataTrigger>
 													</Style.Triggers>
@@ -220,7 +220,7 @@
 																	<MultiBinding.Bindings>
 																		<Binding Path="Elements.Count"/>
 																		<Binding Path="Type"/>
-																		<Binding Path="Editor.ClipboardNodes.Count"/>
+																		<Binding Path="Tree.Editor.ClipboardNodes.Count"/>
 																	</MultiBinding.Bindings>
 																</MultiBinding>
 															</DataTrigger.Binding>
@@ -269,7 +269,7 @@
 														<MultiDataTrigger>
 															<MultiDataTrigger.Conditions>
 																<Condition Binding="{Binding ElementName=_listView, Path=SelectedItems.Count}" Value="1"/>
-																<Condition Binding="{Binding Path=Editor.HasClipboardNodes}" Value="True"/>
+																<Condition Binding="{Binding Path=Tree.Editor.HasClipboardNodes}" Value="True"/>
 															</MultiDataTrigger.Conditions>
 															<Setter Property="IsEnabled" Value="True"/>
 														</MultiDataTrigger>

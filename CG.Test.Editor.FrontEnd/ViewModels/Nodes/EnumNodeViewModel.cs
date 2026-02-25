@@ -29,7 +29,7 @@ namespace CG.Test.Editor.FrontEnd.ViewModels.Nodes
 
         public override EnumNodeViewModel Clone(NodeViewModelBase? parent) => new(Tree, Parent, Type, SelectedIndex);
 
-        public override void SerializeTo(Utf8JsonWriter writer, IReadOnlyDictionary<NodeViewModelBase, ulong> referencedNodes)
+        public override void SerializeTo(Utf8JsonWriter writer, IReadOnlyDictionary<NodeViewModelBase, int> referencedNodes)
         {
             writer.WriteStringValue(Type.PossibleValues[SelectedIndex]);
         }

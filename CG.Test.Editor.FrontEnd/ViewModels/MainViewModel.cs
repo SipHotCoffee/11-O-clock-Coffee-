@@ -156,7 +156,13 @@ namespace CG.Test.Editor.FrontEnd.ViewModels
 			}
 		}
 
-		public static async Task<SchemaTypeBase?> LoadSchema(Window window)
+		public static async Task<SchemaTypeBase?> LoadSchema(FileInfo file, ILogger<SchemaParsingMessage> logger)
+		{
+			await using var stream = file.OpenRead();
+			return await SchemaTypeBase.LoadFromStream(stream, logger);
+		}
+
+		public static async Task<FileInfo?> SelectSchemaFile(Window window)
         {
 			ArgumentNullException.ThrowIfNull(window, nameof(window));
 
@@ -166,26 +172,9 @@ namespace CG.Test.Editor.FrontEnd.ViewModels
 
 			if (recentSchemasDialog.ShowDialog() == true)
 			{
-				try
-				{
-					var messages = new HashSet<SchemaParsingMessage>(10, new SchemaParsingMessageComparer());
-					var logger = new CollectionLogger<SchemaParsingMessage>(messages);
-
-					await using var stream = File.OpenRead(recentSchemasDialog.SelectedSchema.FileName);
-					var result = await SchemaTypeBase.LoadFromStream(stream, logger);
-
-					foreach (var message in messages)
-					{
-						window.ShowMessage(message.Message);
-					}
-
-					return result;
-				}
-				catch (Exception exception)
-				{
-					window.ShowMessage(exception.ToString());
-				}
+				return new FileInfo(recentSchemasDialog.SelectedSchema.FileName);
 			}
+
             return null;
 		}
 
@@ -206,27 +195,37 @@ namespace CG.Test.Editor.FrontEnd.ViewModels
 				return;
 			}
 
-			var schemaType = await LoadSchema(window);
-			if (schemaType is null)
-			{
-				return;
-			}
-
-			await using var streams = await OpenFilesAsync(window, schemaType, _filesToOpen);
+			await using var streams = await OpenFilesAsync(window, _filesToOpen);
 		}
 
-        public async Task<IAsyncDisposableCollection> OpenFilesAsync(Window window, SchemaTypeBase schemaType, IEnumerable<FileInfo> files) 
-			=> new AsyncDisposableCollection<Stream[]>(await Task.WhenAll(files.Select((file) => OpenFileAsync(window, schemaType, file))));
+        public async Task<IAsyncDisposableCollection> OpenFilesAsync(Window window, IEnumerable<FileInfo> files) 
+			=> new AsyncDisposableCollection<Stream[]>(await Task.WhenAll(files.Select((file) => OpenFileAsync(window, file))));
 
-        private async Task<Stream> OpenFileAsync(Window window, SchemaTypeBase schemaType, FileInfo file)
+        private async Task<Stream> OpenFileAsync(Window window, FileInfo file)
 		{
 			var stream = file.OpenRead();
 			try
 			{
 				var instance = new FileInstanceViewModel(this, file, window);
-				var rootNodeViewModel = await NodeViewModelBase.ParseFromStream(window, instance, schemaType, file, stream);
+
+				var messages = new HashSet<string>();
+				var logger = new CollectionLogger<string>(messages);
+
+				var loadedFile = await NodeViewModelBase.ParseFromStream(window, instance, file, stream, logger);
+
+				foreach (var message in messages)
+				{
+					window.ShowMessage(message);
+				}
+
+				if (loadedFile is null)
+				{
+					return stream;
+				}
+
 				instance.HasChanges = false;
-				instance.Root = rootNodeViewModel;
+				instance.SchemaFile = loadedFile.SchemaFile;
+				instance.Root = loadedFile.RootNode;
 				OpenFiles.Add(instance);
 				SelectedFile = instance;
 			}
@@ -254,12 +253,27 @@ namespace CG.Test.Editor.FrontEnd.ViewModels
         async Task NewFile(Window window)
         {
 			var instance = new FileInstanceViewModel(this, null, window);
-            var schemaType = await LoadSchema(window);
+            var schemaFile = await SelectSchemaFile(window);
+			if (schemaFile is null)
+			{
+				return;
+			}
+
+			var messages = new HashSet<SchemaParsingMessage>(10, new SchemaParsingMessageComparer());
+			var logger = new CollectionLogger<SchemaParsingMessage>(messages);
+
+			var schemaType = await LoadSchema(schemaFile, logger);
+
+			foreach (var schemaMessage in messages)
+			{
+				window.ShowMessage(schemaMessage.Message);
+			}
 
             if (schemaType is not null)
             {
 				var tree = new NodeTree(instance.File, instance);
 				instance.Root = schemaType.Visit(new NodeViewModelGeneratorVisitor(window, tree, null, null));
+				instance.SchemaFile = schemaFile;
                 OpenFiles.Add(instance);
                 SelectedFile = instance;
             }
@@ -268,13 +282,6 @@ namespace CG.Test.Editor.FrontEnd.ViewModels
 		[RelayCommand]
 		async Task OpenFile(Window window)
 		{
-			var schemaType = await LoadSchema(window);
-
-			if (schemaType is null)
-			{
-				return;
-			}
-
 			var openFileDialog = new OpenFileDialog()
 			{
 				Filter = "Json files (*.json)|*.json",
@@ -284,7 +291,7 @@ namespace CG.Test.Editor.FrontEnd.ViewModels
 
 			if (openFileDialog.ShowDialog() == true)
 			{
-				await using var streams = await OpenFilesAsync(window, schemaType, openFileDialog.FileNames.Select((fileName) => new FileInfo(fileName)));
+				await using var streams = await OpenFilesAsync(window, openFileDialog.FileNames.Select((fileName) => new FileInfo(fileName)));
 			}
 		}
 
@@ -310,12 +317,7 @@ namespace CG.Test.Editor.FrontEnd.ViewModels
 		[RelayCommand]
 		async Task SaveAll()
 		{
-            var tasks = new List<Task>();
-			foreach (var file in OpenFiles)
-            {
-                tasks.Add(file.SaveAsync());
-            }
-            await Task.WhenAll(tasks);
+            await Task.WhenAll(OpenFiles.Select((file) => file.SaveAsync()));
 		}
 
 		[RelayCommand]

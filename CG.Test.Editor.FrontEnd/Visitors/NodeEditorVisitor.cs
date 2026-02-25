@@ -115,7 +115,7 @@ namespace CG.Test.Editor.FrontEnd.Visitors
 
         public void Visit(ReferenceNodeViewModel referenceNode)
         {
-            if (referenceNode.Root.AllChildren.Any((node) => referenceNode.Type.TargetType.IsConvertibleFrom(node.Type)))
+            if (referenceNode.Root.EnumerateOfType(referenceNode.Type.TargetType).Any())
             {
 				var referenceDialog = new ReferencePickerDialog()
 				{
@@ -141,11 +141,13 @@ namespace CG.Test.Editor.FrontEnd.Visitors
 
         public void Visit(ExternalReferenceNodeViewModel externalReferenceNode)
         {
-			if (externalReferenceNode.Root.AllChildren.Any((node) => externalReferenceNode.Type.TargetType.IsConvertibleFrom(node.Type)))
+            var editor = externalReferenceNode.Tree.Editor!;
+            var fileNodes = editor.IncludedFiles.Select((file) => file.Value.RootNode).Append(externalReferenceNode.Root);
+			if (fileNodes.SelectMany((node) => node.EnumerateOfType(externalReferenceNode.Type.TargetType)).Any())
 			{
                 var roots = new ObservableCollection<TreeNodeViewModel>([new TreeNodeViewModel(externalReferenceNode.Root.Type.ToString(), externalReferenceNode.Type.TargetType, externalReferenceNode.Root)]);
 
-                foreach (var (fileName, includeFile) in externalReferenceNode.Tree.Editor!.IncludedFiles)
+                foreach (var (fileName, includeFile) in editor.IncludedFiles)
                 {
                     roots.Add(new TreeNodeViewModel(fileName, externalReferenceNode.Type.TargetType, includeFile.RootNode));
                 }

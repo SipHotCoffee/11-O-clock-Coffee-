@@ -275,7 +275,7 @@ namespace CG.Test.Editor.FrontEnd.ViewModels.Nodes
 
         public override IReadOnlyList<NodeViewModelBase> Children => Elements;
 
-        public override void SerializeTo(Utf8JsonWriter writer, IReadOnlyDictionary<NodeViewModelBase, ulong> referencedNodes)
+        public override void SerializeTo(Utf8JsonWriter writer, IReadOnlyDictionary<NodeViewModelBase, int> referencedNodes)
         {
             writer.WriteStartArray();
             foreach (var element in Elements)

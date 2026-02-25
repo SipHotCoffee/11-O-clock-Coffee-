@@ -12,13 +12,13 @@ namespace CG.Test.Editor.FrontEnd.Visitors
 		public NodePath Path { get; } = path;
 	}
 
-    public class NodeParserVisitor(NodeTree tree, NodePath currentPath, Dictionary<ulong, List<ReferenceNodeViewModel>> referenceNodesToAssign, NodeViewModelBase? parent, ILogger<NodeParsingMessage> logger, JsonNode? sourceNode) : Visitor<NodeParserVisitor, SchemaTypeBase, NodeViewModelBase?>
+    public class NodeParserVisitor(NodeTree tree, NodePath currentPath, List<ReferenceNodeViewModel>[] referenceNodesToAssign, NodeViewModelBase? parent, ILogger<NodeParsingMessage> logger, JsonNode? sourceNode) : Visitor<NodeParserVisitor, SchemaTypeBase, NodeViewModelBase?>
     {
         private readonly NodeTree _tree = tree;
 
         private readonly ILogger<NodeParsingMessage> _logger = logger;
 
-		private readonly Dictionary<ulong, List<ReferenceNodeViewModel>> _referenceNodesToAssign = referenceNodesToAssign;
+		private readonly List<ReferenceNodeViewModel>[] _referenceNodesToAssign = referenceNodesToAssign;
 
 		public NodeViewModelBase? Parent { get; } = parent;
 
@@ -151,18 +151,13 @@ namespace CG.Test.Editor.FrontEnd.Visitors
 		{
 			if (SourceNode is JsonValue valueNode)
 			{
-				if (valueNode.TryGetValue<ulong>(out var value))
+				if (valueNode.TryGetValue<int>(out var index))
 				{
 					var result = new ReferenceNodeViewModel(_tree, Parent, referenceType, null);
 
-					if (value != 0)
+					if (index >= 0)
 					{
-						if (!_referenceNodesToAssign.TryGetValue(value, out var referenceNodes))
-						{
-							referenceNodes = [];
-							_referenceNodesToAssign.Add(value, referenceNodes);
-						}
-						referenceNodes.Add(result);
+						_referenceNodesToAssign[index].Add(result);
 					}
 					return result;
 				}
@@ -182,18 +177,13 @@ namespace CG.Test.Editor.FrontEnd.Visitors
 		{
 			if (SourceNode is JsonValue valueNode)
 			{
-				if (valueNode.TryGetValue<ulong>(out var value))
+				if (valueNode.TryGetValue<int>(out var index))
 				{
 					var result = new ExternalReferenceNodeViewModel(_tree, Parent, referenceType, null);
 
-					if (value != 0)
+					if (index >= 0)
 					{
-						if (!_referenceNodesToAssign.TryGetValue(value, out var referenceNodes))
-						{
-							referenceNodes = [];
-							_referenceNodesToAssign.Add(value, referenceNodes);
-						}
-						referenceNodes.Add(result);
+						_referenceNodesToAssign[index].Add(result);
 					}
 					return result;
 				}

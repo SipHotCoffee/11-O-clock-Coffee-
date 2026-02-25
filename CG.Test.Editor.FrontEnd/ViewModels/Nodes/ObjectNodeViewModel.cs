@@ -64,7 +64,7 @@ namespace CG.Test.Editor.FrontEnd.ViewModels.Nodes
 
         public override IEnumerable<NodeViewModelBase> Children => Nodes.Select((pair) => pair.Value);
 
-		public override void SerializeTo(Utf8JsonWriter writer, IReadOnlyDictionary<NodeViewModelBase, ulong> referencedNodes)
+		public override void SerializeTo(Utf8JsonWriter writer, IReadOnlyDictionary<NodeViewModelBase, int> referencedNodes)
 		{
 			writer.WriteStartObject();
 			foreach (var pair in Nodes)

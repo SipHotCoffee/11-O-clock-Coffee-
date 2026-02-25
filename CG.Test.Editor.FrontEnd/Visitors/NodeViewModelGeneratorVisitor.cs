@@ -83,14 +83,16 @@ namespace CG.Test.Editor.FrontEnd.Visitors
 
         public EnumNodeViewModel? Visit(SchemaEnumType enumType) => new(_tree, _parent, enumType, 0);
 
-		public NumberNodeViewModel? Visit(SchemaNumberType numberType) => new(_tree, _parent, numberType, Math.Min(Math.Max(numberType.Minimum, 0), numberType.Maximum));
+		public NumberNodeViewModel? Visit(SchemaNumberType numberType) => new(_tree, _parent, numberType, numberType.DefaultValue);
 
-        public IntegerNodeViewModel? Visit(SchemaIntegerType integerType) => new(_tree, _parent, integerType, Math.Min(Math.Max(integerType.Minimum, 0), integerType.Maximum));
+        public IntegerNodeViewModel? Visit(SchemaIntegerType integerType) => new(_tree, _parent, integerType, integerType.DefaultValue);
 
-        public StringNodeViewModel? Visit(SchemaStringType stringType) => new(_tree, _parent, stringType, string.Empty);
+        public StringNodeViewModel? Visit(SchemaStringType stringType) => new(_tree, _parent, stringType, stringType.DefaultValue);
 
-		public BooleanNodeViewModel? Visit(SchemaBooleanType booleanType) => new(_tree, _parent, booleanType, false);
+		public BooleanNodeViewModel? Visit(SchemaBooleanType booleanType) => new(_tree, _parent, booleanType, booleanType.DefaultValue);
 
         public ReferenceNodeViewModel? Visit(SchemaReferenceType referenceType) => new(_tree, _parent, referenceType, null);
+
+		public ExternalReferenceNodeViewModel? Visit(SchemaExternalReferenceType referenceType) => new(_tree, _parent, referenceType, null);
 	}
 }

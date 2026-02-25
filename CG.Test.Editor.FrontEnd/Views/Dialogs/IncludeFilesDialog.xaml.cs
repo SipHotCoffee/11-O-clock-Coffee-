@@ -30,22 +30,15 @@ namespace CG.Test.Editor.FrontEnd.Views.Dialogs
         }
 
         [DependencyProperty]
-        public partial ObservableCollection<FileIncludeInfo> IncludedFiles { get; set; }
+        public partial ObservableCollection<FileInfo> IncludedFiles { get; set; }
 
-        partial void OnIncludedFilesChanged(ObservableCollection<FileIncludeInfo> oldValue, ObservableCollection<FileIncludeInfo> newValue)
+        partial void OnIncludedFilesChanged(ObservableCollection<FileInfo> oldValue, ObservableCollection<FileInfo> newValue)
         {
-            _includedFileNames = [.. newValue.Select((includedFile) => includedFile.File.FullName)];
+            _includedFileNames = [.. newValue.Select((includedFile) => includedFile.FullName)];
         }
 
         private async void InsertButton_Click(object sender, RoutedEventArgs e)
         {
-			var schemaType = await MainViewModel.LoadSchema(this);
-
-			if (schemaType is null)
-			{
-				return;
-			}
-
 			var openFileDialog = new OpenFileDialog()
 			{
 				Filter = "Json files (*.json)|*.json",
@@ -62,12 +55,7 @@ namespace CG.Test.Editor.FrontEnd.Views.Dialogs
                         continue;
                     }
 
-                    var file = new FileIncludeInfo()
-                    {
-                        File = new FileInfo(fileName),
-                        Type = schemaType,
-                    };
-
+                    var file = new FileInfo(fileName);
                     IncludedFiles.Add(file);
                 }
 			}
@@ -75,10 +63,10 @@ namespace CG.Test.Editor.FrontEnd.Views.Dialogs
 
         private void DeleteButton_Click(object sender, RoutedEventArgs e)
         {
-            foreach (var includedFile in _includedFilesListView.SelectedItems.OfType<FileIncludeInfo>())
+            foreach (var includedFile in _includedFilesListView.SelectedItems.OfType<FileInfo>())
             {
                 IncludedFiles.Remove(includedFile);
-                _includedFileNames.Remove(includedFile.File.FullName);
+                _includedFileNames.Remove(includedFile.FullName);
             }
 		}
 

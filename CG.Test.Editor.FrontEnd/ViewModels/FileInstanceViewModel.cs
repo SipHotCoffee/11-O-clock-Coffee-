@@ -1,6 +1,7 @@
 ﻿using CG.Test.Editor.FrontEnd.Models.Types;
 using CG.Test.Editor.FrontEnd.ViewModels.Nodes;
 using CG.Test.Editor.FrontEnd.Views.Dialogs;
+using CG.Test.Editor.FrontEnd.Visitors;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.Win32;
@@ -78,6 +79,8 @@ namespace CG.Test.Editor.FrontEnd.ViewModels
 
 		public Dictionary<string, IncludedFile> IncludedFiles { get; }
 
+		public FileInfo? SchemaFile { get; set; }
+
 		public FileInfo? File { get; set; }
 
 		public Window OwnerWindow { get; }
@@ -119,52 +122,52 @@ namespace CG.Test.Editor.FrontEnd.ViewModels
 			await using var writer = new Utf8JsonWriter(stream);
 			writer.WriteStartObject();
 			{
-				var referencedNodes = new Dictionary<NodeViewModelBase, ulong>();
+				var referencedNodes = new Dictionary<NodeViewModelBase, int>();
 
+				writer.WriteString("schemaFileName", SchemaFile!.FullName);
+
+				var fileNameIndexMap = new Dictionary<string, int>();
+
+				writer.WriteStartArray("includeFileNames");
+				{
+					var index = 0;
+					foreach (var fileName in IncludedFiles.Keys)
+					{
+						writer.WriteStringValue(fileName);
+						fileNameIndexMap.Add(fileName, index++);
+					}
+				}
+				writer.WriteEndArray();
+				
 				writer.WriteStartArray("referencePaths");
 				{
-					var nextId = 1UL;
-
-					writer.WriteStartArray();
-					{
-						foreach (var fileName in IncludedFiles.Keys)
-						{
-							writer.WriteStringValue(fileName);
-						}
-					}
-
-					writer.WriteEndArray();
-
+					var index = 0;
 					foreach (var node in Root!.AllChildren)
 					{
 						if (node is ReferenceNodeViewModel referenceNode && referenceNode.Node is not null)
 						{
-							referencedNodes.TryAdd(referenceNode.Node, nextId++);	
-						}
-					}
-
-					foreach (var (node, id) in referencedNodes)
-					{
-						writer.WriteStartObject();
-						{
-							writer.WriteNumber("id", id);
-
-							var sourceFile = node.Tree.File;
-							if (sourceFile is not null && sourceFile != File)
+							if (referencedNodes.TryAdd(referenceNode.Node, index))
 							{
-								writer.WriteString("sourceFile", sourceFile.FullName);
-							}
-
-							writer.WriteStartArray("path");
-							{
-								foreach (var element in node.Address)
+								writer.WriteStartObject();
 								{
-									element.SerializeTo(writer);
+									var sourceFile = node.Tree.File;
+									if (sourceFile is not null && sourceFile != File)
+									{
+										writer.WriteNumber("sourceFile", fileNameIndexMap[sourceFile.FullName]);
+									}
+
+									writer.WriteStartArray("path");
+									{
+										foreach (var element in node.Address)
+										{
+											element.SerializeTo(writer);
+										}
+									}
+									writer.WriteEndArray();
 								}
+								writer.WriteEndObject();
 							}
-							writer.WriteEndArray();
 						}
-						writer.WriteEndObject();
 					}
 				}
 				writer.WriteEndArray();
@@ -188,9 +191,9 @@ namespace CG.Test.Editor.FrontEnd.ViewModels
 			if (saveFileDialog.ShowDialog() == true)
 			{
 				await using var stream = saveFileDialog.OpenFile();
-				await SaveFileAsync(stream);
 				File = new FileInfo(saveFileDialog.FileName);
 				Name = File.Name;
+				await SaveFileAsync(stream);
 			}
 		}
 
@@ -326,29 +329,33 @@ namespace CG.Test.Editor.FrontEnd.ViewModels
 		{
 			var includeFilesDialog = new IncludeFilesDialog()
 			{
-				IncludedFiles = new(IncludedFiles.Values.Select((includedFile) => new FileIncludeInfo()
-				{
-					File = includedFile.File,
-					Type = includedFile.RootNode.Type
-				}))
+				IncludedFiles = new(IncludedFiles.Values.Select((includedFile) => includedFile.File))
 			};
 			
 			if (includeFilesDialog.ShowDialog() == true)
 			{
 				foreach (var includedFile in includeFilesDialog.IncludedFiles)
 				{
-					if (!IncludedFiles.ContainsKey(includedFile.File.FullName))
+					if (!IncludedFiles.ContainsKey(includedFile.FullName))
 					{
-						await using var stream = includedFile.File.OpenRead();
+						await using var stream = includedFile.OpenRead();
 
-						var rootNode = await NodeViewModelBase.ParseFromStream(OwnerWindow, null, includedFile.Type, includedFile.File, stream);
+						var messages = new HashSet<string>();
+						var logger = new CollectionLogger<string>(messages);
 
-						if (rootNode is not null)
+						var loadedFile = await NodeViewModelBase.ParseFromStream(OwnerWindow, null, includedFile, stream, logger);
+
+						foreach (var message in messages)
 						{
-							IncludedFiles.Add(includedFile.File.FullName, new IncludedFile()
+							includeFilesDialog.ShowMessage(message);
+						}
+
+						if (loadedFile is not null)
+						{
+							IncludedFiles.TryAdd(includedFile.FullName, new IncludedFile()
 							{
-								File     = includedFile.File,
-								RootNode = rootNode,
+								File = includedFile,
+								RootNode = loadedFile.RootNode,
 							});
 						}
 					}
