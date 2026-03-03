@@ -141,21 +141,19 @@ namespace CG.Test.Editor.FrontEnd.Visitors
 
         public void Visit(ExternalReferenceNodeViewModel externalReferenceNode)
         {
-            var editor = externalReferenceNode.Tree.Editor!;
-            var fileNodes = editor.IncludedFiles.Select((file) => file.Value.RootNode).Append(externalReferenceNode.Root);
-			if (fileNodes.SelectMany((node) => node.EnumerateOfType(externalReferenceNode.Type.TargetType)).Any())
+			var editor = externalReferenceNode.Tree.Editor!;
+
+			var rootNodes = editor.IncludedFiles.Select((includedFile) => includedFile.Value.RootNode).Append(externalReferenceNode.Root);
+
+			var treeRootNodes = rootNodes.Where((rootNode) => rootNode.EnumerateOfType(externalReferenceNode.Type.TargetType).Any())
+										 .Select((rootNode) => new TreeNodeViewModel(rootNode.Tree.File?.Name ?? externalReferenceNode.Root.Type.ToString(), externalReferenceNode.Type.TargetType, rootNode));
+
+			if (treeRootNodes.Any())
 			{
-                var roots = new ObservableCollection<TreeNodeViewModel>([new TreeNodeViewModel(externalReferenceNode.Root.Type.ToString(), externalReferenceNode.Type.TargetType, externalReferenceNode.Root)]);
-
-                foreach (var (fileName, includeFile) in editor.IncludedFiles)
-                {
-                    roots.Add(new TreeNodeViewModel(fileName, externalReferenceNode.Type.TargetType, includeFile.RootNode));
-                }
-
 				var referenceDialog = new ReferencePickerDialog()
 				{
 					FilterType = externalReferenceNode.Type.TargetType,
-					Roots = new(roots),
+					Roots = new(treeRootNodes),
 					SelectedNode = externalReferenceNode.Node,
 				};
 
