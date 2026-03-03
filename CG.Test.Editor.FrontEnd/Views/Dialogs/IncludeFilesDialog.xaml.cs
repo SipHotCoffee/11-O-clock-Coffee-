@@ -63,7 +63,7 @@ namespace CG.Test.Editor.FrontEnd.Views.Dialogs
 
         private void DeleteButton_Click(object sender, RoutedEventArgs e)
         {
-            foreach (var includedFile in _includedFilesListView.SelectedItems.OfType<FileInfo>())
+            foreach (var includedFile in _includedFilesListView.SelectedItems.OfType<FileInfo>().ToList())
             {
                 IncludedFiles.Remove(includedFile);
                 _includedFileNames.Remove(includedFile.FullName);

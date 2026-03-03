@@ -150,7 +150,7 @@ namespace CG.Test.Editor.FrontEnd.ViewModels
 							{
 								writer.WriteStartObject();
 								{
-									var sourceFile = node.Tree.File;
+									var sourceFile = referenceNode.Node.Tree.File;
 									if (sourceFile is not null && sourceFile != File)
 									{
 										writer.WriteNumber("sourceFile", fileNameIndexMap[sourceFile.FullName]);
@@ -158,7 +158,7 @@ namespace CG.Test.Editor.FrontEnd.ViewModels
 
 									writer.WriteStartArray("path");
 									{
-										foreach (var element in node.Address)
+										foreach (var element in referenceNode.Node.Address)
 										{
 											element.SerializeTo(writer);
 										}
@@ -352,11 +352,14 @@ namespace CG.Test.Editor.FrontEnd.ViewModels
 
 						if (loadedFile is not null)
 						{
-							IncludedFiles.TryAdd(includedFile.FullName, new IncludedFile()
+							if (IncludedFiles.TryAdd(includedFile.FullName, new IncludedFile()
 							{
 								File = includedFile,
 								RootNode = loadedFile.RootNode,
-							});
+							}))
+							{
+								HasChanges = true;
+							}
 						}
 					}
 				}

@@ -161,6 +161,21 @@
 						<TextBlock VerticalAlignment="Center" FontFamily="Cascadia Mono" Text=")"/>
 					</StackPanel>
 				</DataTemplate>
+				<DataTemplate DataType="{x:Type viewmodelnodes:ExternalReferenceNodeViewModel}">
+					<StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+						<TextBlock VerticalAlignment="Center" FontFamily="Cascadia Mono" Text="{Binding Type.TargetType}"/>
+						<TextBlock VerticalAlignment="Center" FontFamily="Cascadia Mono" Text=" -> "/>
+						<TextBlock VerticalAlignment="Center" FontFamily="Cascadia Mono" Text="("/>
+						<ContentControl Margin="0" 
+									Padding="0" 
+									VerticalContentAlignment="Center"
+									VerticalAlignment="Center" 
+									FontFamily="Cascadia Mono" 
+									Content="{Binding Node}"
+									Visibility="{Binding Node.IsAlive, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+						<TextBlock VerticalAlignment="Center" FontFamily="Cascadia Mono" Text=")"/>
+					</StackPanel>
+				</DataTemplate>
 			</ResourceDictionary>
 		</ResourceDictionary>
 	</Application.Resources>

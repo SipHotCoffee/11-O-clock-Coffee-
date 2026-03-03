@@ -18,6 +18,11 @@ namespace CG.Test.Editor.FrontEnd.ViewModels.Nodes
 			Node = node;
 		}
 
+		partial void OnNodeChanged(NodeViewModelBase? oldValue, NodeViewModelBase? newValue)
+		{
+			Tree.Editor?.HasChanges = true;
+		}
+
         public override SchemaReferenceType Type { get; }
 
         public override ReferenceNodeViewModel Clone(NodeViewModelBase? parent) => new(Tree, parent, Type, Node);
@@ -32,7 +37,7 @@ namespace CG.Test.Editor.FrontEnd.ViewModels.Nodes
 			}
 			else
 			{
-				writer.WriteNumberValue(-1);
+				writer.WriteNullValue();
 			}
 		}
 	}

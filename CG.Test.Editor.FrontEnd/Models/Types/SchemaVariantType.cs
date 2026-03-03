@@ -1,15 +1,50 @@
-﻿using CG.Test.Editor.FrontEnd;
-using System.Collections.Immutable;
+﻿using System.Collections.Immutable;
+using System.Diagnostics.CodeAnalysis;
 
 namespace CG.Test.Editor.FrontEnd.Models.Types
 {
-    public class SchemaVariantType(string name, IEnumerable<SchemaTypeBase> possibleTypes) : SchemaTypeBase, INamedObject
+    public class SchemaVariantType : SchemaTypeBase, INamedObject
 	{
-        public IReadOnlySet<SchemaTypeBase> PossibleTypes { get; } = possibleTypes.ToImmutableSortedSet(new SchemaTypeComparer());
+        private readonly Dictionary<string, SchemaTypeBase> _possibleObjectTypes;
 
-        public IReadOnlyDictionary<string, SchemaObjectType> PossibleObjectTypes { get; } = possibleTypes.OfType<SchemaObjectType>().ToImmutableDictionary((type) => type.Name, (type) => type);
+		public SchemaVariantType(string name, IEnumerable<SchemaTypeBase> possibleTypes)
+		{
+			_possibleObjectTypes = [];
+			foreach (var possibleType in possibleTypes)
+			{
+				if (possibleType is INamedObject namedObject)
+				{
+					_possibleObjectTypes.Add(namedObject.Name, possibleType);
+				}
+			}
 
-        public string Name { get; } = name;
+			PossibleTypes = possibleTypes.ToImmutableSortedSet(new SchemaTypeComparer());
+
+			Name = name;
+		}
+
+		public bool TryGetObjectType(string name, [NotNullWhen(true)] out SchemaObjectType? objectType)
+		{
+			if (_possibleObjectTypes.TryGetValue(name, out var possibleType))
+			{
+				if (possibleType is SchemaObjectType possibleObjectType)
+				{
+					objectType = possibleObjectType;
+					return true;
+				}
+				else if (possibleType is SchemaSymbolType possibleSymbolType && possibleSymbolType.LinkedType is SchemaObjectType linkedObjectType)
+				{
+					objectType = linkedObjectType;
+					return true;
+				}
+			}
+			objectType = null;
+			return false;
+		}
+
+		public IReadOnlySet<SchemaTypeBase> PossibleTypes { get; }
+
+        public string Name { get; }
 
         public override bool IsConvertibleFrom(SchemaTypeBase sourceType) 
             => PossibleTypes.Contains(sourceType) || sourceType is SchemaSymbolType symbolType && PossibleTypes.Contains(symbolType.LinkedType);

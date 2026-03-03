@@ -67,6 +67,8 @@ namespace CG.Test.Editor.FrontEnd.ViewModels.Nodes
 		public override void SerializeTo(Utf8JsonWriter writer, IReadOnlyDictionary<NodeViewModelBase, int> referencedNodes)
 		{
 			writer.WriteStartObject();
+            writer.WriteString("$type", Type.Name);
+
 			foreach (var pair in Nodes)
 			{
 				writer.WritePropertyName(pair.Key);

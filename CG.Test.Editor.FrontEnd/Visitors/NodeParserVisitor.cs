@@ -1,6 +1,7 @@
 ﻿using CG.Test.Editor.FrontEnd.Models.Types;
 using CG.Test.Editor.FrontEnd.ViewModels;
 using CG.Test.Editor.FrontEnd.ViewModels.Nodes;
+using System.Text.Json;
 using System.Text.Json.Nodes;
 
 namespace CG.Test.Editor.FrontEnd.Visitors
@@ -149,16 +150,17 @@ namespace CG.Test.Editor.FrontEnd.Visitors
 
 		public ReferenceNodeViewModel? Visit(SchemaReferenceType referenceType)
 		{
+			if (SourceNode is null)
+			{
+				return new ReferenceNodeViewModel(_tree, Parent, referenceType, null);
+			}
+
 			if (SourceNode is JsonValue valueNode)
 			{
-				if (valueNode.TryGetValue<int>(out var index))
+				if (valueNode.TryGetValue<uint>(out var index))
 				{
 					var result = new ReferenceNodeViewModel(_tree, Parent, referenceType, null);
-
-					if (index >= 0)
-					{
-						_referenceNodesToAssign[index].Add(result);
-					}
+					_referenceNodesToAssign[index].Add(result);
 					return result;
 				}
 				else
@@ -175,21 +177,22 @@ namespace CG.Test.Editor.FrontEnd.Visitors
 
 		public ExternalReferenceNodeViewModel? Visit(SchemaExternalReferenceType referenceType)
 		{
+			if (SourceNode is null)
+			{
+				return new ExternalReferenceNodeViewModel(_tree, Parent, referenceType, null);
+			}
+
 			if (SourceNode is JsonValue valueNode)
 			{
 				if (valueNode.TryGetValue<int>(out var index))
 				{
 					var result = new ExternalReferenceNodeViewModel(_tree, Parent, referenceType, null);
-
-					if (index >= 0)
-					{
-						_referenceNodesToAssign[index].Add(result);
-					}
+					_referenceNodesToAssign[index].Add(result);
 					return result;
 				}
 				else
 				{
-					LogMessage($"Failed to convert value of '{valueNode.GetType()}' to '{typeof(ulong)}'.");
+					LogMessage($"Failed to convert value of '{valueNode.GetType()}' to '{typeof(int)}'.");
 				}
 			}
 			else
@@ -264,7 +267,7 @@ namespace CG.Test.Editor.FrontEnd.Visitors
 				objectNode.TryGetPropertyValue("$type", out var typeNode) && 
 				typeNode is JsonValue typeValueNode && 
 				typeValueNode.TryGetValue<string>(out var typeName) && 
-				variantType.PossibleObjectTypes.TryGetValue(typeName, out var objectType) &&
+				variantType.TryGetObjectType(typeName, out var objectType) &&
 				objectType.Visit(new NodeParserVisitor(_tree, CurrentPath, _referenceNodesToAssign, Parent, _logger, SourceNode)) is ObjectNodeViewModel objectNodeViewModel)
 			{
 				return new VariantNodeViewModel(_tree, Parent, variantType, objectNodeViewModel);

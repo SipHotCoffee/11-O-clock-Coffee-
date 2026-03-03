@@ -83,8 +83,7 @@ namespace CG.Test.Editor.FrontEnd.ViewModels
 						return null;
 					}
 
-					//GLITCH HERE!!!
-					var includedFileName = includedFileNode["schemaFileName"]!.GetValue<string>();
+					var includedFileName = includedFileNode.GetValue<string>();
 
 					if (!alreadyIncludedFileNames.Add(includedFileName))
 					{
@@ -92,10 +91,10 @@ namespace CG.Test.Editor.FrontEnd.ViewModels
 						return null;
 					}
 
-					var includedFile = new FileInfo(includedFileName);
-					await using var includedFileStream = includedFile.OpenRead();
+					var includedFileInfo = new FileInfo(includedFileName);
+					await using var includedFileStream = includedFileInfo.OpenRead();
 
-					var loadedFile = await ParseFromStreamInternal(window, null, includedFile, includedFileStream, logger, alreadyIncludedFileNames);
+					var loadedFile = await ParseFromStreamInternal(window, null, includedFileInfo, includedFileStream, logger, alreadyIncludedFileNames);
 
 					if (loadedFile is null)
 					{
@@ -104,11 +103,15 @@ namespace CG.Test.Editor.FrontEnd.ViewModels
 
 					includedFileIndexMap.Add(includedFileName, includedFiles.Count);
 
-					includedFiles.Add(new IncludedFile()
+					var includedFile = new IncludedFile()
 					{
 						File = new FileInfo(includedFileName),
 						RootNode = loadedFile.RootNode
-					});
+					};
+
+					includedFiles.Add(includedFile);
+
+					fileInstance?.IncludedFiles.Add(includedFileName, includedFile);
 				}
 			}
 
@@ -121,9 +124,9 @@ namespace CG.Test.Editor.FrontEnd.ViewModels
 
 					var path = NodePath.Root;
 
-					if (pathNode!.AsObject().TryGetPropertyValue("sourceFile", out var sourceFileNode) && sourceFileNode is JsonValue sourceFileValueNode && sourceFileValueNode.TryGetValue<string>(out var sourceFileName))
+					if (pathNode!.AsObject().TryGetPropertyValue("sourceFile", out var sourceFileNode) && sourceFileNode is JsonValue sourceFileValueNode && sourceFileValueNode.TryGetValue<uint>(out var sourceFileIndex))
 					{
-						sourceFile = new FileInfo(sourceFileName);
+						sourceFile = includedFiles[(int)sourceFileIndex].File;
 					}
 
 					var pathElementsArrayNode = pathNode["path"]!.AsArray();
@@ -156,6 +159,11 @@ namespace CG.Test.Editor.FrontEnd.ViewModels
 			var tree = new NodeTree(file, fileInstance);
 
 			var referenceNodesToAssign = new List<ReferenceNodeViewModel>[paths.Count];
+			foreach (ref var referenceNodes in referenceNodesToAssign.AsSpan())
+			{
+				referenceNodes = [];
+			}
+
 			var rootNodeViewModel = schemaType.Visit(new NodeParserVisitor(tree, NodePath.Root, referenceNodesToAssign, null, contentLogger, contentNode));
 
 			for (var pathIndex = 0; pathIndex < referenceNodesToAssign.Length; pathIndex++)
@@ -234,7 +242,7 @@ namespace CG.Test.Editor.FrontEnd.ViewModels
                 {
                     for (var i = 0; i < arrayNode.Elements.Count; i++)
                     {
-                        if (ReferenceEquals(arrayNode.Elements[i], this))
+                        if (arrayNode.Elements[i] == this)
                         {
 							return Parent.Address.GetChild(new IndexIdentifier(i));
 						}
@@ -245,12 +253,23 @@ namespace CG.Test.Editor.FrontEnd.ViewModels
                 {
                     foreach (var (name, node) in objectNode.Nodes)
                     {
-                        if (ReferenceEquals(node, this))
+                        if (node == this)
                         {
 							return Parent.Address.GetChild(new NameIdentifier(name));
 						}
                     }
                 }
+
+				if (Parent is VariantNodeViewModel variantNode)
+				{
+					foreach (var (name, node) in variantNode.SelectedObject.Nodes)
+					{
+						if (node == this)
+						{
+							return Parent.Address.GetChild(new NameIdentifier(name));
+						}
+					}
+				}
 
 				return NodePath.Root;
 			}

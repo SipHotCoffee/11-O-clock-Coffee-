@@ -17,6 +17,8 @@ namespace CG.Test.Editor.FrontEnd
         public int ElementIndex { get; } = elementIndex;
 
         public void SerializeTo(Utf8JsonWriter writer) => writer.WriteNumberValue(ElementIndex);
+
+        public override string ToString() => $"[{ElementIndex}]";
     }
 
     public class NameIdentifier(string propertyName) : INodeIdentifier
@@ -24,6 +26,8 @@ namespace CG.Test.Editor.FrontEnd
         public string PropertyName { get; } = propertyName;
 
         public void SerializeTo(Utf8JsonWriter writer) => writer.WriteStringValue(PropertyName);
+
+        public override string ToString() => $".{PropertyName}";
     }
 
 	public class NodePath : IEnumerable<INodeIdentifier>
@@ -50,22 +54,30 @@ namespace CG.Test.Editor.FrontEnd
             }
 
             var key = _path[depth];
-            if (root is ArrayNodeViewModel arrayNode && key is IndexIdentifier index)
+            if (key is IndexIdentifier index && root is ArrayNodeViewModel arrayNode)
             {
                 return TryNavigate(arrayNode.Elements[index.ElementIndex], out node, depth + 1);
             }
-            else if (root is ObjectNodeViewModel objectNode && key is NameIdentifier name && objectNode.Type.TryGetProperty(name.PropertyName, out var property))
+            else if (key is NameIdentifier name)
             {
-                return TryNavigate(objectNode.Nodes[property.Index].Value, out node, depth + 1);
-            }
+                if (root is ObjectNodeViewModel objectNode && objectNode.Type.TryGetProperty(name.PropertyName, out var property))
+                {
+					return TryNavigate(objectNode.Nodes[property.Index].Value, out node, depth + 1);
+				}
 
+                if (root is VariantNodeViewModel variantNode && variantNode.SelectedObject.Type.TryGetProperty(name.PropertyName, out var variantProperty))
+                {
+                    return TryNavigate(variantNode.SelectedObject.Nodes[variantProperty.Index].Value, out node, depth + 1);
+                }
+            }
+           
             node = null;
             return false;
         }
 
         public bool TryNavigate(NodeViewModelBase root, [NotNullWhen(true)] out NodeViewModelBase? node) => TryNavigate(root, out node, 0);
 
-        public override string ToString() => string.Join('/', _path);
+        public override string ToString() => $"*{string.Join(string.Empty, _path)}";
 
         public IEnumerator<INodeIdentifier> GetEnumerator() => _path.OfType<INodeIdentifier>().GetEnumerator();
 
