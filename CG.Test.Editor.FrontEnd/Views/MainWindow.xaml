@@ -18,10 +18,13 @@
 	<Window.Resources>
 		<converters:IsNotNullConverter x:Key="IsNotNullConverter"/>
 		<BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
+		<converters:NullToVisibilityConverter x:Key="NullToVisibilityConverter"/>
 	</Window.Resources>
 	<Window.InputBindings>
-		<KeyBinding Modifiers="Ctrl" Key="N" Command="{Binding  NewFileCommand}" CommandParameter="{Binding RelativeSource={RelativeSource AncestorType={x:Type Window}}}"/>
-		<KeyBinding Modifiers="Ctrl" Key="O" Command="{Binding OpenFileCommand}" CommandParameter="{Binding RelativeSource={RelativeSource AncestorType={x:Type Window}}}"/>
+		<KeyBinding Modifiers="Ctrl" Key="N" Command="{Binding  NewFileCommand}" 
+					CommandParameter="{Binding RelativeSource={RelativeSource AncestorType={x:Type Window}}}"/>
+		<KeyBinding Modifiers="Ctrl" Key="O" Command="{Binding OpenFileCommand}" 
+					CommandParameter="{Binding RelativeSource={RelativeSource AncestorType={x:Type Window}}}"/>
 		<KeyBinding Modifiers="Ctrl" Key="S" Command="{Binding SaveFileCommand}"/>
 	</Window.InputBindings>
     <Grid>
@@ -427,42 +430,190 @@
 										</ScrollViewer>
 									</Grid>
 								</DataTemplate>
+								
 								<DataTemplate DataType="{x:Type viewmodelnodes:ObjectNodeViewModel}">
-									<ListView ItemsSource="{Binding Nodes}">
-										<ListView.ItemContainerStyle>
-											<Style TargetType="{x:Type ListViewItem}" BasedOn="{StaticResource {x:Static GridView.GridViewItemContainerStyleKey}}">
-												<Setter Property="VerticalContentAlignment" Value="Center"/>
-												<Setter Property="VerticalAlignment" Value="Center"/>
-												<EventSetter Event="MouseDoubleClick" Handler="ObjectViewItem_MouseDoubleClick"/>
-											</Style>
-										</ListView.ItemContainerStyle>
-										<ListView.View>
-											<GridView>
-												<GridView.Columns>
-													<GridViewColumn Width="auto" Header="Property Name">
-														<GridViewColumn.CellTemplate>
-															<DataTemplate>
-																<StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-																	<TextBlock VerticalAlignment="Center" FontFamily="Cascadia Mono" 
-																			   FontWeight="Bold" FontSize="16" Text="{Binding Key}"/>
-																	<TextBlock VerticalAlignment="Center" FontFamily="Cascadia Mono" 
-																			   FontWeight="Bold" FontSize="16" Text=": "/>
-																</StackPanel>
-															</DataTemplate>
-														</GridViewColumn.CellTemplate>
-													</GridViewColumn>
-													<GridViewColumn Width="auto" Header="Value">
-														<GridViewColumn.CellTemplate>
-															<DataTemplate>
-																<ContentControl VerticalAlignment="Center" Content="{Binding Value}" 
-																				Resources="{StaticResource NodeCompactDataTemplates}"/>
-															</DataTemplate>
-														</GridViewColumn.CellTemplate>
-													</GridViewColumn>
-												</GridView.Columns>
-											</GridView>
-										</ListView.View>	
-									</ListView>
+									<Grid>
+										<Grid.RowDefinitions>
+											<RowDefinition Height="auto"/>
+											<RowDefinition Height="*"/>
+										</Grid.RowDefinitions>
+										<ToolBar Visibility="{Binding Type.AdditionalPropertiesType, Mode=OneWay, Converter={StaticResource NullToVisibilityConverter}}">
+											<ToolBar.Resources>
+												<Style x:Key="MultipleSelectionButton" 
+													   TargetType="{x:Type Button}" BasedOn="{StaticResource {x:Static ToolBar.ButtonStyleKey}}">
+													<Style.Triggers>
+														<DataTrigger Binding="{Binding ElementName=_listView, Path=SelectedItems.Count}" Value="0">
+															<Setter Property="IsEnabled" Value="False"/>
+														</DataTrigger>
+													</Style.Triggers>
+												</Style>
+
+												<Style x:Key="DeleteMultipleSelectionButton" 
+													   TargetType="{x:Type Button}" BasedOn="{StaticResource {x:Static ToolBar.ButtonStyleKey}}">
+													<Setter Property="IsEnabled" Value="False"/>
+													<Style.Triggers>
+														<DataTrigger Value="True">
+															<DataTrigger.Binding>
+																<MultiBinding Converter="{StaticResource IsDeleteEnabledConverter}">
+																	<Binding Path="Elements.Count"/>
+																	<Binding Path="Type"/>
+																	<Binding ElementName="_listView" Path="SelectedItems.Count"/>
+																</MultiBinding>
+															</DataTrigger.Binding>
+															<Setter Property="IsEnabled" Value="True"/>
+														</DataTrigger>
+													</Style.Triggers>
+												</Style>
+
+												<Style x:Key="ClipboardHasItemsButton" 
+													   TargetType="{x:Type Button}" BasedOn="{StaticResource {x:Static ToolBar.ButtonStyleKey}}">
+													<Setter Property="IsEnabled" Value="False"/>
+													<Style.Triggers>
+														<DataTrigger Binding="{Binding Path=Tree.Editor.HasClipboardNodes}" Value="True">
+															<Setter Property="IsEnabled" Value="True"/>
+														</DataTrigger>
+													</Style.Triggers>
+												</Style>
+
+												<Style x:Key="ClipboardItemCountInRange" 
+													   TargetType="{x:Type Button}" BasedOn="{StaticResource {x:Static ToolBar.ButtonStyleKey}}">
+													<Setter Property="IsEnabled" Value="False"/>
+													<Style.Triggers>
+														<DataTrigger Value="True">
+															<DataTrigger.Binding>
+																<MultiBinding Converter="{StaticResource IsPasteEnabledConverter}">
+																	<MultiBinding.Bindings>
+																		<Binding Path="Elements.Count"/>
+																		<Binding Path="Type"/>
+																		<Binding Path="Tree.Editor.ClipboardNodes.Count"/>
+																	</MultiBinding.Bindings>
+																</MultiBinding>
+															</DataTrigger.Binding>
+															<Setter Property="IsEnabled" Value="True"/>
+														</DataTrigger>
+													</Style.Triggers>
+												</Style>
+
+												<Style x:Key="SingleSelectionButton" 
+													   TargetType="{x:Type Button}" 
+													   BasedOn="{StaticResource {x:Static ToolBar.ButtonStyleKey}}">
+													<Setter Property="IsEnabled" Value="False"/>
+													<Style.Triggers>
+														<DataTrigger Binding="{Binding ElementName=_listView, Path=SelectedItems.Count}" Value="1">
+															<Setter Property="IsEnabled" Value="True"/>
+														</DataTrigger>
+													</Style.Triggers>
+												</Style>
+
+												<Style x:Key="SingleInsertSelectionButton" 
+													   TargetType="{x:Type Button}" 
+													   BasedOn="{StaticResource {x:Static ToolBar.ButtonStyleKey}}">
+													<Setter Property="IsEnabled" Value="False"/>
+													<Style.Triggers>
+														<MultiDataTrigger>
+															<MultiDataTrigger.Conditions>
+																<Condition Binding="{Binding ElementName=_listView, Path=SelectedItems.Count}" Value="1"/>
+																<Condition Value="True">
+																	<Condition.Binding>
+																		<MultiBinding Converter="{StaticResource IsInsertEnabledConverter}">
+																			<Binding Path="Elements.Count"/>
+																			<Binding Path="Type"/>
+																		</MultiBinding>
+																	</Condition.Binding>
+																</Condition>
+															</MultiDataTrigger.Conditions>
+															<Setter Property="IsEnabled" Value="True"/>
+														</MultiDataTrigger>
+													</Style.Triggers>
+												</Style>
+
+												<Style x:Key="PasteSingleSelectionButton" 
+													   TargetType="{x:Type Button}" BasedOn="{StaticResource {x:Static ToolBar.ButtonStyleKey}}">
+													<Setter Property="IsEnabled" Value="False"/>
+													<Style.Triggers>
+														<MultiDataTrigger>
+															<MultiDataTrigger.Conditions>
+																<Condition Binding="{Binding ElementName=_listView, Path=SelectedItems.Count}" Value="1"/>
+																<Condition Binding="{Binding Path=Tree.Editor.HasClipboardNodes}" Value="True"/>
+															</MultiDataTrigger.Conditions>
+															<Setter Property="IsEnabled" Value="True"/>
+														</MultiDataTrigger>
+													</Style.Triggers>
+												</Style>
+											</ToolBar.Resources>
+
+											<Button Command="{Binding InsertCommand}" FontSize="18" FontFamily="{StaticResource SymbolFont}" Content="&#xe948;"/>
+
+											<Button FontFamily="{StaticResource SymbolFont}" 
+													FontSize="18" 
+													Content="&#xe8c6;"
+													Command="{Binding CutNodeCommand}"
+													CommandParameter="{Binding ElementName=_nodeListView, Path=SelectedItem}"
+													Style="{StaticResource DeleteMultipleSelectionButton}">
+											</Button>
+
+											<Button FontFamily="{StaticResource SymbolFont}" 
+													FontSize="18" 
+													Content="&#xe8c8;"
+													Command="{Binding CopyNodeCommand}"
+													CommandParameter="{Binding ElementName=_nodeListView, Path=SelectedItem}"
+													Style="{StaticResource MultipleSelectionButton}"/>
+
+											<Button FontFamily="{StaticResource SymbolFont}"
+													FontSize="18" 
+													Command="{Binding PasteNodesCommand}"
+													Style="{StaticResource ClipboardItemCountInRange}"
+													Content="&#xe77f;">
+											</Button>
+
+											<Button FontFamily="{StaticResource SymbolFont}"
+													FontSize="18" Content="&#xe74d;" 
+													Command="{Binding DeleteNodesCommand}"
+													CommandParameter="{Binding ElementName=_nodeListView, Path=SelectedItems}"
+													Style="{StaticResource DeleteMultipleSelectionButton}"/>
+
+											<Separator/>
+
+											<!--<Button FontFamily="{StaticResource SymbolFont}"
+													FontSize="18" Content="&#xe721;" 
+													Command="{Binding SearchElementsCommand}"/>-->
+										</ToolBar>
+										<ListView x:Name="_nodeListView" Grid.Row="1" ItemsSource="{Binding Nodes}">
+											<ListView.ItemContainerStyle>
+												<Style TargetType="{x:Type ListViewItem}" BasedOn="{StaticResource {x:Static GridView.GridViewItemContainerStyleKey}}">
+													<Setter Property="VerticalContentAlignment" Value="Center"/>
+													<Setter Property="VerticalAlignment" Value="Center"/>
+													<EventSetter Event="MouseDoubleClick" Handler="ObjectViewItem_MouseDoubleClick"/>
+												</Style>
+											</ListView.ItemContainerStyle>
+											<ListView.View>
+												<GridView>
+													<GridView.Columns>
+														<GridViewColumn Width="auto" Header="Property Name">
+															<GridViewColumn.CellTemplate>
+																<DataTemplate>
+																	<StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+																		<TextBlock VerticalAlignment="Center" FontFamily="Cascadia Mono" 
+																				   FontWeight="Bold" FontSize="16" Text="{Binding PropertyName}"/>
+																		<TextBlock VerticalAlignment="Center" FontFamily="Cascadia Mono" 
+																				   FontWeight="Bold" FontSize="16" Text=": "/>
+																	</StackPanel>
+																</DataTemplate>
+															</GridViewColumn.CellTemplate>
+														</GridViewColumn>
+														<GridViewColumn Width="auto" Header="Value">
+															<GridViewColumn.CellTemplate>
+																<DataTemplate>
+																	<ContentControl VerticalAlignment="Center" Content="{Binding Node}" 
+																					Resources="{StaticResource NodeCompactDataTemplates}"/>
+																</DataTemplate>
+															</GridViewColumn.CellTemplate>
+														</GridViewColumn>
+													</GridView.Columns>
+												</GridView>
+											</ListView.View>	
+										</ListView>
+									</Grid>
 								</DataTemplate>
 							</ContentControl.Resources>
 						</ContentControl>

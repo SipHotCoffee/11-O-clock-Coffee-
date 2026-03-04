@@ -10,9 +10,9 @@ namespace CG.Test.Editor.FrontEnd
         public abstract TTarget Convert(TSource source);
         public abstract TSource ConvertBack(TTarget source);
 
-        object? IValueConverter.Convert(object value, Type targetType, object parameter, CultureInfo culture) => value is not null ? Convert((TSource)value) : null;
+        object? IValueConverter.Convert(object value, Type targetType, object parameter, CultureInfo culture) => Convert((TSource)value);
 
-        object? IValueConverter.ConvertBack(object value, Type targetType, object parameter, CultureInfo culture) => value is not null ? ConvertBack((TTarget)value) : null;
+        object? IValueConverter.ConvertBack(object value, Type targetType, object parameter, CultureInfo culture) => ConvertBack((TTarget)value);
 	}
 
 	public abstract class MultiValueConverterBase<TTarget> : IMultiValueConverter

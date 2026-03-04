@@ -110,7 +110,7 @@
 								<DataTemplate>
 									<StackPanel VerticalAlignment="Center" Orientation="Horizontal">
 										<TextBlock VerticalAlignment="Center" FontFamily="Cascadia Mono" x:Name="commaTextBlock" Text=", "/>
-										<ContentPresenter Content="{Binding Value}"/>
+										<ContentPresenter Content="{Binding Node}"/>
 									</StackPanel>
 									<DataTemplate.Triggers>
 										<DataTrigger Binding="{Binding RelativeSource={RelativeSource PreviousData}}" Value="{x:Null}">

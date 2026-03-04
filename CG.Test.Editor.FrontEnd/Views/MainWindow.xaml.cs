@@ -1,4 +1,5 @@
 ﻿using CG.Test.Editor.FrontEnd.ViewModels;
+using CG.Test.Editor.FrontEnd.ViewModels.Nodes;
 using CG.Test.Editor.FrontEnd.Visitors;
 using System.ComponentModel;
 using System.IO;
@@ -21,9 +22,9 @@ namespace CG.Test.Editor.FrontEnd.Views
         private void ObjectViewItem_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
             var item = (ListViewItem)sender;
-            if (ViewModel.SelectedFile is not null && item.Content is KeyValuePair<string, NodeViewModelBase> node)
+            if (ViewModel.SelectedFile is not null && item.Content is NodeEntryViewModel entry)
             {
-                node.Value.Visit(new NodeEditorVisitor(true));
+				entry.Node.Visit(new NodeEditorVisitor(true));
 			}
         }
 

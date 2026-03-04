@@ -30,10 +30,12 @@
 	{
         private readonly Dictionary<string, int> _propertyIndices;
 
-        public SchemaObjectType(string name, IEnumerable<LinkedSchemaProperty> properties)
+        public SchemaObjectType(string name, IEnumerable<LinkedSchemaProperty> properties, SchemaTypeBase? additionalPropertiesType)
         {
             Name       = name;
             Properties = [.. properties];
+
+            AdditionalPropertiesType = additionalPropertiesType;
 
 			_propertyIndices = [];
             for (var i = 0; i < Properties.Count; i++)
@@ -46,7 +48,9 @@
 
 		public IReadOnlyList<LinkedSchemaProperty> Properties { get; }
 
-        public bool TryGetProperty(string propertyName, out LinkedSchemaProperty property)
+		public SchemaTypeBase? AdditionalPropertiesType { get; }
+
+		public bool TryGetProperty(string propertyName, out LinkedSchemaProperty property)
         {
             if (_propertyIndices.TryGetValue(propertyName, out var index))
             {
@@ -57,9 +61,11 @@
             return false;
         }
 
-        public override bool IsConvertibleFrom(SchemaTypeBase sourceType) 
+        public bool ContainsProperty(string propertyName) => _propertyIndices.ContainsKey(propertyName);
+
+		public override bool IsConvertibleFrom(SchemaTypeBase sourceType) 
             => sourceType == this || sourceType is SchemaSymbolType symbolType && IsConvertibleFrom(symbolType.LinkedType);
 
         public override string ToString() => Name;
-    }
+	}
 }

@@ -3,6 +3,7 @@ using CG.Test.Editor.FrontEnd.ViewModels;
 using CG.Test.Editor.FrontEnd.ViewModels.Nodes;
 using System.Text.Json;
 using System.Text.Json.Nodes;
+using System.Xml.Linq;
 
 namespace CG.Test.Editor.FrontEnd.Visitors
 {
@@ -244,7 +245,12 @@ namespace CG.Test.Editor.FrontEnd.Visitors
 						var childNode = property.Type.Visit(nodeVisitor);
 						if (childNode is not null)
 						{
-							result.Nodes.Add(new KeyValuePair<string, NodeViewModelBase>(property.Name, childNode));
+							result.Nodes.Add(new NodeEntryViewModel()
+							{ 
+								PropertyName = property.Name, 
+								Node         = childNode,
+								IsAdditional = false,
+							});
 						}
 					}
 					else

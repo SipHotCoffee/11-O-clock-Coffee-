@@ -27,16 +27,16 @@ namespace CG.Test.Editor.FrontEnd.ViewModels.Nodes
 
 		protected override string GetName(NodeViewModelBase item)
         {
-			if (SelectedObject.Type.TryGetProperty("name", out var property) && SelectedObject.Nodes[property.Index].Value is StringNodeViewModel stringNode)
+			if (SelectedObject.Type.TryGetProperty("name", out var property) && SelectedObject.Nodes[property.Index].Node is StringNodeViewModel stringNode)
 			{
 				return stringNode.Value;
 			}
 
-			foreach (var pair in SelectedObject.Nodes)
+			foreach (var (propertyName, node) in SelectedObject.Nodes)
 			{
-				if (pair.Value == item)
+				if (node == item)
 				{
-					return pair.Key;
+					return propertyName;
 				}
 			}
 			return "Child not found!";

@@ -108,6 +108,7 @@ namespace CG.Test.Editor.FrontEnd.ViewModels.Nodes
             {
                 var itemDialog = new ItemCountDialog()
                 {
+                    Owner = Tree.Editor?.OwnerWindow,
                     MaximumItemCount = (uint)(Elements.Count - Type.MaximumItemCount)
                 };
 

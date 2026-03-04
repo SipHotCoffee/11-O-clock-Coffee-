@@ -92,7 +92,7 @@ namespace CG.Test.Editor.FrontEnd.Views.Dialogs
 			{
 				if (child is ObjectNodeViewModel childObject && childObject.Type == SelectedType)
 				{
-                    var node = childObject.Nodes[SelectedProperty.Index].Value;
+                    var node = childObject.Nodes[SelectedProperty.Index].Node;
                     if (!IsFilterEnabled || node.Equals(OldValue))
                     {
                         ++occurences;

@@ -47,60 +47,7 @@ namespace CG.Test.Editor.FrontEnd
 				return new SchemaNumberType(double.CreateTruncating(TFloat.MinValue), double.CreateTruncating(TFloat.MaxValue), default);
             }
         }
-
-		extension(Type type)
-		{
-			public SchemaTypeBase GetSchemaFromType(ParameterInfo? parameter)
-			{
-				     if (type == typeof(byte))    { return    byte.GetIntegerSchema(parameter); }
-				else if (type == typeof(ushort))  { return  ushort.GetIntegerSchema(parameter); }
-				else if (type == typeof(uint))    { return    uint.GetIntegerSchema(parameter); }
-				else if (type == typeof(ulong))   { return   ulong.GetIntegerSchema(parameter); }
-				else if (type == typeof(sbyte))   { return   sbyte.GetIntegerSchema(parameter); }
-				else if (type == typeof(short))   { return   short.GetIntegerSchema(parameter); }
-				else if (type == typeof(int))     { return     int.GetIntegerSchema(parameter); }
-				else if (type == typeof(long))    { return    long.GetIntegerSchema(parameter); }
-				else if (type == typeof(float))   { return   float.GetFloatSchema(parameter);   }
-				else if (type == typeof(double))  { return  double.GetFloatSchema(parameter);   }
-				else if (type == typeof(decimal)) { return decimal.GetFloatSchema(parameter);   }
-				else if (type == typeof(bool))
-				{
-					return new SchemaBooleanType(default);
-				}
-				else if (type == typeof(string))
-				{
-					return new SchemaStringType(int.MaxValue, string.Empty);
-				}
-				else if (type.IsArray)
-				{
-					return new SchemaArrayType((type.GetElementType() ?? typeof(object)).GetSchemaFromType(null), int.MinValue, int.MaxValue);
-				}
-				else if (type.IsAssignableTo(typeof(IEnumerable)))
-				{
-					if (type.GenericTypeArguments.Length > 0)
-					{
-						return new SchemaArrayType(type.GenericTypeArguments[0].GetSchemaFromType(null), int.MinValue, int.MaxValue);
-					}
-					else
-					{
-						return new SchemaArrayType(typeof(object).GetSchemaFromType(null), int.MinValue, int.MaxValue);
-					}
-				}
-				else
-				{
-					var constructor = type.GetConstructors(BindingFlags.Public | BindingFlags.Instance).First();
-					var properties = new Dictionary<string, LinkedSchemaProperty>();
-                    var parameters = constructor.GetParameters();
-					return new SchemaObjectType(type.Name, parameters.Select((parameter, index) => new LinkedSchemaProperty()
-					{ 
-						Index = index,
-						Name = parameter.Name ?? string.Empty,
-						Type = parameter.ParameterType.GetSchemaFromType(parameter)
-					}));
-				}
-			}
-		}
-
+	
 		extension(SchemaTypeBase type)
 		{
 			public IEnumerable<SchemaObjectType> EnumerateObjectTypes()
@@ -297,46 +244,54 @@ namespace CG.Test.Editor.FrontEnd
 
 			private bool TryParseSchemaObjectType(ILogger<SchemaParsingMessage> logger, IReadOnlyDictionary<string, SchemaTypeBase> registeredTypes, [NotNullWhen(true)] out SchemaTypeBase? type)
 			{
+				SchemaTypeBase? additionalPropertiesType = null;
+
+				if (objectNode.TryGetPropertyValue("additionalProperties", out var additionalPropertiesNode))
+				{
+					if (additionalPropertiesNode is JsonObject additionalPropertiesObjectNode)
+					{
+						additionalPropertiesObjectNode.TryParseSchemaType(logger, registeredTypes, out additionalPropertiesType);
+					}
+				}
+
 				if (objectNode.TryGetPropertyValue("properties", out var propertiesNode))
 				{
 					if (propertiesNode is JsonObject propertiesObjectNode)
 					{
-						if (propertiesObjectNode.TryGetPropertyValue("$type", out var typeNode) &&
-							typeNode is JsonObject typeObjectNode && typeObjectNode.TryGetValue<string>("const", logger, out var typeName))
+						if (!propertiesObjectNode.TryGetPropertyValue("$type", out var typeNode) || 
+							typeNode is not JsonObject typeObjectNode ||
+							!typeObjectNode.TryGetValue<string>("const", logger, out var typeName))
 						{
-							var properties = new List<LinkedSchemaProperty>();
-							var index = 0;
-							foreach (var (propertyName, propertyNode) in propertiesObjectNode)
+							typeName = "{}";
+						}
+
+						var properties = new List<LinkedSchemaProperty>();
+						var index = 0;
+						foreach (var (propertyName, propertyNode) in propertiesObjectNode)
+						{
+							if (propertyName == "$type")
 							{
-								if (propertyName == "$type")
-								{
-									continue;
-								}
-
-								if (propertyNode is not null && propertyNode.TryParseSchemaType(logger, registeredTypes, out var propertyType))
-								{
-									properties.Add(new LinkedSchemaProperty()
-									{
-										Name  = propertyName,
-										Type  = propertyType,
-										Index = index++,
-									});
-								}
-								else
-								{
-									type = null;
-									return false;
-								}
+								continue;
 							}
-					
-							type = new SchemaObjectType(typeName, properties);
 
-							return true;
+							if (propertyNode is not null && propertyNode.TryParseSchemaType(logger, registeredTypes, out var propertyType))
+							{
+								properties.Add(new LinkedSchemaProperty()
+								{
+									Name  = propertyName,
+									Type  = propertyType,
+									Index = index++,
+								});
+							}
+							else
+							{
+								type = null;
+								return false;
+							}
 						}
-						else
-						{
-							logger.Log(new SchemaParsingMessage($"Object properties must all have a '$type' of type: '{typeof(string)}'", propertiesObjectNode));
-						}
+						type = new SchemaObjectType(typeName, properties, additionalPropertiesType);
+
+						return true;
 					}
 					else
 					{

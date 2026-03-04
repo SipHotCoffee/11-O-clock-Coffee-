@@ -35,7 +35,7 @@ namespace CG.Test.Editor.FrontEnd.Views.Dialogs
 					}
 					else if (node is ObjectNodeViewModel objectNode &&
 								objectNode.Type.TryGetProperty("name", out var property) &&
-								objectNode.Nodes[property.Index].Value is StringNodeViewModel nameNode)
+								objectNode.Nodes[property.Index].Node is StringNodeViewModel nameNode)
 					{
 						return nameNode.Value.Contains(newValue, StringComparison.CurrentCultureIgnoreCase);
 					}
@@ -56,7 +56,7 @@ namespace CG.Test.Editor.FrontEnd.Views.Dialogs
                     }
                     else if (node is ObjectNodeViewModel objectNode &&
                                 objectNode.Type.TryGetProperty("name", out var property) && 
-                                objectNode.Nodes[property.Index].Value is StringNodeViewModel nameNode)
+                                objectNode.Nodes[property.Index].Node is StringNodeViewModel nameNode)
                     {
 						return nameNode.Value.Contains(searchText, StringComparison.CurrentCultureIgnoreCase);
 					}

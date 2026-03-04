@@ -31,7 +31,7 @@ namespace CG.Test.Editor.FrontEnd.Visitors
 			return new ArrayNodeViewModel(_tree, _parent, nodes.OfType<NodeViewModelBase>(), arrayType);
         }
 
-        public ObjectNodeViewModel? Visit(SchemaObjectType objectType)
+		public ObjectNodeViewModel? Visit(SchemaObjectType objectType)
         {
 			var result = new ObjectNodeViewModel(_tree, _parent, objectType);
 
@@ -43,7 +43,12 @@ namespace CG.Test.Editor.FrontEnd.Visitors
                     return null;
                 }
 
-                result.Nodes.Add(new KeyValuePair<string, NodeViewModelBase>(property.Name, node));
+                result.Nodes.Add(new NodeEntryViewModel()
+                {
+                    PropertyName = property.Name,
+                    Node         = node,
+                    IsAdditional = false
+                });
 			}
             
             return result;

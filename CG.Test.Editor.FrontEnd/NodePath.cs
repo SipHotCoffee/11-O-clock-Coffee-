@@ -62,12 +62,12 @@ namespace CG.Test.Editor.FrontEnd
             {
                 if (root is ObjectNodeViewModel objectNode && objectNode.Type.TryGetProperty(name.PropertyName, out var property))
                 {
-					return TryNavigate(objectNode.Nodes[property.Index].Value, out node, depth + 1);
+					return TryNavigate(objectNode.Nodes[property.Index].Node, out node, depth + 1);
 				}
 
                 if (root is VariantNodeViewModel variantNode && variantNode.SelectedObject.Type.TryGetProperty(name.PropertyName, out var variantProperty))
                 {
-                    return TryNavigate(variantNode.SelectedObject.Nodes[variantProperty.Index].Value, out node, depth + 1);
+                    return TryNavigate(variantNode.SelectedObject.Nodes[variantProperty.Index].Node, out node, depth + 1);
                 }
             }
            

@@ -19,7 +19,7 @@ namespace CG.Test.Editor.FrontEnd.Visitors
 			objectNode.Tree.Editor?.Navigate(objectNode);
 		}
 
-        public void Visit(VariantNodeViewModel variantNode)
+		public void Visit(VariantNodeViewModel variantNode)
         {
             if (!_askForChangingType)
             {
@@ -43,7 +43,7 @@ namespace CG.Test.Editor.FrontEnd.Visitors
 			variantNode.SelectedObject.Visit(this);
 		}
 
-        public void Visit(NumberNodeViewModel numberNode)
+		public void Visit(NumberNodeViewModel numberNode)
         {
             var numberValueDialog = new NumberValueDialog
             {
