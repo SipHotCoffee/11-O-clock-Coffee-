@@ -3,10 +3,8 @@ using CG.Test.Editor.FrontEnd.ViewModels;
 using CG.Test.Editor.FrontEnd.ViewModels.Nodes;
 using DependencyPropertyToolkit;
 using System.Collections.ObjectModel;
-using System.Globalization;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
 
 namespace CG.Test.Editor.FrontEnd.Views.Dialogs
 {
@@ -42,11 +40,16 @@ namespace CG.Test.Editor.FrontEnd.Views.Dialogs
         }
     }
 
-	public class NodeFromPairConverter : ValueConverterBase<NodeViewModelBase, KeyValuePair<string, NodeViewModelBase>>
+	public class NodeFromPairConverter : ValueConverterBase<NodeViewModelBase?, NodeEntryViewModel?>
 	{
-        public override KeyValuePair<string, NodeViewModelBase> Convert(NodeViewModelBase node) => KeyValuePair.Create(node.Name, node);
+        public override NodeEntryViewModel? Convert(NodeViewModelBase? node) => node is null ? null : new NodeEntryViewModel()
+		{ 
+			PropertyName = node.Name,
+			Node         = node,
+			IsAdditional = false,
+		};
 
-        public override NodeViewModelBase ConvertBack(KeyValuePair<string, NodeViewModelBase> pair) => pair.Value;
+        public override NodeViewModelBase? ConvertBack(NodeEntryViewModel? pair) => pair?.Node;
     }
 
 	public partial class ReferencePickerDialog : CustomWindow
@@ -131,7 +134,7 @@ namespace CG.Test.Editor.FrontEnd.Views.Dialogs
         private void ObjectViewItem_MouseDoubleClick(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
 			var item = (ListViewItem)sender;
-			var (_, node) = (KeyValuePair<string, NodeViewModelBase>)item.Content;
+			var (_, node) = (NodeEntryViewModel)item.Content;
 			Navigate(node);
 		}
 
@@ -201,9 +204,9 @@ namespace CG.Test.Editor.FrontEnd.Views.Dialogs
         {
 			var listView = (ListView)sender;
 
-			if (listView.SelectedItem is KeyValuePair<string, NodeViewModelBase> pair)
+			if (listView.SelectedItem is NodeEntryViewModel pair)
 			{
-				SelectedNode = pair.Value;
+				SelectedNode = pair.Node;
 			}
 			else
 			{

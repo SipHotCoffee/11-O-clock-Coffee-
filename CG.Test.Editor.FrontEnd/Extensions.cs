@@ -317,6 +317,12 @@ namespace CG.Test.Editor.FrontEnd
 							}
 						}
 
+						if (possibleTypes.Count == 1)
+						{
+							type = possibleTypes[0];
+							return true;
+						}
+
 						type = new SchemaVariantType(string.Empty, possibleTypes);
 						return true;
 					}
